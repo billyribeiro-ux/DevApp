@@ -98,8 +98,8 @@
 			style="
 				background: var(--bg-sidebar);
 				border-color: var(--border-default);
-				width: {ui.sidebarOpen ? '280px' : '0px'};
-				min-width: {ui.sidebarOpen ? '280px' : '0px'};
+				width: {ui.sidebarOpen ? '260px' : '0px'};
+				min-width: {ui.sidebarOpen ? '260px' : '0px'};
 				opacity: {ui.sidebarOpen ? 1 : 0};
 				overflow: hidden;
 			"
@@ -125,7 +125,7 @@
 									style="color: {isActive(item.href) ? 'var(--text-accent)' : 'var(--text-secondary)'}; background: {isActive(item.href) ? 'var(--bg-active)' : 'transparent'}; font-weight: {isActive(item.href) ? '600' : '500'}; {isActive(item.href) ? 'box-shadow: inset 0 0 0 1px rgba(0,122,255,0.08);' : ''}"
 								>
 									<Icon icon={item.icon} width={22} height={22} />
-									<span>{item.label}</span>
+									<span class="truncate">{item.label}</span>
 								</a>
 							{/each}
 						</div>

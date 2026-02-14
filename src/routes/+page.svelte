@@ -40,76 +40,76 @@
 
 <div class="flex flex-col h-full overflow-y-auto">
 	<!-- Header -->
-	<div class="px-10 pt-10 pb-2">
+	<div class="px-8 pt-8 pb-4">
 		<p class="text-[12px] font-semibold uppercase tracking-widest" style="color: var(--text-tertiary);">{dateStr}</p>
 		<h1 class="text-[32px] font-bold mt-1.5" style="color: var(--text-primary); letter-spacing: -0.02em;">{greeting}</h1>
 		<p class="text-[15px] mt-1" style="color: var(--text-secondary);">Welcome back to your workspace</p>
 	</div>
 
-	<div class="px-10 py-6 space-y-10">
+	<div class="px-8 pb-10 space-y-8">
 		<!-- Quick Actions -->
 		<section>
 			<h2 class="text-[12px] font-semibold uppercase tracking-widest mb-4" style="color: var(--text-tertiary);">Quick Actions</h2>
-			<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+			<div class="grid grid-cols-3 md:grid-cols-6 gap-3">
 				{#each quickActions as action}
 					<a
 						href={action.href}
 						onclick={() => nav.navigate(action.href)}
-						class="group flex flex-col items-center gap-2.5 rounded-2xl border p-5 transition-all duration-200 hover:shadow-md"
+						class="group flex flex-col items-center gap-2 rounded-2xl border px-3 py-4 transition-all duration-200 hover:shadow-md"
 						style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);"
 					>
-						<div class="rounded-2xl p-3 transition-transform duration-200 group-hover:scale-110" style="background: {action.color}15;">
-							<Icon icon={action.icon} width={28} height={28} style="color: {action.color};" />
+						<div class="rounded-xl p-2.5 transition-transform duration-200 group-hover:scale-110" style="background: {action.color}15;">
+							<Icon icon={action.icon} width={24} height={24} style="color: {action.color};" />
 						</div>
-						<span class="text-[13px] font-medium" style="color: var(--text-secondary);">{action.label}</span>
+						<span class="text-[12px] font-medium text-center" style="color: var(--text-secondary);">{action.label}</span>
 					</a>
 				{/each}
 			</div>
 		</section>
 
 		<!-- Stats Row -->
-		<section class="grid grid-cols-2 lg:grid-cols-4 gap-5">
+		<section class="grid grid-cols-2 md:grid-cols-4 gap-3">
 			<div class="rounded-2xl border p-5" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
 				<div class="flex items-center gap-3">
-					<div class="rounded-xl p-2.5" style="background: rgba(0, 122, 255, 0.1);">
-						<Icon icon="ph:files-bold" width={22} height={22} style="color: #007AFF;" />
+					<div class="rounded-xl p-2" style="background: rgba(0, 122, 255, 0.1);">
+						<Icon icon="ph:files-bold" width={20} height={20} style="color: #007AFF;" />
 					</div>
 					<div>
-						<p class="text-[28px] font-bold leading-none" style="color: var(--text-primary);">{vault.folders.length}</p>
-						<p class="text-[13px] mt-1" style="color: var(--text-tertiary);">Folders</p>
+						<p class="text-[24px] font-bold leading-none" style="color: var(--text-primary);">{vault.folders.length}</p>
+						<p class="text-[12px] mt-0.5" style="color: var(--text-tertiary);">Folders</p>
 					</div>
 				</div>
 			</div>
 			<div class="rounded-2xl border p-5" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
 				<div class="flex items-center gap-3">
-					<div class="rounded-xl p-2.5" style="background: rgba(48, 209, 88, 0.1);">
-						<Icon icon="ph:note-pencil-bold" width={22} height={22} style="color: #30D158;" />
+					<div class="rounded-xl p-2" style="background: rgba(48, 209, 88, 0.1);">
+						<Icon icon="ph:note-pencil-bold" width={20} height={20} style="color: #30D158;" />
 					</div>
 					<div>
-						<p class="text-[28px] font-bold leading-none" style="color: var(--text-primary);">{recentFiles.length}</p>
-						<p class="text-[13px] mt-1" style="color: var(--text-tertiary);">Recent Files</p>
+						<p class="text-[24px] font-bold leading-none" style="color: var(--text-primary);">{recentFiles.length}</p>
+						<p class="text-[12px] mt-0.5" style="color: var(--text-tertiary);">Recent Files</p>
 					</div>
 				</div>
 			</div>
 			<div class="rounded-2xl border p-5" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
 				<div class="flex items-center gap-3">
-					<div class="rounded-xl p-2.5" style="background: rgba(255, 149, 0, 0.1);">
-						<Icon icon="ph:bell-bold" width={22} height={22} style="color: #FF9500;" />
+					<div class="rounded-xl p-2" style="background: rgba(255, 149, 0, 0.1);">
+						<Icon icon="ph:bell-bold" width={20} height={20} style="color: #FF9500;" />
 					</div>
 					<div>
-						<p class="text-[28px] font-bold leading-none" style="color: var(--text-primary);">{upcomingReminders.length}</p>
-						<p class="text-[13px] mt-1" style="color: var(--text-tertiary);">Pending Reminders</p>
+						<p class="text-[24px] font-bold leading-none" style="color: var(--text-primary);">{upcomingReminders.length}</p>
+						<p class="text-[12px] mt-0.5" style="color: var(--text-tertiary);">Pending Reminders</p>
 					</div>
 				</div>
 			</div>
 			<div class="rounded-2xl border p-5" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
 				<div class="flex items-center gap-3">
-					<div class="rounded-xl p-2.5" style="background: rgba(175, 82, 222, 0.1);">
-						<Icon icon="ph:graduation-cap-bold" width={22} height={22} style="color: #AF52DE;" />
+					<div class="rounded-xl p-2" style="background: rgba(175, 82, 222, 0.1);">
+						<Icon icon="ph:graduation-cap-bold" width={20} height={20} style="color: #AF52DE;" />
 					</div>
 					<div>
-						<p class="text-[28px] font-bold leading-none" style="color: var(--text-primary);">{activeCourses.length}</p>
-						<p class="text-[13px] mt-1" style="color: var(--text-tertiary);">Active Courses</p>
+						<p class="text-[24px] font-bold leading-none" style="color: var(--text-primary);">{activeCourses.length}</p>
+						<p class="text-[12px] mt-0.5" style="color: var(--text-tertiary);">Active Courses</p>
 					</div>
 				</div>
 			</div>
