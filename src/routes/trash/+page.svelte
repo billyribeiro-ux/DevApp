@@ -6,8 +6,12 @@
 	import { formatFileSize, formatRelativeDate } from '$utils/formatters';
 	import { getFileTypeInfo } from '$config/constants';
 	import type { VaultFile } from '$types';
+	import ConfirmDialog from '$lib/components/ui/ConfirmDialog.svelte';
 
 	let trashFiles = $state<VaultFile[]>([]);
+	let confirmDeleteOpen = $state(false);
+	let confirmEmptyOpen = $state(false);
+	let pendingDeleteId = $state<string | null>(null);
 
 	async function handleRestore(id: string) {
 		await restoreFile(id);
@@ -15,10 +19,21 @@
 		toasts.success('File Restored');
 	}
 
-	async function handlePermanentDelete(id: string) {
-		await permanentDeleteFile(id);
+	function requestPermanentDelete(id: string) {
+		pendingDeleteId = id;
+		confirmDeleteOpen = true;
+	}
+
+	async function handlePermanentDelete() {
+		if (!pendingDeleteId) return;
+		await permanentDeleteFile(pendingDeleteId);
 		trashFiles = await getTrashFiles();
+		pendingDeleteId = null;
 		toasts.success('File Permanently Deleted');
+	}
+
+	function requestEmptyTrash() {
+		confirmEmptyOpen = true;
 	}
 
 	async function emptyTrash() {
@@ -43,7 +58,7 @@
 			<span class="rounded-full px-2.5 py-0.5 text-[12px] font-semibold" style="background: var(--color-error-light); color: var(--color-error);">{trashFiles.length}</span>
 		</div>
 		{#if trashFiles.length > 0}
-			<button onclick={emptyTrash} class="flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium" style="color: var(--color-error); border: 1px solid var(--color-error);">
+			<button onclick={requestEmptyTrash} class="flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium" style="color: var(--color-error); border: 1px solid var(--color-error);">
 				<Icon icon="ph:trash-bold" width={16} height={16} /> Empty Trash
 			</button>
 		{/if}
@@ -65,7 +80,7 @@
 						</div>
 						<div class="flex items-center gap-2 shrink-0">
 							<button onclick={() => handleRestore(file.id)} class="rounded-xl px-3 py-1.5 text-[12px] font-medium transition-colors" style="color: var(--text-accent);">Restore</button>
-							<button onclick={() => handlePermanentDelete(file.id)} class="rounded-xl px-3 py-1.5 text-[12px] font-medium transition-colors" style="color: var(--color-error);">Delete</button>
+							<button onclick={() => requestPermanentDelete(file.id)} class="rounded-xl px-3 py-1.5 text-[12px] font-medium transition-colors" style="color: var(--color-error);">Delete</button>
 						</div>
 					</div>
 				{/each}
@@ -79,3 +94,21 @@
 		{/if}
 	</div>
 </div>
+
+<ConfirmDialog
+	bind:open={confirmDeleteOpen}
+	title="Permanently Delete File"
+	description="This file will be permanently deleted and cannot be recovered. Are you sure?"
+	confirmLabel="Delete Forever"
+	variant="danger"
+	onconfirm={handlePermanentDelete}
+/>
+
+<ConfirmDialog
+	bind:open={confirmEmptyOpen}
+	title="Empty Trash"
+	description="All {trashFiles.length} item(s) in trash will be permanently deleted. This cannot be undone."
+	confirmLabel="Empty Trash"
+	variant="danger"
+	onconfirm={emptyTrash}
+/>

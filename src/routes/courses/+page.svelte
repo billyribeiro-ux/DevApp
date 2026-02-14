@@ -7,11 +7,15 @@
 	import { getStatusColor } from '$utils/formatters';
 	import type { Course } from '$types';
 	import { v4 as uuid } from 'uuid';
+	import ConfirmDialog from '$lib/components/ui/ConfirmDialog.svelte';
+	import DropZone from '$lib/components/ui/DropZone.svelte';
 
 	let courses = $state<Course[]>([]);
 	let activeFilter = $state('all');
 	let showForm = $state(false);
 	let editingCourse = $state<Course | null>(null);
+	let confirmDeleteOpen = $state(false);
+	let pendingDeleteId = $state<string | null>(null);
 
 	let cName = $state('');
 	let cInstructor = $state('');
@@ -63,10 +67,37 @@
 		courses = await getCourses();
 	}
 
-	async function handleDelete(id: string) {
-		await deleteCourse(id);
+	function requestDelete(id: string) {
+		pendingDeleteId = id;
+		confirmDeleteOpen = true;
+	}
+
+	async function handleDelete() {
+		if (!pendingDeleteId) return;
+		await deleteCourse(pendingDeleteId);
 		courses = await getCourses();
+		pendingDeleteId = null;
 		toasts.success('Course Deleted');
+	}
+
+	async function handleFileDrop(files: File[]) {
+		let imported = 0;
+		for (const file of files) {
+			const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+			if (ext !== 'json') continue;
+			try {
+				const text = await file.text();
+				const data = JSON.parse(text);
+				await createCourse({ id: uuid(), name: data.name || file.name.replace(/\.json$/, ''), instructor: data.instructor || null, platform: data.platform || null, url: data.url || null, description: data.description || null, status: 'not_started' });
+				imported++;
+			} catch { toasts.warning(`Invalid JSON in ${file.name}`); }
+		}
+		if (imported > 0) {
+			courses = await getCourses();
+			toasts.success(`Imported ${imported} course${imported > 1 ? 's' : ''}`);
+		} else {
+			toasts.warning('No .json course files found');
+		}
 	}
 
 	onMount(async () => {
@@ -154,7 +185,7 @@
 								<button onclick={() => startEdit(course)} class="rounded-xl p-2" style="color: var(--text-tertiary);">
 									<Icon icon="ph:pencil" width={16} height={16} />
 								</button>
-								<button onclick={() => handleDelete(course.id)} class="rounded-xl p-2" style="color: var(--text-tertiary);">
+								<button onclick={() => requestDelete(course.id)} class="rounded-xl p-2" style="color: var(--text-tertiary);">
 									<Icon icon="ph:trash" width={16} height={16} />
 								</button>
 							</div>
@@ -170,12 +201,24 @@
 				{/each}
 			</div>
 			{#if filteredCourses().length === 0}
-				<div class="flex flex-col items-center justify-center py-24">
-					<Icon icon="ph:graduation-cap" width={56} height={56} style="color: var(--text-tertiary); opacity: 0.3;" />
-					<p class="mt-4 text-sm" style="color: var(--text-tertiary);">No courses yet</p>
-					<button onclick={() => startEdit()} class="mt-4 btn-primary">Add your first course</button>
-				</div>
+				<DropZone onfiledrop={handleFileDrop}>
+					<div class="flex flex-col items-center justify-center py-24">
+						<Icon icon="ph:graduation-cap" width={56} height={56} style="color: var(--text-tertiary); opacity: 0.3;" />
+						<p class="mt-4 text-sm" style="color: var(--text-tertiary);">No courses yet</p>
+						<p class="text-xs mt-1" style="color: var(--text-tertiary);">Drop .json files to import courses</p>
+						<button onclick={() => startEdit()} class="mt-4 btn-primary">Add your first course</button>
+					</div>
+				</DropZone>
 			{/if}
 		{/if}
 	</div>
 </div>
+
+<ConfirmDialog
+	bind:open={confirmDeleteOpen}
+	title="Delete Course"
+	description="Are you sure you want to delete this course? This action cannot be undone."
+	confirmLabel="Delete"
+	variant="danger"
+	onconfirm={handleDelete}
+/>

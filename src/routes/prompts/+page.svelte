@@ -8,6 +8,7 @@
 	import type { Prompt } from '$types';
 	import { v4 as uuid } from 'uuid';
 	import ConfirmDialog from '$lib/components/ui/ConfirmDialog.svelte';
+	import DropZone from '$lib/components/ui/DropZone.svelte';
 
 	let prompts = $state<Prompt[]>([]);
 	let activeCategory = $state('all');
@@ -87,6 +88,33 @@
 		prompts = await getPrompts();
 		pendingDeleteId = null;
 		toasts.success('Prompt Deleted');
+	}
+
+	async function handleFileDrop(files: File[]) {
+		const validExts = ['txt', 'md', 'json'];
+		let imported = 0;
+		for (const file of files) {
+			const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+			if (!validExts.includes(ext)) continue;
+			const text = await file.text();
+			const title = file.name.replace(/\.[^.]+$/, '');
+			if (ext === 'json') {
+				try {
+					const data = JSON.parse(text);
+					await createPrompt({ id: uuid(), title: data.title || title, content: data.content || text, category: data.category || 'general', language: data.language || null });
+					imported++;
+				} catch { toasts.warning(`Invalid JSON in ${file.name}`); }
+			} else {
+				await createPrompt({ id: uuid(), title, content: text, category: 'general' });
+				imported++;
+			}
+		}
+		if (imported > 0) {
+			prompts = await getPrompts();
+			toasts.success(`Imported ${imported} prompt${imported > 1 ? 's' : ''}`);
+		} else {
+			toasts.warning('No .txt, .md, or .json files found');
+		}
 	}
 
 	onMount(async () => {
@@ -195,11 +223,14 @@
 				{/each}
 			</div>
 			{#if filteredPrompts().length === 0}
-				<div class="flex flex-col items-center justify-center py-24">
-					<Icon icon="ph:chat-dots" width={56} height={56} style="color: var(--text-tertiary); opacity: 0.3;" />
-					<p class="mt-4 text-sm" style="color: var(--text-tertiary);">{searchQuery ? 'No matching prompts' : 'No prompts yet'}</p>
-					<button onclick={() => startEdit()} class="mt-4 btn-primary">Create your first prompt</button>
-				</div>
+				<DropZone onfiledrop={handleFileDrop}>
+					<div class="flex flex-col items-center justify-center py-24">
+						<Icon icon="ph:chat-dots" width={56} height={56} style="color: var(--text-tertiary); opacity: 0.3;" />
+						<p class="mt-4 text-sm" style="color: var(--text-tertiary);">{searchQuery ? 'No matching prompts' : 'No prompts yet'}</p>
+						<p class="text-xs mt-1" style="color: var(--text-tertiary);">Drop .txt, .md, or .json files to import</p>
+						<button onclick={() => startEdit()} class="mt-4 btn-primary">Create your first prompt</button>
+					</div>
+				</DropZone>
 			{/if}
 		{/if}
 	</div>

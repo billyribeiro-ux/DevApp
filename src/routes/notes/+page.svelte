@@ -6,6 +6,8 @@
 	import { formatRelativeDate, countWords } from '$utils/formatters';
 	import type { Note } from '$types';
 	import { v4 as uuid } from 'uuid';
+	import ConfirmDialog from '$lib/components/ui/ConfirmDialog.svelte';
+	import DropZone from '$lib/components/ui/DropZone.svelte';
 
 	let notes = $state<Note[]>([]);
 	let activeNoteId = $state<string | null>(null);
@@ -13,6 +15,8 @@
 	let editContent = $state('');
 	let unsaved = $state(false);
 	let searchQuery = $state('');
+	let confirmDeleteOpen = $state(false);
+	let pendingDeleteId = $state<string | null>(null);
 
 	let activeNote = $derived(notes.find(n => n.id === activeNoteId) ?? null);
 	let filteredNotes = $derived(
@@ -63,14 +67,21 @@
 		}
 	}
 
-	async function handleDelete(id: string) {
-		await deleteNote(id);
-		if (activeNoteId === id) {
+	function requestDelete(id: string) {
+		pendingDeleteId = id;
+		confirmDeleteOpen = true;
+	}
+
+	async function handleDelete() {
+		if (!pendingDeleteId) return;
+		await deleteNote(pendingDeleteId);
+		if (activeNoteId === pendingDeleteId) {
 			activeNoteId = null;
 			editTitle = '';
 			editContent = '';
 		}
 		notes = await getNotes();
+		pendingDeleteId = null;
 		toasts.success('Note Deleted');
 	}
 
@@ -96,6 +107,25 @@
 		if ((e.metaKey || e.ctrlKey) && e.key === 'n') {
 			e.preventDefault();
 			handleCreate();
+		}
+	}
+
+	async function handleFileDrop(files: File[]) {
+		const validExts = ['txt', 'md'];
+		let imported = 0;
+		for (const file of files) {
+			const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+			if (!validExts.includes(ext)) continue;
+			const text = await file.text();
+			const title = file.name.replace(/\.[^.]+$/, '');
+			await createNote({ id: uuid(), title, content_text: text, content_json: JSON.stringify({ text }), word_count: text.split(/\s+/).filter(Boolean).length });
+			imported++;
+		}
+		if (imported > 0) {
+			notes = await getNotes();
+			toasts.success(`Imported ${imported} note${imported > 1 ? 's' : ''}`);
+		} else {
+			toasts.warning('No .txt or .md files found');
 		}
 	}
 
@@ -126,10 +156,13 @@
 		</div>
 		<div class="flex-1 overflow-y-auto px-3 py-1">
 			{#each filteredNotes as note (note.id)}
+				<div
+					class="relative rounded-xl mb-1 group"
+					style="background: {activeNoteId === note.id ? 'var(--bg-active)' : 'transparent'};"
+				>
 				<button
 					onclick={() => selectNote(note.id)}
-					class="w-full text-left rounded-xl px-4 py-3.5 mb-1 transition-all duration-150 group"
-					style="background: {activeNoteId === note.id ? 'var(--bg-active)' : 'transparent'};"
+					class="w-full text-left px-4 py-3.5 transition-all duration-150"
 				>
 					<div class="flex items-center gap-1.5">
 						<p class="text-sm font-medium truncate flex-1" style="color: {activeNoteId === note.id ? 'var(--text-accent)' : 'var(--text-primary)'};">{note.title}</p>
@@ -140,6 +173,15 @@
 					<p class="text-[13px] mt-1 truncate" style="color: var(--text-tertiary);">{note.content_text?.slice(0, 80) || 'Empty note'}</p>
 					<p class="text-[12px] mt-1.5" style="color: var(--text-tertiary);">{formatRelativeDate(note.updated_at)} &middot; {note.word_count} words</p>
 				</button>
+				<button
+					onclick={(e) => { e.stopPropagation(); requestDelete(note.id); }}
+					class="absolute top-3 right-2 hidden group-hover:flex rounded-lg p-1.5 transition-colors"
+					style="color: var(--text-tertiary); background: var(--bg-surface-raised);"
+					title="Delete note"
+				>
+					<Icon icon="ph:trash" width={13} height={13} />
+				</button>
+				</div>
 			{/each}
 			{#if filteredNotes.length === 0}
 				<div class="flex flex-col items-center justify-center py-16">
@@ -163,7 +205,7 @@
 				</div>
 				<div class="flex items-center gap-2">
 					<button onclick={handleSave} class="btn-primary rounded-xl px-4 py-2">Save</button>
-					<button onclick={() => handleDelete(activeNote!.id)} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);">
+					<button onclick={() => requestDelete(activeNote!.id)} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);">
 						<Icon icon="ph:trash" width={18} height={18} />
 					</button>
 				</div>
@@ -195,16 +237,28 @@
 				<span>{formatRelativeDate(activeNote.updated_at)}</span>
 			</div>
 		{:else}
-			<div class="flex flex-col items-center justify-center h-full">
-				<Icon icon="ph:note-pencil" width={56} height={56} style="color: var(--text-tertiary); opacity: 0.3;" />
-				<p class="mt-4 text-sm font-medium" style="color: var(--text-tertiary);">Select a note or create a new one</p>
-				<button onclick={handleCreate} class="mt-4 btn-primary rounded-xl text-sm px-5 py-2.5">
-					<Icon icon="ph:plus" width={16} height={16} style="display: inline; vertical-align: -2px;" /> New Note
-				</button>
-			</div>
+			<DropZone onfiledrop={handleFileDrop} class_="h-full flex flex-col items-center justify-center">
+				<div class="flex flex-col items-center justify-center h-full">
+					<Icon icon="ph:note-pencil" width={56} height={56} style="color: var(--text-tertiary); opacity: 0.3;" />
+					<p class="mt-4 text-sm font-medium" style="color: var(--text-tertiary);">Select a note or create a new one</p>
+					<p class="text-xs mt-1" style="color: var(--text-tertiary);">Drop .txt or .md files here to import</p>
+					<button onclick={handleCreate} class="mt-4 btn-primary rounded-xl text-sm px-5 py-2.5">
+						<Icon icon="ph:plus" width={16} height={16} style="display: inline; vertical-align: -2px;" /> New Note
+					</button>
+				</div>
+			</DropZone>
 		{/if}
 	</div>
 </div>
+
+<ConfirmDialog
+	bind:open={confirmDeleteOpen}
+	title="Delete Note"
+	description="Are you sure you want to delete this note? This action cannot be undone."
+	confirmLabel="Delete"
+	variant="danger"
+	onconfirm={handleDelete}
+/>
 
 <style>
 	button:not(.btn-primary):not(.btn-secondary):not(.btn-ghost):hover { background: var(--bg-card-hover); }

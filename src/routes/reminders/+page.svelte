@@ -2,10 +2,12 @@
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
 	import { nav, toasts } from '$stores/app.svelte';
-	import { getReminders, createReminder, updateReminder, completeReminder, deleteReminder } from '$services/database';
+	import { getReminders, createReminder, updateReminder, completeReminder, uncompleteReminder, deleteReminder } from '$services/database';
 	import { formatRelativeDate, formatDate, getPriorityColor } from '$utils/formatters';
 	import type { Reminder } from '$types';
 	import { v4 as uuid } from 'uuid';
+	import ConfirmDialog from '$lib/components/ui/ConfirmDialog.svelte';
+	import DropZone from '$lib/components/ui/DropZone.svelte';
 
 	let reminders = $state<Reminder[]>([]);
 	let activeFilter = $state('all');
@@ -18,6 +20,8 @@
 	let fDueTime = $state('');
 	let fPriority = $state<Reminder['priority']>('medium');
 	let fRecurrence = $state<Reminder['recurrence']>('none');
+	let confirmDeleteOpen = $state(false);
+	let pendingDeleteId = $state<string | null>(null);
 
 	let filteredReminders = $derived(() => {
 		if (activeFilter === 'all') return reminders;
@@ -64,16 +68,68 @@
 		toasts.success(editingReminder ? 'Reminder Updated' : 'Reminder Created');
 	}
 
-	async function handleComplete(id: string) {
-		await completeReminder(id);
-		reminders = await getReminders();
-		toasts.success('Reminder Completed');
+	async function handleToggleComplete(reminder: Reminder) {
+		if (reminder.status === 'completed') {
+			await uncompleteReminder(reminder.id);
+			reminders = await getReminders();
+			toasts.info('Reminder Reopened');
+		} else {
+			await completeReminder(reminder.id);
+			reminders = await getReminders();
+			toasts.success('Reminder Completed');
+		}
 	}
 
-	async function handleDelete(id: string) {
-		await deleteReminder(id);
+	function requestDelete(id: string) {
+		pendingDeleteId = id;
+		confirmDeleteOpen = true;
+	}
+
+	async function handleDelete() {
+		if (!pendingDeleteId) return;
+		await deleteReminder(pendingDeleteId);
 		reminders = await getReminders();
+		pendingDeleteId = null;
 		toasts.success('Reminder Deleted');
+	}
+
+	async function handleFileDrop(files: File[]) {
+		let imported = 0;
+		for (const file of files) {
+			const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+			const text = await file.text();
+			if (ext === 'json') {
+				try {
+					const data = JSON.parse(text);
+					const items = Array.isArray(data) ? data : [data];
+					for (const item of items) {
+						if (!item.title) continue;
+						await createReminder({ id: uuid(), title: item.title, description: item.description || null, due_date: item.due_date || null, priority: item.priority || 'medium', recurrence: item.recurrence || 'none' });
+						imported++;
+					}
+				} catch { toasts.warning(`Invalid JSON in ${file.name}`); }
+			} else if (ext === 'csv') {
+				const lines = text.trim().split('\n');
+				const header = lines[0]?.toLowerCase().split(',').map(h => h.trim());
+				if (!header?.includes('title')) { toasts.warning('CSV must have a "title" column'); continue; }
+				const titleIdx = header.indexOf('title');
+				const descIdx = header.indexOf('description');
+				const dateIdx = header.indexOf('due_date');
+				const prioIdx = header.indexOf('priority');
+				for (let i = 1; i < lines.length; i++) {
+					const cols = lines[i].split(',').map(c => c.trim());
+					if (!cols[titleIdx]) continue;
+					await createReminder({ id: uuid(), title: cols[titleIdx], description: descIdx >= 0 ? cols[descIdx] || null : null, due_date: dateIdx >= 0 ? cols[dateIdx] || null : null, priority: (prioIdx >= 0 ? cols[prioIdx] : 'medium') as Reminder['priority'] || 'medium' });
+					imported++;
+				}
+			}
+		}
+		if (imported > 0) {
+			reminders = await getReminders();
+			toasts.success(`Imported ${imported} reminder${imported > 1 ? 's' : ''}`);
+		} else {
+			toasts.warning('No valid .json or .csv reminder files found');
+		}
 	}
 
 	onMount(async () => {
@@ -150,7 +206,7 @@
 			<div class="space-y-3">
 				{#each filteredReminders() as reminder (reminder.id)}
 					<div class="flex items-center gap-4 rounded-2xl border p-5 transition-all duration-150" style="background: var(--bg-card); border-color: var(--border-default); border-left: 3px solid {getPriorityColor(reminder.priority)}; box-shadow: var(--shadow-card);">
-						<button onclick={() => handleComplete(reminder.id)} class="shrink-0 rounded-lg border-2 w-6 h-6 flex items-center justify-center transition-colors" style="border-color: {reminder.status === 'completed' ? 'var(--color-success)' : 'var(--border-default)'}; background: {reminder.status === 'completed' ? 'var(--color-success)' : 'transparent'};">
+						<button onclick={() => handleToggleComplete(reminder)} class="shrink-0 rounded-lg border-2 w-6 h-6 flex items-center justify-center transition-colors" style="border-color: {reminder.status === 'completed' ? 'var(--color-success)' : 'var(--border-default)'}; background: {reminder.status === 'completed' ? 'var(--color-success)' : 'transparent'};" title="{reminder.status === 'completed' ? 'Mark as pending' : 'Mark as complete'}">
 							{#if reminder.status === 'completed'}
 								<Icon icon="ph:check-bold" width={14} height={14} style="color: white;" />
 							{/if}
@@ -178,7 +234,7 @@
 							<button onclick={() => startEdit(reminder)} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);">
 								<Icon icon="ph:pencil" width={16} height={16} />
 							</button>
-							<button onclick={() => handleDelete(reminder.id)} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);">
+							<button onclick={() => requestDelete(reminder.id)} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);">
 								<Icon icon="ph:trash" width={16} height={16} />
 							</button>
 						</div>
@@ -186,11 +242,23 @@
 				{/each}
 			</div>
 			{#if filteredReminders().length === 0}
-				<div class="flex flex-col items-center justify-center py-24">
-					<Icon icon="ph:bell" width={56} height={56} style="color: var(--text-tertiary); opacity: 0.3;" />
-					<p class="mt-4 text-sm" style="color: var(--text-tertiary);">{activeFilter === 'all' ? 'No reminders yet' : `No ${activeFilter} reminders`}</p>
-				</div>
+				<DropZone onfiledrop={handleFileDrop}>
+					<div class="flex flex-col items-center justify-center py-24">
+						<Icon icon="ph:bell" width={56} height={56} style="color: var(--text-tertiary); opacity: 0.3;" />
+						<p class="mt-4 text-sm" style="color: var(--text-tertiary);">{activeFilter === 'all' ? 'No reminders yet' : `No ${activeFilter} reminders`}</p>
+						<p class="text-xs mt-1" style="color: var(--text-tertiary);">Drop .json or .csv files to import reminders</p>
+					</div>
+				</DropZone>
 			{/if}
 		{/if}
 	</div>
 </div>
+
+<ConfirmDialog
+	bind:open={confirmDeleteOpen}
+	title="Delete Reminder"
+	description="Are you sure you want to delete this reminder? This action cannot be undone."
+	confirmLabel="Delete"
+	variant="danger"
+	onconfirm={handleDelete}
+/>

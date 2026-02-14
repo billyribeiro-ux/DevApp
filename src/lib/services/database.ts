@@ -321,6 +321,14 @@ export async function completeReminder(id: string): Promise<void> {
   );
 }
 
+export async function uncompleteReminder(id: string): Promise<void> {
+  const d = await getDb();
+  await d.execute(
+    "UPDATE reminder SET status = 'pending', completed_at = NULL, updated_at = datetime('now') WHERE id = $1",
+    [id]
+  );
+}
+
 export async function deleteReminder(id: string): Promise<void> {
   const d = await getDb();
   await d.execute("UPDATE reminder SET is_deleted = 1, updated_at = datetime('now') WHERE id = $1", [id]);
