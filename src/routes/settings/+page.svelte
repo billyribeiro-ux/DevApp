@@ -90,33 +90,33 @@
 
 <div class="flex h-full overflow-hidden">
 	<!-- Settings sidebar -->
-	<div class="w-56 shrink-0 border-r flex flex-col py-4 px-2" style="border-color: var(--border-default); background: var(--bg-surface);">
+	<div class="w-60 shrink-0 border-r flex flex-col py-5 px-3" style="border-color: var(--border-default); background: var(--bg-surface);">
 		{#each tabs as tab}
 			<button
 				onclick={() => { activeTab = tab.id; }}
-				class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors"
-				style="color: {activeTab === tab.id ? 'var(--text-accent)' : 'var(--text-secondary)'}; background: {activeTab === tab.id ? 'var(--bg-active)' : 'transparent'};"
+				class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-[14px] transition-colors"
+				style="color: {activeTab === tab.id ? 'var(--text-accent)' : 'var(--text-secondary)'}; background: {activeTab === tab.id ? 'var(--bg-active)' : 'transparent'}; font-weight: {activeTab === tab.id ? '600' : '500'};"
 			>
-				<Icon icon={tab.icon} width={18} height={18} />
+				<Icon icon={tab.icon} width={20} height={20} />
 				{tab.label}
 			</button>
 		{/each}
 	</div>
 
 	<!-- Settings content -->
-	<div class="flex-1 overflow-y-auto px-8 py-6">
+	<div class="flex-1 overflow-y-auto px-10 py-8">
 		{#if activeTab === 'general'}
-			<h2 class="text-lg font-bold mb-6" style="color: var(--text-primary);">General</h2>
-			<div class="space-y-6 max-w-lg">
+			<h2 class="text-xl font-bold mb-8" style="color: var(--text-primary);">General</h2>
+			<div class="space-y-8 max-w-lg">
 				<div class="flex items-center justify-between">
 					<div>
-						<p class="text-sm font-medium" style="color: var(--text-primary);">Default View</p>
-						<p class="text-xs" style="color: var(--text-tertiary);">Choose grid or list view for files</p>
+						<p class="text-[15px] font-medium" style="color: var(--text-primary);">Default View</p>
+						<p class="text-[13px] mt-0.5" style="color: var(--text-tertiary);">Choose grid or list view for files</p>
 					</div>
 					<select
 						onchange={(e) => ui.setViewMode((e.target as HTMLSelectElement).value as 'grid' | 'list')}
-						class="rounded-lg border px-3 py-1.5 text-xs"
-						style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);"
+						class="input-field input-field-sm"
+						style="width: auto;"
 					>
 						<option value="grid" selected={ui.viewMode === 'grid'}>Grid</option>
 						<option value="list" selected={ui.viewMode === 'list'}>List</option>
@@ -124,29 +124,29 @@
 				</div>
 				<div class="flex items-center justify-between">
 					<div>
-						<p class="text-sm font-medium" style="color: var(--text-primary);">Sidebar</p>
-						<p class="text-xs" style="color: var(--text-tertiary);">Show or hide the sidebar</p>
+						<p class="text-[15px] font-medium" style="color: var(--text-primary);">Sidebar</p>
+						<p class="text-[13px] mt-0.5" style="color: var(--text-tertiary);">Show or hide the sidebar</p>
 					</div>
-					<button onclick={() => ui.toggleSidebar()} class="rounded-lg border px-3 py-1.5 text-xs" style="border-color: var(--border-default); color: var(--text-secondary);">
+					<button onclick={() => ui.toggleSidebar()} class="btn-secondary">
 						{ui.sidebarOpen ? 'Hide' : 'Show'}
 					</button>
 				</div>
 			</div>
 
 		{:else if activeTab === 'appearance'}
-			<h2 class="text-lg font-bold mb-6" style="color: var(--text-primary);">Appearance</h2>
-			<div class="space-y-6 max-w-lg">
+			<h2 class="text-xl font-bold mb-8" style="color: var(--text-primary);">Appearance</h2>
+			<div class="space-y-8 max-w-lg">
 				<div>
-					<p class="text-sm font-medium mb-3" style="color: var(--text-primary);">Theme</p>
-					<div class="grid grid-cols-3 gap-3">
+					<p class="text-[15px] font-medium mb-4" style="color: var(--text-primary);">Theme</p>
+					<div class="grid grid-cols-3 gap-4">
 						{#each [{ value: 'light', label: 'Light', icon: 'ph:sun' }, { value: 'dark', label: 'Dark', icon: 'ph:moon' }, { value: 'system', label: 'System', icon: 'ph:desktop' }] as t}
 							<button
 								onclick={() => theme.setMode(t.value as 'light' | 'dark' | 'system')}
-								class="flex flex-col items-center gap-2 rounded-xl border p-4 transition-all"
-								style="border-color: {theme.mode === t.value ? 'var(--color-primary-500)' : 'var(--border-default)'}; background: {theme.mode === t.value ? 'var(--bg-active)' : 'var(--bg-card)'};"
+								class="flex flex-col items-center gap-2.5 rounded-2xl border p-5 transition-all"
+								style="border-color: {theme.mode === t.value ? 'var(--color-primary-500)' : 'var(--border-default)'}; background: {theme.mode === t.value ? 'var(--bg-active)' : 'var(--bg-card)'}; box-shadow: {theme.mode === t.value ? '0 0 0 1px var(--color-primary-500)' : 'var(--shadow-card)'};"
 							>
-								<Icon icon={t.icon} width={24} height={24} style="color: {theme.mode === t.value ? 'var(--text-accent)' : 'var(--text-secondary)'};" />
-								<span class="text-xs font-medium" style="color: {theme.mode === t.value ? 'var(--text-accent)' : 'var(--text-secondary)'};">{t.label}</span>
+								<Icon icon={t.icon} width={28} height={28} style="color: {theme.mode === t.value ? 'var(--text-accent)' : 'var(--text-secondary)'};" />
+								<span class="text-[13px] font-medium" style="color: {theme.mode === t.value ? 'var(--text-accent)' : 'var(--text-secondary)'};">{t.label}</span>
 							</button>
 						{/each}
 					</div>
@@ -154,88 +154,85 @@
 			</div>
 
 		{:else if activeTab === 'sync'}
-			<h2 class="text-lg font-bold mb-6" style="color: var(--text-primary);">Sync & Account</h2>
+			<h2 class="text-xl font-bold mb-8" style="color: var(--text-primary);">Sync & Account</h2>
 			<div class="space-y-6 max-w-lg">
-				<!-- Server Status -->
-				<div class="rounded-xl border p-5" style="background: var(--bg-card); border-color: var(--border-default);">
+				<div class="rounded-2xl border p-6" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
 					<div class="flex items-center justify-between mb-3">
 						<div class="flex items-center gap-2">
 							<div class="h-2.5 w-2.5 rounded-full" style="background: {serverOnline ? 'var(--color-success)' : 'var(--color-error)'};"></div>
-							<span class="text-sm font-medium" style="color: var(--text-primary);">Sync Server</span>
+							<span class="text-[15px] font-medium" style="color: var(--text-primary);">Sync Server</span>
 						</div>
-						<button onclick={checkServer} class="rounded-md px-2 py-1 text-[11px]" style="color: var(--text-secondary); border: 1px solid var(--border-default);">Refresh</button>
+						<button onclick={checkServer} class="btn-secondary text-[12px]">Refresh</button>
 					</div>
-					<p class="text-xs" style="color: var(--text-tertiary);">{serverOnline ? 'Server is reachable' : 'Server offline — run `cargo run` in sync-server/'}</p>
+					<p class="text-[13px]" style="color: var(--text-tertiary);">{serverOnline ? 'Server is reachable' : 'Server offline — run `cargo run` in sync-server/'}</p>
 				</div>
 
-				<!-- Auth -->
-				<div class="rounded-xl border p-5" style="background: var(--bg-card); border-color: var(--border-default);">
-					<div class="flex items-center gap-2 mb-4">
-						<Icon icon="ph:user-circle-bold" width={20} height={20} style="color: var(--text-accent);" />
-						<span class="text-sm font-semibold" style="color: var(--text-primary);">Account</span>
+				<div class="rounded-2xl border p-6" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
+					<div class="flex items-center gap-2 mb-5">
+						<Icon icon="ph:user-circle-bold" width={22} height={22} style="color: var(--text-accent);" />
+						<span class="text-[15px] font-semibold" style="color: var(--text-primary);">Account</span>
 					</div>
 					{#if sync.isAuthenticated}
-						<div class="space-y-3">
+						<div class="space-y-4">
 							<div class="flex items-center gap-2">
 								<div class="h-2 w-2 rounded-full" style="background: var(--color-success);"></div>
-								<span class="text-sm" style="color: var(--text-primary);">Signed in as <strong>{sync.userEmail}</strong></span>
+								<span class="text-[14px]" style="color: var(--text-primary);">Signed in as <strong>{sync.userEmail}</strong></span>
 							</div>
-							<p class="text-xs" style="color: var(--text-tertiary);">Last synced: {sync.lastSyncedAt ?? 'Never'}</p>
-							<button onclick={handleLogout} class="rounded-lg px-3 py-1.5 text-xs font-medium" style="color: var(--color-error); border: 1px solid var(--color-error);">
-								<Icon icon="ph:sign-out-bold" width={14} height={14} style="display: inline; vertical-align: -2px;" /> Sign Out
+							<p class="text-[13px]" style="color: var(--text-tertiary);">Last synced: {sync.lastSyncedAt ?? 'Never'}</p>
+							<button onclick={handleLogout} class="flex items-center gap-1.5 rounded-xl px-4 py-2 text-[13px] font-medium" style="color: var(--color-error); border: 1px solid var(--color-error);">
+								<Icon icon="ph:sign-out-bold" width={16} height={16} /> Sign Out
 							</button>
 						</div>
 					{:else}
-						<p class="text-xs mb-4" style="color: var(--text-secondary);">Sign in to enable cross-device sync. Your data syncs to your self-hosted server — no third-party services, zero cost.</p>
-						<div class="space-y-3">
+						<p class="text-[13px] mb-5" style="color: var(--text-secondary);">Sign in to enable cross-device sync. Your data syncs to your self-hosted server — no third-party services, zero cost.</p>
+						<div class="space-y-4">
 							<div class="flex gap-2">
-								<button onclick={() => { authMode = 'login'; }} class="rounded-md px-3 py-1 text-xs font-medium" style="background: {authMode === 'login' ? 'var(--bg-active)' : 'transparent'}; color: {authMode === 'login' ? 'var(--text-accent)' : 'var(--text-secondary)'};">Sign In</button>
-								<button onclick={() => { authMode = 'register'; }} class="rounded-md px-3 py-1 text-xs font-medium" style="background: {authMode === 'register' ? 'var(--bg-active)' : 'transparent'}; color: {authMode === 'register' ? 'var(--text-accent)' : 'var(--text-secondary)'};">Register</button>
+								<button onclick={() => { authMode = 'login'; }} class="rounded-lg px-4 py-1.5 text-[13px] font-medium" style="background: {authMode === 'login' ? 'var(--bg-active)' : 'transparent'}; color: {authMode === 'login' ? 'var(--text-accent)' : 'var(--text-secondary)'};">Sign In</button>
+								<button onclick={() => { authMode = 'register'; }} class="rounded-lg px-4 py-1.5 text-[13px] font-medium" style="background: {authMode === 'register' ? 'var(--bg-active)' : 'transparent'}; color: {authMode === 'register' ? 'var(--text-accent)' : 'var(--text-secondary)'};">Register</button>
 							</div>
-							<input type="email" bind:value={authEmail} placeholder="Email" class="w-full rounded-lg border px-3 py-2 text-sm outline-none" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);" />
-							<input type="password" bind:value={authPassword} placeholder="Password (8+ chars)" class="w-full rounded-lg border px-3 py-2 text-sm outline-none" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);" onkeydown={(e) => { if (e.key === 'Enter') handleAuth(); }} />
-							<button onclick={handleAuth} disabled={authLoading} class="w-full rounded-lg px-4 py-2 text-xs font-medium text-white disabled:opacity-50" style="background: var(--color-primary-600);">
+							<input type="email" bind:value={authEmail} placeholder="Email" class="input-field" />
+							<input type="password" bind:value={authPassword} placeholder="Password (8+ chars)" class="input-field" onkeydown={(e) => { if (e.key === 'Enter') handleAuth(); }} />
+							<button onclick={handleAuth} disabled={authLoading} class="w-full btn-primary disabled:opacity-50">
 								{authLoading ? 'Please wait...' : authMode === 'register' ? 'Create Account' : 'Sign In'}
 							</button>
 						</div>
 					{/if}
 				</div>
 
-				<!-- Info -->
-				<div class="rounded-xl border p-5" style="background: var(--bg-card); border-color: var(--border-default);">
-					<p class="text-xs leading-relaxed" style="color: var(--text-secondary);">
-						<strong>Self-hosted sync.</strong> DevVault uses its own Rust sync server — no Supabase, no Firebase, no subscriptions. Run <code class="font-mono rounded px-1 py-0.5 text-[10px]" style="background: var(--bg-surface-raised);">cd sync-server && cargo run</code> to start the server. Your data stays on your infrastructure.
+				<div class="rounded-2xl border p-6" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
+					<p class="text-[13px] leading-relaxed" style="color: var(--text-secondary);">
+						<strong>Self-hosted sync.</strong> DevVault uses its own Rust sync server — no Supabase, no Firebase, no subscriptions. Run <code class="font-mono rounded-md px-1.5 py-0.5 text-[11px]" style="background: var(--bg-surface-raised);">cd sync-server && cargo run</code> to start the server. Your data stays on your infrastructure.
 					</p>
 				</div>
 			</div>
 
 		{:else if activeTab === 'shortcuts'}
-			<h2 class="text-lg font-bold mb-6" style="color: var(--text-primary);">Keyboard Shortcuts</h2>
-			<div class="max-w-lg space-y-1">
-				{#each shortcuts as s}
-					<div class="flex items-center justify-between rounded-lg px-3 py-2" style="border-bottom: 1px solid var(--border-subtle);">
-						<span class="text-sm" style="color: var(--text-primary);">{s.action}</span>
-						<kbd class="rounded-md px-2 py-0.5 text-xs font-mono" style="background: var(--bg-surface-raised); color: var(--text-secondary); border: 1px solid var(--border-default);">{s.keys}</kbd>
+			<h2 class="text-xl font-bold mb-8" style="color: var(--text-primary);">Keyboard Shortcuts</h2>
+			<div class="max-w-lg rounded-2xl border overflow-hidden" style="border-color: var(--border-default); box-shadow: var(--shadow-card);">
+				{#each shortcuts as s, i}
+					<div class="flex items-center justify-between px-5 py-3.5" style="background: {i % 2 === 0 ? 'var(--bg-card)' : 'var(--bg-surface)'}; {i < shortcuts.length - 1 ? 'border-bottom: 1px solid var(--border-subtle);' : ''}">
+						<span class="text-[14px]" style="color: var(--text-primary);">{s.action}</span>
+						<kbd class="rounded-lg px-2.5 py-1 text-[12px] font-mono" style="background: var(--bg-surface-raised); color: var(--text-secondary); border: 1px solid var(--border-default);">{s.keys}</kbd>
 					</div>
 				{/each}
 			</div>
 
 		{:else if activeTab === 'about'}
-			<h2 class="text-lg font-bold mb-6" style="color: var(--text-primary);">About</h2>
+			<h2 class="text-xl font-bold mb-8" style="color: var(--text-primary);">About</h2>
 			<div class="max-w-lg">
-				<div class="flex items-center gap-4 mb-6">
-					<div class="rounded-2xl p-4" style="background: var(--color-primary-600);">
-						<Icon icon="ph:vault-bold" width={32} height={32} style="color: white;" />
+				<div class="flex items-center gap-5 mb-8">
+					<div class="rounded-2xl p-5" style="background: var(--color-primary-600);">
+						<Icon icon="ph:vault-bold" width={36} height={36} style="color: white;" />
 					</div>
 					<div>
-						<h3 class="text-xl font-bold" style="color: var(--text-primary);">{APP_NAME}</h3>
-						<p class="text-sm" style="color: var(--text-secondary);">Version {APP_VERSION}</p>
+						<h3 class="text-2xl font-bold" style="color: var(--text-primary);">{APP_NAME}</h3>
+						<p class="text-[15px] mt-0.5" style="color: var(--text-secondary);">Version {APP_VERSION}</p>
 					</div>
 				</div>
-				<p class="text-sm leading-relaxed mb-4" style="color: var(--text-secondary);">
+				<p class="text-[15px] leading-relaxed mb-6" style="color: var(--text-secondary);">
 					DevVault is a personal developer workspace & cloud sync desktop app. Built with Tauri v2, SvelteKit, Svelte 5, TailwindCSS v4, and GSAP.
 				</p>
-				<div class="space-y-2 text-sm" style="color: var(--text-secondary);">
+				<div class="space-y-3 text-[14px]" style="color: var(--text-secondary);">
 					<p><strong>Desktop:</strong> Tauri v2 + SvelteKit + Svelte 5 (Runes) + TailwindCSS v4</p>
 					<p><strong>Sync Server:</strong> Custom Rust (Axum + SQLite + JWT + WebSocket)</p>
 					<p><strong>Icons:</strong> Phosphor Icons + Iconify</p>

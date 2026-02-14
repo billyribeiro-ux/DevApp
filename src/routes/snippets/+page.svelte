@@ -76,82 +76,82 @@
 </script>
 
 <div class="flex flex-col h-full overflow-hidden">
-	<div class="flex items-center justify-between px-6 py-4 border-b shrink-0" style="border-color: var(--border-default);">
+	<div class="flex items-center justify-between px-8 py-5 border-b shrink-0" style="border-color: var(--border-default);">
 		<div class="flex items-center gap-3">
-			<Icon icon="ph:code-bold" width={22} height={22} style="color: #14b8a6;" />
-			<h1 class="text-lg font-bold" style="color: var(--text-primary);">Code Snippets</h1>
-			<span class="rounded-full px-2 py-0.5 text-[10px] font-semibold" style="background: rgba(20, 184, 166, 0.1); color: #14b8a6;">{snippets.length}</span>
+			<Icon icon="ph:code-bold" width={24} height={24} style="color: #14b8a6;" />
+			<h1 class="text-xl font-bold" style="color: var(--text-primary);">Code Snippets</h1>
+			<span class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold" style="background: rgba(20, 184, 166, 0.1); color: #14b8a6;">{snippets.length}</span>
 		</div>
-		<div class="flex items-center gap-2">
-			<div class="flex items-center gap-2 rounded-lg px-2.5 py-1.5" style="background: var(--bg-input); border: 1px solid var(--border-default);">
-				<Icon icon="ph:magnifying-glass" width={14} height={14} style="color: var(--text-tertiary);" />
-				<input type="text" bind:value={searchQuery} placeholder="Search snippets..." class="bg-transparent text-xs outline-none w-36" style="color: var(--text-primary);" />
+		<div class="flex items-center gap-3">
+			<div class="flex items-center gap-2 rounded-xl px-3 py-2" style="background: var(--bg-input); border: 1px solid var(--border-default);">
+				<Icon icon="ph:magnifying-glass" width={15} height={15} style="color: var(--text-tertiary);" />
+				<input type="text" bind:value={searchQuery} placeholder="Search snippets..." class="bg-transparent text-[13px] outline-none w-44" style="color: var(--text-primary);" />
 			</div>
-			<button onclick={() => startEdit()} class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-white" style="background: var(--color-primary-600);">
-				<Icon icon="ph:plus-bold" width={14} height={14} /> New Snippet
+			<button onclick={() => startEdit()} class="btn-primary">
+				<Icon icon="ph:plus-bold" width={15} height={15} /> New Snippet
 			</button>
 		</div>
 	</div>
 
-	<div class="flex items-center gap-1 px-6 py-2 border-b overflow-x-auto shrink-0" style="border-color: var(--border-default);">
-		<button onclick={() => { activeLanguage = 'all'; }} class="rounded-full px-3 py-1 text-xs font-medium transition-colors shrink-0" style="background: {activeLanguage === 'all' ? 'var(--bg-active)' : 'transparent'}; color: {activeLanguage === 'all' ? 'var(--text-accent)' : 'var(--text-secondary)'};">All</button>
+	<div class="flex items-center gap-1.5 px-8 py-3 border-b overflow-x-auto shrink-0" style="border-color: var(--border-default);">
+		<button onclick={() => { activeLanguage = 'all'; }} class="rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors shrink-0" style="background: {activeLanguage === 'all' ? 'var(--bg-active)' : 'transparent'}; color: {activeLanguage === 'all' ? 'var(--text-accent)' : 'var(--text-secondary)'};">All</button>
 		{#each ['javascript', 'typescript', 'python', 'rust', 'css', 'html', 'sql', 'bash'] as lang}
-			<button onclick={() => { activeLanguage = lang; }} class="rounded-full px-3 py-1 text-xs font-medium transition-colors shrink-0" style="background: {activeLanguage === lang ? 'var(--bg-active)' : 'transparent'}; color: {activeLanguage === lang ? 'var(--text-accent)' : 'var(--text-secondary)'};">{lang}</button>
+			<button onclick={() => { activeLanguage = lang; }} class="rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors shrink-0" style="background: {activeLanguage === lang ? 'var(--bg-active)' : 'transparent'}; color: {activeLanguage === lang ? 'var(--text-accent)' : 'var(--text-secondary)'};">{lang}</button>
 		{/each}
 	</div>
 
-	<div class="flex-1 overflow-y-auto px-6 py-4">
+	<div class="flex-1 overflow-y-auto px-8 py-6">
 		{#if showEditor}
 			<div class="max-w-2xl mx-auto animate-slide-up">
-				<div class="rounded-xl border p-6 space-y-4" style="background: var(--bg-card); border-color: var(--border-default);">
-					<h3 class="text-sm font-semibold" style="color: var(--text-primary);">{editingSnippet ? 'Edit Snippet' : 'New Snippet'}</h3>
-					<input type="text" bind:value={sTitle} placeholder="Snippet title..." class="w-full rounded-lg border px-3 py-2 text-sm outline-none" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);" />
+				<div class="rounded-2xl border p-8 space-y-5" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
+					<h3 class="text-base font-semibold" style="color: var(--text-primary);">{editingSnippet ? 'Edit Snippet' : 'New Snippet'}</h3>
+					<input type="text" bind:value={sTitle} placeholder="Snippet title..." class="input-field" />
 					<div class="flex gap-3">
-						<select bind:value={sLanguage} class="rounded-lg border px-3 py-2 text-xs" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);">
+						<select bind:value={sLanguage} class="input-field input-field-sm" style="width: auto;">
 							{#each LANGUAGES as lang}
 								<option value={lang}>{lang}</option>
 							{/each}
 						</select>
-						<input type="text" bind:value={sDescription} placeholder="Description..." class="flex-1 rounded-lg border px-3 py-2 text-xs outline-none" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);" />
+						<input type="text" bind:value={sDescription} placeholder="Description..." class="flex-1 input-field input-field-sm" />
 					</div>
-					<textarea bind:value={sCode} placeholder="Paste your code here..." rows={12} class="w-full rounded-lg border px-3 py-2 text-sm outline-none resize-none font-mono leading-relaxed" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary); tab-size: 2;"></textarea>
-					<div class="flex justify-end gap-2">
-						<button onclick={() => { showEditor = false; }} class="rounded-lg px-4 py-2 text-xs" style="color: var(--text-secondary);">Cancel</button>
-						<button onclick={handleSave} class="rounded-lg px-4 py-2 text-xs font-medium text-white" style="background: var(--color-primary-600);">Save</button>
+					<textarea bind:value={sCode} placeholder="Paste your code here..." rows={14} class="input-field resize-none font-mono leading-relaxed" style="tab-size: 2; font-size: 0.8125rem;"></textarea>
+					<div class="flex justify-end gap-2 pt-2">
+						<button onclick={() => { showEditor = false; }} class="btn-ghost">Cancel</button>
+						<button onclick={handleSave} class="btn-primary">Save</button>
 					</div>
 				</div>
 			</div>
 		{:else}
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 				{#each filteredSnippets() as snippet (snippet.id)}
-					<div class="group rounded-xl border overflow-hidden transition-all duration-150 hover:shadow-md" style="background: var(--bg-card); border-color: var(--border-default);">
-						<div class="flex items-center justify-between px-4 py-3 border-b" style="border-color: var(--border-subtle);">
-							<div class="flex items-center gap-2 min-w-0">
-								<h3 class="text-sm font-semibold truncate" style="color: var(--text-primary);">{snippet.title}</h3>
-								<span class="rounded-md px-1.5 py-0.5 text-[10px] font-mono shrink-0" style="background: var(--bg-surface-raised); color: var(--text-secondary);">{snippet.language}</span>
+					<div class="group rounded-2xl border overflow-hidden transition-all duration-150 hover:shadow-md" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
+						<div class="flex items-center justify-between px-5 py-4 border-b" style="border-color: var(--border-subtle);">
+							<div class="flex items-center gap-2.5 min-w-0">
+								<h3 class="text-[15px] font-semibold truncate" style="color: var(--text-primary);">{snippet.title}</h3>
+								<span class="rounded-lg px-2 py-0.5 text-[11px] font-mono shrink-0" style="background: var(--bg-surface-raised); color: var(--text-secondary);">{snippet.language}</span>
 							</div>
-							<div class="flex items-center gap-1">
-								<button onclick={() => handleCopy(snippet)} class="rounded-md px-2 py-1 text-[11px] font-medium text-white" style="background: var(--color-primary-600);">
-									<Icon icon="ph:copy" width={12} height={12} style="display: inline; vertical-align: -1px;" /> Copy
+							<div class="flex items-center gap-1.5">
+								<button onclick={() => handleCopy(snippet)} class="rounded-xl px-3.5 py-1.5 text-[12px] font-medium text-white" style="background: var(--color-primary-600);">
+									<Icon icon="ph:copy" width={13} height={13} style="display: inline; vertical-align: -1px;" /> Copy
 								</button>
 							</div>
 						</div>
-						<pre class="px-4 py-3 text-xs leading-relaxed overflow-x-auto max-h-40" style="color: var(--text-secondary); background: var(--bg-surface);">{snippet.code.slice(0, 500)}</pre>
-						<div class="flex items-center justify-between px-4 py-2 border-t" style="border-color: var(--border-subtle);">
-							<span class="text-[10px]" style="color: var(--text-tertiary);">Used {snippet.usage_count}x</span>
+						<pre class="px-5 py-4 text-[13px] leading-relaxed overflow-x-auto max-h-44" style="color: var(--text-secondary); background: var(--bg-surface);">{snippet.code.slice(0, 500)}</pre>
+						<div class="flex items-center justify-between px-5 py-3 border-t" style="border-color: var(--border-subtle);">
+							<span class="text-[11px]" style="color: var(--text-tertiary);">Used {snippet.usage_count}x</span>
 							<div class="flex gap-1">
-								<button onclick={() => startEdit(snippet)} class="rounded-md p-1" style="color: var(--text-tertiary);"><Icon icon="ph:pencil" width={12} height={12} /></button>
-								<button onclick={() => handleDelete(snippet.id)} class="rounded-md p-1" style="color: var(--text-tertiary);"><Icon icon="ph:trash" width={12} height={12} /></button>
+								<button onclick={() => startEdit(snippet)} class="rounded-xl p-1.5" style="color: var(--text-tertiary);"><Icon icon="ph:pencil" width={14} height={14} /></button>
+								<button onclick={() => handleDelete(snippet.id)} class="rounded-xl p-1.5" style="color: var(--text-tertiary);"><Icon icon="ph:trash" width={14} height={14} /></button>
 							</div>
 						</div>
 					</div>
 				{/each}
 			</div>
 			{#if filteredSnippets().length === 0}
-				<div class="flex flex-col items-center justify-center py-20">
-					<Icon icon="ph:code" width={48} height={48} style="color: var(--text-tertiary); opacity: 0.3;" />
-					<p class="mt-3 text-sm" style="color: var(--text-tertiary);">No snippets yet</p>
-					<button onclick={() => startEdit()} class="mt-3 rounded-lg px-4 py-2 text-xs font-medium text-white" style="background: var(--color-primary-600);">Create your first snippet</button>
+				<div class="flex flex-col items-center justify-center py-24">
+					<Icon icon="ph:code" width={56} height={56} style="color: var(--text-tertiary); opacity: 0.3;" />
+					<p class="mt-4 text-sm" style="color: var(--text-tertiary);">No snippets yet</p>
+					<button onclick={() => startEdit()} class="mt-4 btn-primary">Create your first snippet</button>
 				</div>
 			{/if}
 		{/if}

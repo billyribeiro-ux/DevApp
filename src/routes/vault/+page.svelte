@@ -123,7 +123,7 @@
 	ondrop={handleFileDrop}
 >
 	<!-- Header -->
-	<div class="flex items-center justify-between px-6 py-4 border-b shrink-0" style="border-color: var(--border-default);">
+	<div class="flex items-center justify-between px-8 py-5 border-b shrink-0" style="border-color: var(--border-default);">
 		<div class="flex items-center gap-2">
 			{#each breadcrumbs as crumb, i}
 				{#if i > 0}
@@ -131,7 +131,7 @@
 				{/if}
 				<button
 					onclick={() => navigateToBreadcrumb(i)}
-					class="text-sm font-medium px-1.5 py-0.5 rounded-md transition-colors"
+					class="text-[14px] font-medium px-1.5 py-0.5 rounded-md transition-colors"
 					style="color: {i === breadcrumbs.length - 1 ? 'var(--text-primary)' : 'var(--text-secondary)'};"
 				>
 					{crumb.name}
@@ -139,11 +139,11 @@
 			{/each}
 		</div>
 		<div class="flex items-center gap-2">
-			<button onclick={() => { showNewFolderInput = !showNewFolderInput; }} class="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors" style="border-color: var(--border-default); color: var(--text-secondary);">
+			<button onclick={() => { showNewFolderInput = !showNewFolderInput; }} class="flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium transition-colors" style="border-color: var(--border-default); color: var(--text-secondary);">
 				<Icon icon="ph:folder-plus-bold" width={16} height={16} />
 				New Folder
 			</button>
-			<button onclick={() => ui.setViewMode(ui.viewMode === 'grid' ? 'list' : 'grid')} class="rounded-lg border p-1.5 transition-colors" style="border-color: var(--border-default); color: var(--text-secondary);" title="Toggle view">
+			<button onclick={() => ui.setViewMode(ui.viewMode === 'grid' ? 'list' : 'grid')} class="rounded-xl border p-2 transition-colors" style="border-color: var(--border-default); color: var(--text-secondary);" title="Toggle view">
 				<Icon icon={ui.viewMode === 'grid' ? 'ph:list-bold' : 'ph:grid-four-bold'} width={18} height={18} />
 			</button>
 		</div>
@@ -151,27 +151,27 @@
 
 	<!-- New folder input -->
 	{#if showNewFolderInput}
-		<div class="flex items-center gap-2 px-6 py-2 border-b animate-slide-down" style="border-color: var(--border-default); background: var(--bg-surface);">
+		<div class="flex items-center gap-2 px-8 py-3 border-b animate-slide-down" style="border-color: var(--border-default); background: var(--bg-surface);">
 			<Icon icon="ph:folder-bold" width={18} height={18} style="color: var(--text-accent);" />
 			<input
 				type="text"
 				bind:value={newFolderName}
 				placeholder="Folder name..."
-				class="flex-1 bg-transparent text-sm outline-none"
+				class="input-field-sm flex-1"
 				style="color: var(--text-primary);"
 				onkeydown={(e) => { if (e.key === 'Enter') handleCreateFolder(); if (e.key === 'Escape') showNewFolderInput = false; }}
 			/>
-			<button onclick={handleCreateFolder} class="rounded-md px-3 py-1 text-xs font-medium text-white" style="background: var(--color-primary-600);">Create</button>
-			<button onclick={() => { showNewFolderInput = false; }} class="rounded-md px-2 py-1 text-xs" style="color: var(--text-tertiary);">Cancel</button>
+			<button onclick={handleCreateFolder} class="rounded-xl px-4 py-2 text-sm font-medium text-white" style="background: var(--color-primary-600);">Create</button>
+			<button onclick={() => { showNewFolderInput = false; }} class="rounded-xl px-3 py-2 text-sm" style="color: var(--text-tertiary);">Cancel</button>
 		</div>
 	{/if}
 
 	<!-- Content -->
-	<div class="flex-1 overflow-y-auto px-6 py-4">
+	<div class="flex-1 overflow-y-auto px-8 py-6">
 		{#if dragOver}
 			<div class="flex flex-col items-center justify-center h-full rounded-2xl border-2 border-dashed transition-all" style="border-color: var(--color-primary-500); background: var(--bg-active);">
-				<Icon icon="ph:upload-bold" width={48} height={48} style="color: var(--color-primary-500);" />
-				<p class="mt-3 text-lg font-medium" style="color: var(--text-accent);">Drop files here</p>
+				<Icon icon="ph:upload-bold" width={56} height={56} style="color: var(--color-primary-500);" />
+				<p class="mt-3 text-xl font-medium" style="color: var(--text-accent);">Drop files here</p>
 				<p class="text-sm" style="color: var(--text-secondary);">Files will be added to the current folder</p>
 			</div>
 		{:else}
@@ -179,16 +179,16 @@
 			{#if subfolders.length > 0}
 				<div class="mb-6">
 					<h3 class="text-xs font-semibold uppercase tracking-wider mb-3" style="color: var(--text-tertiary);">Folders</h3>
-					<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+					<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
 						{#each subfolders as folder}
 							{@const meta = FOLDER_TYPE_META[folder.folder_type] ?? FOLDER_TYPE_META.general}
 							<button
 								onclick={() => navigateToFolder(folder.id, folder.name)}
-								class="flex items-center gap-3 rounded-xl border p-3 text-left transition-all duration-150 hover:shadow-sm"
-								style="background: var(--bg-card); border-color: var(--border-default);"
+								class="flex items-center gap-3 rounded-2xl border p-4 text-left transition-all duration-150 hover:shadow-sm"
+								style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);"
 							>
 								<div class="rounded-lg p-2 shrink-0" style="background: {folder.color ?? meta.color}15;">
-									<Icon icon={folder.icon ?? meta.icon} width={20} height={20} style="color: {folder.color ?? meta.color};" />
+									<Icon icon={folder.icon ?? meta.icon} width={22} height={22} style="color: {folder.color ?? meta.color};" />
 								</div>
 								<div class="min-w-0 flex-1">
 									<p class="text-sm font-medium truncate" style="color: var(--text-primary);">{folder.name}</p>
@@ -209,7 +209,7 @@
 							{#each ['name', 'date', 'size', 'type'] as s}
 								<button
 									onclick={() => { if (sortBy === s) sortAsc = !sortAsc; else { sortBy = s as typeof sortBy; sortAsc = true; } }}
-									class="rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors"
+									class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
 									style="color: {sortBy === s ? 'var(--text-accent)' : 'var(--text-tertiary)'}; background: {sortBy === s ? 'var(--bg-active)' : 'transparent'};"
 								>
 									{s.charAt(0).toUpperCase() + s.slice(1)}
@@ -222,13 +222,13 @@
 					</div>
 
 					{#if ui.viewMode === 'grid'}
-						<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+						<div class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));">
 							{#each sortedFiles() as file (file.id)}
 								{@const typeInfo = getFileTypeInfo(file.extension)}
 								<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
 								<div
-									class="group relative flex flex-col items-center gap-2 rounded-xl border p-4 transition-all duration-150 hover:shadow-md cursor-pointer"
-									style="background: var(--bg-card); border-color: {vault.selectedFileIds.has(file.id) ? 'var(--color-primary-500)' : 'var(--border-default)'};"
+									class="group relative flex flex-col items-center gap-2 rounded-2xl border p-5 transition-all duration-150 hover:shadow-md cursor-pointer"
+									style="background: var(--bg-card); border-color: {vault.selectedFileIds.has(file.id) ? 'var(--color-primary-500)' : 'var(--border-default)'}; box-shadow: var(--shadow-card);"
 									onclick={(e) => vault.selectFile(file.id, e.metaKey || e.ctrlKey)}
 									role="button"
 									tabindex="0"
@@ -239,7 +239,7 @@
 										</div>
 									{/if}
 									<div class="rounded-xl p-3" style="background: {typeInfo.color}10;">
-										<Icon icon={typeInfo.icon} width={32} height={32} style="color: {typeInfo.color};" />
+										<Icon icon={typeInfo.icon} width={36} height={36} style="color: {typeInfo.color};" />
 									</div>
 									<p class="text-xs font-medium text-center truncate w-full" style="color: var(--text-primary);">{file.name}</p>
 									<p class="text-[10px]" style="color: var(--text-tertiary);">{formatFileSize(file.size_bytes)}</p>
@@ -257,7 +257,7 @@
 						</div>
 					{:else}
 						<!-- List view -->
-						<div class="rounded-xl border overflow-hidden" style="border-color: var(--border-default);">
+						<div class="rounded-2xl border overflow-hidden" style="border-color: var(--border-default);">
 							<div class="grid grid-cols-[1fr,80px,80px,100px,60px] px-4 py-2 text-[11px] font-semibold uppercase tracking-wider border-b" style="color: var(--text-tertiary); border-color: var(--border-default); background: var(--bg-surface);">
 								<span>Name</span><span>Size</span><span>Type</span><span>Modified</span><span></span>
 							</div>
@@ -265,8 +265,8 @@
 								{@const typeInfo = getFileTypeInfo(file.extension)}
 								<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
 								<div
-									class="grid grid-cols-[1fr,80px,80px,100px,60px] items-center px-4 py-2.5 border-b transition-colors cursor-pointer"
-									style="border-color: var(--border-subtle); background: {vault.selectedFileIds.has(file.id) ? 'var(--bg-active)' : 'transparent'};"
+									class="grid grid-cols-[1fr,80px,80px,100px,60px] items-center px-4 py-3 border-b transition-colors cursor-pointer"
+									style="border-color: var(--border-default); background: {vault.selectedFileIds.has(file.id) ? 'var(--bg-active)' : 'transparent'};"
 									onclick={(e) => vault.selectFile(file.id, e.metaKey || e.ctrlKey)}
 									role="button"
 									tabindex="0"
@@ -295,9 +295,9 @@
 				<!-- Empty state -->
 				<div class="flex flex-col items-center justify-center h-full">
 					<div class="rounded-2xl p-6" style="background: var(--bg-surface-raised);">
-						<Icon icon="ph:upload" width={48} height={48} style="color: var(--text-tertiary); opacity: 0.5;" />
+						<Icon icon="ph:upload" width={56} height={56} style="color: var(--text-tertiary); opacity: 0.5;" />
 					</div>
-					<p class="mt-4 text-lg font-medium" style="color: var(--text-primary);">This folder is empty</p>
+					<p class="mt-4 text-xl font-medium" style="color: var(--text-primary);">This folder is empty</p>
 					<p class="text-sm mt-1" style="color: var(--text-tertiary);">Drag & drop files here or click Upload</p>
 				</div>
 			{/if}
@@ -305,7 +305,7 @@
 	</div>
 
 	<!-- Status bar -->
-	<div class="flex items-center justify-between px-6 py-2 border-t text-[11px] shrink-0" style="border-color: var(--border-default); color: var(--text-tertiary); background: var(--bg-surface);">
+	<div class="flex items-center justify-between px-8 py-3 border-t text-[11px] shrink-0" style="border-color: var(--border-default); color: var(--text-tertiary); background: var(--bg-surface);">
 		<span>{currentFiles.length} file{currentFiles.length !== 1 ? 's' : ''} &middot; {subfolders.length} folder{subfolders.length !== 1 ? 's' : ''}</span>
 		<span>{vault.selectedFileIds.size > 0 ? `${vault.selectedFileIds.size} selected` : ''}</span>
 	</div>
