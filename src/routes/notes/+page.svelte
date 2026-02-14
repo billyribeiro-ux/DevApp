@@ -2,12 +2,10 @@
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
 	import { nav, toasts } from '$stores/app.svelte';
-	import { getNotes, createNote, updateNote, deleteNote, logActivity } from '$services/database';
+	import { getNotes, createNote, updateNote, deleteNote } from '$services/database';
 	import { formatRelativeDate, countWords } from '$utils/formatters';
 	import type { Note } from '$types';
 	import { v4 as uuid } from 'uuid';
-	import ConfirmDialog from '$lib/components/ui/ConfirmDialog.svelte';
-	import DropZone from '$lib/components/ui/DropZone.svelte';
 
 	let notes = $state<Note[]>([]);
 	let activeNoteId = $state<string | null>(null);
@@ -15,8 +13,6 @@
 	let editContent = $state('');
 	let unsaved = $state(false);
 	let searchQuery = $state('');
-	let confirmDeleteOpen = $state(false);
-	let pendingDeleteId = $state<string | null>(null);
 
 	let activeNote = $derived(notes.find(n => n.id === activeNoteId) ?? null);
 	let filteredNotes = $derived(
@@ -48,7 +44,6 @@
 	async function handleCreate() {
 		const id = uuid();
 		await createNote({ id, folder_id: 'default', title: 'Untitled Note', content_text: '', word_count: 0 });
-		await logActivity({ id: uuid(), entity_type: 'note', entity_id: id, entity_name: 'Untitled Note', action: 'created' });
 		notes = await getNotes();
 		selectNote(id);
 		toasts.success('Note Created');
@@ -68,23 +63,14 @@
 		}
 	}
 
-	function requestDelete(id: string) {
-		pendingDeleteId = id;
-		confirmDeleteOpen = true;
-	}
-
-	async function handleDelete() {
-		if (!pendingDeleteId) return;
-		const note = notes.find(n => n.id === pendingDeleteId);
-		await deleteNote(pendingDeleteId);
-		await logActivity({ id: uuid(), entity_type: 'note', entity_id: pendingDeleteId, entity_name: note?.title, action: 'deleted' });
-		if (activeNoteId === pendingDeleteId) {
+	async function handleDelete(id: string) {
+		await deleteNote(id);
+		if (activeNoteId === id) {
 			activeNoteId = null;
 			editTitle = '';
 			editContent = '';
 		}
 		notes = await getNotes();
-		pendingDeleteId = null;
 		toasts.success('Note Deleted');
 	}
 
@@ -113,25 +99,6 @@
 		}
 	}
 
-	async function handleFileDrop(files: File[]) {
-		const validExts = ['txt', 'md'];
-		let imported = 0;
-		for (const file of files) {
-			const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
-			if (!validExts.includes(ext)) continue;
-			const text = await file.text();
-			const title = file.name.replace(/\.[^.]+$/, '');
-			await createNote({ id: uuid(), title, content_text: text, content_json: JSON.stringify({ text }), word_count: text.split(/\s+/).filter(Boolean).length });
-			imported++;
-		}
-		if (imported > 0) {
-			notes = await getNotes();
-			toasts.success(`Imported ${imported} note${imported > 1 ? 's' : ''}`);
-		} else {
-			toasts.warning('No .txt or .md files found');
-		}
-	}
-
 	onMount(async () => {
 		nav.navigate('/notes');
 		try {
@@ -143,11 +110,10 @@
 <svelte:window onkeydown={handleKeydown} />
 
 <div class="flex h-full overflow-hidden">
-	<!-- Sidebar -->
-	<div class="w-80 border-r flex flex-col shrink-0" style="border-color: var(--border-default);">
-		<!-- Header -->
-		<div class="flex items-center justify-between border-b shrink-0" style="border-color: var(--border-default); height: var(--titlebar-height); padding: 0 var(--content-padding);">
-			<h2 class="text-lg font-bold" style="color: var(--text-primary);">Notes</h2>
+	<!-- Notes list sidebar -->
+	<div class="w-[300px] shrink-0 border-r flex flex-col" style="border-color: var(--border-default); background: var(--bg-surface);">
+		<div class="flex items-center justify-between px-5 py-4 border-b" style="border-color: var(--border-default);">
+			<h2 class="text-base font-bold" style="color: var(--text-primary);">Notes</h2>
 			<button onclick={handleCreate} class="rounded-xl p-2 transition-colors" style="color: var(--text-accent);" title="New Note (Cmd+N)">
 				<Icon icon="ph:plus-bold" width={20} height={20} />
 			</button>
@@ -158,35 +124,22 @@
 				<input type="text" bind:value={searchQuery} placeholder="Search notes..." class="flex-1 bg-transparent text-[13px] outline-none" style="color: var(--text-primary);" />
 			</div>
 		</div>
-		<!-- List -->
-		<div class="flex-1 overflow-y-auto px-6 py-4">
+		<div class="flex-1 overflow-y-auto px-3 py-1">
 			{#each filteredNotes as note (note.id)}
-				<div
-					class="relative rounded-xl mb-1 group"
+				<button
+					onclick={() => selectNote(note.id)}
+					class="w-full text-left rounded-xl px-4 py-3.5 mb-1 transition-all duration-150 group"
 					style="background: {activeNoteId === note.id ? 'var(--bg-active)' : 'transparent'};"
 				>
-					<button
-						onclick={() => selectNote(note.id)}
-						class="w-full text-left px-4 py-3.5 transition-all duration-150"
-					>
-						<div class="flex items-center gap-1.5">
-							<p class="text-sm font-medium truncate flex-1" style="color: {activeNoteId === note.id ? 'var(--text-accent)' : 'var(--text-primary)'};">{note.title}</p>
-							{#if note.is_pinned}
-								<Icon icon="ph:push-pin-fill" width={12} height={12} style="color: var(--text-tertiary);" />
-							{/if}
-						</div>
-						<p class="text-[13px] mt-1 truncate" style="color: var(--text-tertiary);">{note.content_text?.slice(0, 80) || 'Empty note'}</p>
-						<p class="text-[12px] mt-1.5" style="color: var(--text-tertiary);">{formatRelativeDate(note.updated_at)} &middot; {note.word_count} words</p>
-					</button>
-					<button
-						onclick={(e) => { e.stopPropagation(); requestDelete(note.id); }}
-						class="absolute top-3 right-2 hidden group-hover:flex rounded-lg p-1.5 transition-colors"
-						style="color: var(--text-tertiary); background: var(--bg-surface-raised);"
-						title="Delete note"
-					>
-						<Icon icon="ph:trash" width={13} height={13} />
-					</button>
-				</div>
+					<div class="flex items-center gap-1.5">
+						<p class="text-sm font-medium truncate flex-1" style="color: {activeNoteId === note.id ? 'var(--text-accent)' : 'var(--text-primary)'};">{note.title}</p>
+						{#if note.is_pinned}
+							<Icon icon="ph:push-pin-fill" width={12} height={12} style="color: var(--text-tertiary);" />
+						{/if}
+					</div>
+					<p class="text-[12px] mt-1 truncate" style="color: var(--text-tertiary);">{note.content_text?.slice(0, 80) || 'Empty note'}</p>
+					<p class="text-[11px] mt-1.5" style="color: var(--text-tertiary);">{formatRelativeDate(note.updated_at)} &middot; {note.word_count} words</p>
+				</button>
 			{/each}
 			{#if filteredNotes.length === 0}
 				<div class="flex flex-col items-center justify-center py-16">
@@ -198,71 +151,62 @@
 	</div>
 
 	<!-- Editor -->
-	<div class="flex-1 flex flex-col overflow-hidden min-w-0">
-		{#if activeNoteId}
-		<!-- Toolbar -->
-		<div class="flex items-center justify-between border-b shrink-0" style="border-color: var(--border-default); height: var(--titlebar-height); padding: 0 var(--content-padding);">
-			<div class="flex items-center gap-2">
-				{#if unsaved}
-					<div class="h-2 w-2 rounded-full" style="background: var(--color-warning);"></div>
-				{/if}
-				<span class="text-xs" style="color: var(--text-tertiary);">{unsaved ? 'Unsaved changes' : 'Saved'}</span>
-			</div>
-			<div class="flex items-center gap-2">
-				<button onclick={handleSave} class="btn-primary rounded-xl px-4 py-2">Save</button>
-				<button onclick={() => requestDelete(activeNoteId!)} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);">
-					<Icon icon="ph:trash" width={18} height={18} />
-				</button>
-			</div>
-		</div>
-		<!-- Content -->
-		<div class="flex-1 overflow-y-auto" style="padding: var(--content-padding);">
-			<input
-				type="text"
-				bind:value={editTitle}
-				oninput={autoSave}
-				placeholder="Note title..."
-				class="w-full bg-transparent text-[24px] font-bold outline-none mb-4"
-				style="color: var(--text-primary); letter-spacing: -0.01em;"
-			/>
-			<textarea
-				bind:value={editContent}
-				oninput={autoSave}
-				placeholder="Start writing... (Markdown supported)"
-				class="w-full h-full bg-transparent text-[15px] outline-none resize-none"
-				style="color: var(--text-primary); font-family: 'Inter', sans-serif; line-height: 1.8;"
-			></textarea>
-		</div>
-		<!-- Footer -->
-		<div class="flex items-center justify-between py-3 border-t text-[12px] shrink-0" style="border-color: var(--border-default); color: var(--text-tertiary); padding-left: var(--content-padding); padding-right: var(--content-padding);">
-			<span>{wordCount} words</span>
-			<span>{activeNote ? formatRelativeDate(activeNote.updated_at) : ''}</span>
-		</div>
-		{:else}
-			<DropZone onfiledrop={handleFileDrop} class_="h-full flex flex-col items-center justify-center">
-				<div class="flex flex-col items-center justify-center h-full">
-					<Icon icon="ph:note-pencil" width={56} height={56} style="color: var(--text-tertiary); opacity: 0.3;" />
-					<p class="mt-4 text-sm font-medium" style="color: var(--text-tertiary);">Select a note or create a new one</p>
-					<p class="text-xs mt-1" style="color: var(--text-tertiary);">Drop .txt or .md files here to import</p>
-					<button onclick={handleCreate} class="mt-4 btn-primary rounded-xl text-sm px-5 py-2.5">
-						<Icon icon="ph:plus" width={16} height={16} style="display: inline; vertical-align: -2px;" /> New Note
+	<div class="flex-1 flex flex-col min-w-0">
+		{#if activeNote}
+			<!-- Toolbar -->
+			<div class="flex items-center justify-between py-3 border-b shrink-0" style="border-color: var(--border-default); padding-left: var(--content-padding); padding-right: var(--content-padding);">
+				<div class="flex items-center gap-2">
+					{#if unsaved}
+						<div class="h-2 w-2 rounded-full" style="background: var(--color-warning);"></div>
+					{/if}
+					<span class="text-xs" style="color: var(--text-tertiary);">{unsaved ? 'Unsaved changes' : 'Saved'}</span>
+				</div>
+				<div class="flex items-center gap-2">
+					<button onclick={handleSave} class="btn-primary rounded-xl px-4 py-2">Save</button>
+					<button onclick={() => handleDelete(activeNote!.id)} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);">
+						<Icon icon="ph:trash" width={18} height={18} />
 					</button>
 				</div>
-			</DropZone>
+			</div>
+			<!-- Title -->
+			<div style="padding: var(--content-padding-lg) var(--content-padding-lg) 0;">
+				<input
+					type="text"
+					bind:value={editTitle}
+					oninput={autoSave}
+					placeholder="Note title..."
+					class="w-full bg-transparent text-[28px] font-bold outline-none"
+					style="color: var(--text-primary); letter-spacing: -0.02em;"
+				/>
+			</div>
+			<!-- Content -->
+			<div class="flex-1 overflow-y-auto" style="padding: 24px var(--content-padding-lg);">
+				<textarea
+					bind:value={editContent}
+					oninput={autoSave}
+					placeholder="Start writing... (Markdown supported)"
+					class="w-full h-full bg-transparent text-[15px] outline-none resize-none"
+					style="color: var(--text-primary); font-family: 'Inter', sans-serif; line-height: 1.8;"
+				></textarea>
+			</div>
+			<!-- Footer -->
+			<div class="flex items-center justify-between py-3 border-t text-[11px] shrink-0" style="border-color: var(--border-default); color: var(--text-tertiary); padding-left: var(--content-padding-lg); padding-right: var(--content-padding-lg);">
+				<span>{wordCount} words</span>
+				<span>{formatRelativeDate(activeNote.updated_at)}</span>
+			</div>
+		{:else}
+			<div class="flex flex-col items-center justify-center h-full">
+				<Icon icon="ph:note-pencil" width={56} height={56} style="color: var(--text-tertiary); opacity: 0.3;" />
+				<p class="mt-4 text-sm font-medium" style="color: var(--text-tertiary);">Select a note or create a new one</p>
+				<button onclick={handleCreate} class="mt-4 btn-primary rounded-xl text-sm px-5 py-2.5">
+					<Icon icon="ph:plus" width={16} height={16} style="display: inline; vertical-align: -2px;" /> New Note
+				</button>
+			</div>
 		{/if}
 	</div>
 </div>
 
-<ConfirmDialog
-	bind:open={confirmDeleteOpen}
-	title="Delete Note"
-	description="Are you sure you want to delete this note? This action cannot be undone."
-	confirmLabel="Delete"
-	variant="danger"
-	onconfirm={handleDelete}
-/>
-
 <style>
-	button:not(.btn-primary):not(.btn-secondary):not(.btn-ghost):hover { background: var(--bg-card-hover); }
+	button:hover { background: var(--bg-card-hover); }
 	textarea::placeholder { color: var(--text-tertiary); }
 </style>

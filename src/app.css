@@ -10,7 +10,7 @@
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
-  src: url('/fonts/inter-variable.woff2') format('woff2');
+  src: url('https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hiA.woff2') format('woff2');
 }
 
 @font-face {
@@ -18,7 +18,7 @@
   font-style: normal;
   font-weight: 400 700;
   font-display: swap;
-  src: url('/fonts/jetbrains-mono-variable.woff2') format('woff2');
+  src: url('https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbY2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKxTOlOTk6OThhvA.woff2') format('woff2');
 }
 
 :root {
@@ -38,6 +38,7 @@
   --color-accent-400: #2dd4bf;
   --color-accent-500: #14b8a6;
   --color-accent-600: #0d9488;
+  --color-accent-light: rgba(20, 184, 166, 0.1);
 
   /* Neutral */
   --color-neutral-0: #ffffff;
@@ -115,31 +116,6 @@
   --content-padding: 24px;
   --content-padding-lg: 32px;
   --section-gap: 32px;
-
-  /* Icon sizes */
-  --icon-xs: 14px;
-  --icon-sm: 16px;
-  --icon-md: 20px;
-  --icon-lg: 24px;
-  --icon-xl: 32px;
-
-  /* Typography scale */
-  --text-xs: 0.6875rem;
-  /* 11px */
-  --text-sm: 0.8125rem;
-  /* 13px */
-  --text-base: 0.875rem;
-  /* 14px */
-  --text-md: 0.9375rem;
-  /* 15px */
-  --text-lg: 1rem;
-  /* 16px */
-  --text-xl: 1.125rem;
-  /* 18px */
-  --text-2xl: 1.25rem;
-  /* 20px */
-  --text-3xl: 1.5rem;
-  /* 24px */
 }
 
 /* ============================================
@@ -252,43 +228,8 @@ pre,
   font-size: 0.8125rem;
 }
 
-/* Typography scale — enterprise-grade minimums */
-.text-page-title {
-  font-size: 1.375rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.3;
-  color: var(--text-primary);
-}
-
-.text-section-label {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-tertiary);
-}
-
-.text-body {
-  font-size: 0.875rem;
-  line-height: 1.6;
-  color: var(--text-primary);
-}
-
-.text-caption {
-  font-size: 0.75rem;
-  line-height: 1.5;
-  color: var(--text-tertiary);
-}
-
-.text-card-title {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
 /* ============================================
-   VIBRANCY & GLASS (Subtle)
+   VIBRANCY & GLASS
    ============================================ */
 
 .vibrancy {
@@ -297,19 +238,19 @@ pre,
 }
 
 .glass-card {
-  backdrop-filter: blur(8px) saturate(110%);
-  -webkit-backdrop-filter: blur(8px) saturate(110%);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: var(--shadow-card);
 }
 
 :root .glass-card {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.7);
   border-color: rgba(0, 0, 0, 0.04);
 }
 
 .dark .glass-card {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.04);
   border-color: rgba(255, 255, 255, 0.06);
 }
 
@@ -340,7 +281,7 @@ pre,
 }
 
 .input-field-sm {
-  padding: 9px 12px;
+  padding: 8px 12px;
   font-size: 0.8125rem;
 }
 
@@ -378,8 +319,8 @@ pre,
   justify-content: center;
   gap: 6px;
   border-radius: var(--radius-md);
-  padding: 9px 20px;
-  font-size: 0.875rem;
+  padding: 8px 18px;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: var(--text-secondary);
   background: transparent;
@@ -399,8 +340,8 @@ pre,
   justify-content: center;
   gap: 6px;
   border-radius: var(--radius-md);
-  padding: 7px 14px;
-  font-size: 0.875rem;
+  padding: 6px 12px;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: var(--text-secondary);
   background: transparent;
@@ -422,16 +363,15 @@ pre,
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--content-padding);
+  padding: 20px var(--content-padding);
   border-bottom: 1px solid var(--border-default);
   flex-shrink: 0;
-  height: var(--titlebar-height);
+  min-height: 68px;
 }
 
 .page-header h1 {
   font-size: 1.125rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-weight: 700;
   color: var(--text-primary);
 }
 
@@ -542,7 +482,7 @@ pre,
 }
 
 .animate-shimmer {
-  background: linear-gradient(90deg, var(--color-primary-500) 25%, var(--color-primary-400) 50%, var(--color-primary-500) 75%);
+  background: linear-gradient(90deg, var(--bg-surface-raised) 25%, var(--bg-card-hover) 50%, var(--bg-surface-raised) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }

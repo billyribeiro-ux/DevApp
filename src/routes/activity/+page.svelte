@@ -35,12 +35,14 @@
 </script>
 
 <div class="flex flex-col h-full overflow-hidden">
-	<div class="flex items-center gap-3 border-b shrink-0" style="border-color: var(--border-default); height: var(--titlebar-height); padding: 0 var(--content-padding);">
-		<Icon icon="ph:clock-counter-clockwise-bold" width={24} height={24} style="color: var(--text-accent);" />
-		<h1 class="text-[22px] font-bold" style="color: var(--text-primary); letter-spacing: -0.02em;">Activity</h1>
+	<div class="page-header">
+		<div class="flex items-center gap-3">
+			<Icon icon="ph:clock-counter-clockwise-bold" width={24} height={24} style="color: var(--text-accent);" />
+			<h1>Activity</h1>
+		</div>
 	</div>
 
-	<div class="flex-1 overflow-y-auto" style="padding: var(--content-padding);">
+	<div class="page-content">
 		{#if activities.length > 0}
 			<div class="max-w-2xl mx-auto space-y-2">
 				{#each activities as activity (activity.id)}
@@ -49,13 +51,13 @@
 							<Icon icon={entityIcons[activity.entity_type] ?? 'ph:circle'} width={18} height={18} style="color: var(--text-secondary);" />
 						</div>
 						<div class="flex-1 min-w-0">
-							<p class="text-[14px]" style="color: var(--text-primary);">
+							<p class="text-[15px]" style="color: var(--text-primary);">
 								<span class="font-medium capitalize">{activity.action}</span>
 								{#if activity.entity_name}
 									<span> "{activity.entity_name}"</span>
 								{/if}
 							</p>
-							<p class="text-[13px] mt-0.5" style="color: var(--text-tertiary);">{activity.entity_type} &middot; {formatRelativeDate(activity.created_at)}</p>
+							<p class="text-[12px] mt-0.5" style="color: var(--text-tertiary);">{activity.entity_type} &middot; {formatRelativeDate(activity.created_at)}</p>
 						</div>
 						<Icon icon={actionIcons[activity.action] ?? 'ph:circle'} width={16} height={16} style="color: var(--text-tertiary);" />
 					</div>

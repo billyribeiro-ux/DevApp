@@ -7,8 +7,6 @@
 	import { getFileTypeInfo, FOLDER_TYPE_META } from '$config/constants';
 	import type { Folder, VaultFile } from '$types';
 	import { v4 as uuid } from 'uuid';
-	import { invoke } from '@tauri-apps/api/core';
-	import { writeFile } from '@tauri-apps/plugin-fs';
 
 	let currentFiles = $state<VaultFile[]>([]);
 	let subfolders = $state<Folder[]>([]);
@@ -63,38 +61,20 @@
 		dragOver = false;
 		if (!e.dataTransfer?.files.length || !vault.currentFolderId) return;
 
-		const folderId = vault.currentFolderId;
-		let count = 0;
-		try {
-			const vaultPath = await invoke<string>('get_vault_path');
-			const destFolder = `${vaultPath}/${folderId}`;
-			await invoke('ensure_directory', { path: destFolder });
-
-			for (const file of Array.from(e.dataTransfer.files)) {
-				const ext = getExtension(file.name);
-				const id = uuid();
-				const arrayBuf = await file.arrayBuffer();
-				const destPath = `${destFolder}/${file.name}`;
-				await writeFile(destPath, new Uint8Array(arrayBuf));
-				await createFile({
-					id,
-					folder_id: folderId,
-					name: file.name,
-					extension: ext || null,
-					mime_type: file.type || null,
-					size_bytes: file.size,
-					local_path: destPath,
-				});
-				count++;
-			}
-		} catch (err) {
-			console.error('File drop error:', err);
-			toasts.warning('Some files could not be uploaded');
+		for (const file of Array.from(e.dataTransfer.files)) {
+			const ext = getExtension(file.name);
+			const id = uuid();
+			await createFile({
+				id,
+				folder_id: vault.currentFolderId,
+				name: file.name,
+				extension: ext || null,
+				mime_type: file.type || null,
+				size_bytes: file.size,
+			});
 		}
-		if (count > 0) {
-			toasts.success('Files Added', `${count} file(s) added to vault`);
-		}
-		await loadFolder(folderId);
+		toasts.success('Files Added', `${e.dataTransfer.files.length} file(s) added to vault`);
+		await loadFolder(vault.currentFolderId);
 	}
 
 	async function handleCreateFolder() {
@@ -143,7 +123,7 @@
 	ondrop={handleFileDrop}
 >
 	<!-- Header -->
-	<div class="flex items-center justify-between border-b shrink-0" style="border-color: var(--border-default); height: var(--titlebar-height); padding: 0 var(--content-padding);">
+	<div class="page-header">
 		<div class="flex items-center gap-2">
 			{#each breadcrumbs as crumb, i}
 				{#if i > 0}
@@ -171,7 +151,7 @@
 
 	<!-- New folder input -->
 	{#if showNewFolderInput}
-		<div class="flex items-center gap-2 py-3 border-b animate-slide-down" style="border-color: var(--border-default); background: var(--bg-surface); padding-left: var(--content-padding); padding-right: var(--content-padding);">
+		<div class="flex items-center gap-2 px-8 py-3 border-b animate-slide-down" style="border-color: var(--border-default); background: var(--bg-surface);">
 			<Icon icon="ph:folder-bold" width={18} height={18} style="color: var(--text-accent);" />
 			<input
 				type="text"
@@ -187,7 +167,7 @@
 	{/if}
 
 	<!-- Content -->
-	<div class="flex-1 overflow-y-auto" style="padding: var(--content-padding);">
+	<div class="page-content">
 		{#if dragOver}
 			<div class="flex flex-col items-center justify-center h-full rounded-2xl border-2 border-dashed transition-all" style="border-color: var(--color-primary-500); background: var(--bg-active);">
 				<Icon icon="ph:upload-bold" width={56} height={56} style="color: var(--color-primary-500);" />
@@ -325,14 +305,14 @@
 	</div>
 
 	<!-- Status bar -->
-	<div class="flex items-center justify-between py-3 border-t text-[12px] shrink-0" style="border-color: var(--border-default); color: var(--text-tertiary); background: var(--bg-surface); padding-left: var(--content-padding); padding-right: var(--content-padding);">
+	<div class="flex items-center justify-between px-8 py-3 border-t text-[11px] shrink-0" style="border-color: var(--border-default); color: var(--text-tertiary); background: var(--bg-surface);">
 		<span>{currentFiles.length} file{currentFiles.length !== 1 ? 's' : ''} &middot; {subfolders.length} folder{subfolders.length !== 1 ? 's' : ''}</span>
 		<span>{vault.selectedFileIds.size > 0 ? `${vault.selectedFileIds.size} selected` : ''}</span>
 	</div>
 </div>
 
 <style>
-	button:not(.btn-primary):not(.btn-secondary):not(.btn-ghost):hover {
+	button:hover {
 		background: var(--bg-card-hover);
 	}
 </style>

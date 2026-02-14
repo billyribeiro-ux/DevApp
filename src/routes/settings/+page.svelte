@@ -104,7 +104,7 @@
 	</div>
 
 	<!-- Settings content -->
-	<div class="flex-1 overflow-y-auto px-10 py-8">
+	<div class="flex-1 overflow-y-auto" style="padding: var(--content-padding-lg);">
 		{#if activeTab === 'general'}
 			<h2 class="text-xl font-bold mb-8" style="color: var(--text-primary);">General</h2>
 			<div class="space-y-8 max-w-lg">
