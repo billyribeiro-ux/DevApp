@@ -146,7 +146,7 @@
 	<!-- Sidebar -->
 	<div class="w-80 border-r flex flex-col shrink-0" style="border-color: var(--border-default);">
 		<!-- Header -->
-		<div class="flex items-center justify-between px-8 border-b shrink-0" style="border-color: var(--border-default); height: 64px;">
+		<div class="flex items-center justify-between border-b shrink-0" style="border-color: var(--border-default); height: var(--titlebar-height); padding: 0 var(--content-padding);">
 			<h2 class="text-lg font-bold" style="color: var(--text-primary);">Notes</h2>
 			<button onclick={handleCreate} class="rounded-xl p-2 transition-colors" style="color: var(--text-accent);" title="New Note (Cmd+N)">
 				<Icon icon="ph:plus-bold" width={20} height={20} />
@@ -201,7 +201,7 @@
 	<div class="flex-1 flex flex-col overflow-hidden min-w-0">
 		{#if activeNoteId}
 		<!-- Toolbar -->
-		<div class="flex items-center justify-between px-8 border-b shrink-0" style="border-color: var(--border-default); height: 64px;">
+		<div class="flex items-center justify-between border-b shrink-0" style="border-color: var(--border-default); height: var(--titlebar-height); padding: 0 var(--content-padding);">
 			<div class="flex items-center gap-2">
 				{#if unsaved}
 					<div class="h-2 w-2 rounded-full" style="background: var(--color-warning);"></div>
@@ -216,7 +216,7 @@
 			</div>
 		</div>
 		<!-- Content -->
-		<div class="flex-1 overflow-y-auto px-8 py-6">
+		<div class="flex-1 overflow-y-auto" style="padding: var(--content-padding);">
 			<input
 				type="text"
 				bind:value={editTitle}

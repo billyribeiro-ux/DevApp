@@ -119,7 +119,7 @@
 						<p class="px-3 pb-1 pt-3 text-[11px] uppercase tracking-wider font-medium" style="color: var(--text-tertiary); opacity: 0.7;">{group.label}</p>
 						<div class="space-y-px">
 							{#each group.items as item}
-								
+								<a
 									href={item.href}
 									onclick={() => nav.navigate(item.href)}
 									class="sidebar-link group flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] transition-colors duration-100"

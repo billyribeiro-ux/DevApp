@@ -35,12 +35,12 @@
 </script>
 
 <div class="flex flex-col h-full overflow-hidden">
-	<div class="flex items-center gap-3 px-8 py-5 border-b shrink-0" style="border-color: var(--border-default);">
+	<div class="flex items-center gap-3 border-b shrink-0" style="border-color: var(--border-default); height: var(--titlebar-height); padding: 0 var(--content-padding);">
 		<Icon icon="ph:clock-counter-clockwise-bold" width={24} height={24} style="color: var(--text-accent);" />
 		<h1 class="text-[22px] font-bold" style="color: var(--text-primary); letter-spacing: -0.02em;">Activity</h1>
 	</div>
 
-	<div class="flex-1 overflow-y-auto px-8 py-6">
+	<div class="flex-1 overflow-y-auto" style="padding: var(--content-padding);">
 		{#if activities.length > 0}
 			<div class="max-w-2xl mx-auto space-y-2">
 				{#each activities as activity (activity.id)}

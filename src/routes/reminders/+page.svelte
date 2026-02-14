@@ -149,7 +149,7 @@
 
 <div class="flex flex-col h-full overflow-hidden">
 	<!-- Header -->
-	<div class="flex items-center justify-between px-8 border-b shrink-0" style="border-color: var(--border-default); height: 64px;">
+	<div class="flex items-center justify-between border-b shrink-0" style="border-color: var(--border-default); height: var(--titlebar-height); padding: 0 var(--content-padding);">
 		<div class="flex items-center gap-3">
 			<Icon icon="ph:bell-bold" width={24} height={24} style="color: #FF9500;" />
 			<h1 class="text-xl font-bold" style="color: var(--text-primary); letter-spacing: -0.02em;">Reminders</h1>
@@ -160,7 +160,7 @@
 		</button>
 	</div>
 	<!-- Filters -->
-	<div class="flex items-center gap-1 px-8 py-4 border-b overflow-x-auto shrink-0" style="border-color: var(--border-default);">
+	<div class="flex items-center gap-1 py-4 border-b overflow-x-auto shrink-0" style="border-color: var(--border-default); padding-left: var(--content-padding); padding-right: var(--content-padding);">
 		{#each filters as f}
 			<button onclick={() => { activeFilter = f.value; }} class="flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors" style="background: {activeFilter === f.value ? 'var(--bg-active)' : 'transparent'}; color: {activeFilter === f.value ? 'var(--text-accent)' : 'var(--text-secondary)'};">
 				<Icon icon={f.icon} width={14} height={14} />
@@ -169,7 +169,7 @@
 		{/each}
 	</div>
 
-	<div class="flex-1 overflow-y-auto px-8 py-6">
+	<div class="flex-1 overflow-y-auto" style="padding: var(--content-padding);">
 		{#if showForm}
 			<div class="max-w-lg mx-auto animate-slide-up">
 				<div class="rounded-2xl border p-8 space-y-5" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">

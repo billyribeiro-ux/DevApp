@@ -90,7 +90,7 @@
 
 <div class="flex h-full overflow-hidden">
 	<!-- Settings sidebar -->
-	<div class="w-60 shrink-0 border-r flex flex-col py-5 px-3" style="border-color: var(--border-default); background: var(--bg-surface);">
+	<div class="w-60 shrink-0 border-r flex flex-col px-3" style="border-color: var(--border-default); background: var(--bg-surface); padding-top: var(--content-padding); padding-bottom: var(--content-padding);">
 		{#each tabs as tab}
 			<button
 				onclick={() => { activeTab = tab.id; }}

@@ -54,7 +54,7 @@
 			<section>
 				<div class="flex flex-wrap gap-2">
 					{#each quickActions as action}
-						
+						<a
 							href={action.href}
 							onclick={() => nav.navigate(action.href)}
 							class="group inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-[13px] transition-colors duration-100"
@@ -69,13 +69,12 @@
 
 			<!-- Stats -->
 			<section class="grid grid-cols-4 gap-px rounded-xl border overflow-hidden" style="border-color: var(--border-default); background: var(--border-default);">
-				{@const stats = [
+				{#each [
 					{ label: 'Folders', value: vault.folders.length, icon: 'ph:files-bold', color: '#007AFF' },
 					{ label: 'Recent Files', value: recentFiles.length, icon: 'ph:note-pencil-bold', color: '#30D158' },
 					{ label: 'Reminders', value: upcomingReminders.length, icon: 'ph:bell-bold', color: '#FF9500' },
 					{ label: 'Courses', value: activeCourses.length, icon: 'ph:graduation-cap-bold', color: '#AF52DE' },
-				]}
-				{#each stats as stat}
+				] as stat}
 					<div class="flex items-center gap-3 px-4 py-4" style="background: var(--bg-card);">
 						<Icon icon={stat.icon} width={18} height={18} style="color: {stat.color}; opacity: 0.8;" />
 						<div>

@@ -130,7 +130,7 @@
 
 <div class="flex flex-col h-full overflow-hidden">
 	<!-- Header -->
-	<div class="flex items-center justify-between px-8 border-b shrink-0" style="border-color: var(--border-default); height: 64px;">
+	<div class="flex items-center justify-between border-b shrink-0" style="border-color: var(--border-default); height: var(--titlebar-height); padding: 0 var(--content-padding);">
 		<div class="flex items-center gap-3">
 			<Icon icon="ph:chat-dots-bold" width={24} height={24} style="color: var(--text-accent);" />
 			<h1 class="text-xl font-bold" style="color: var(--text-primary); letter-spacing: -0.02em;">Prompts Library</h1>
@@ -148,7 +148,7 @@
 	</div>
 
 	<!-- Categories -->
-	<div class="flex items-center gap-1 px-8 py-4 border-b overflow-x-auto shrink-0" style="border-color: var(--border-default);">
+	<div class="flex items-center gap-1 py-4 border-b overflow-x-auto shrink-0" style="border-color: var(--border-default); padding-left: var(--content-padding); padding-right: var(--content-padding);">
 		<button onclick={() => { activeCategory = 'all'; }} class="rounded-full px-4 py-1.5 text-[13px] font-medium whitespace-nowrap transition-colors" style="background: {activeCategory === 'all' ? 'var(--bg-active)' : 'transparent'}; color: {activeCategory === 'all' ? 'var(--text-accent)' : 'var(--text-secondary)'};">
 			All
 		</button>
@@ -161,7 +161,7 @@
 	</div>
 
 	<!-- Content -->
-	<div class="flex-1 overflow-y-auto px-8 py-6">
+	<div class="flex-1 overflow-y-auto" style="padding: var(--content-padding);">
 		{#if showEditor}
 			<div class="max-w-2xl mx-auto animate-slide-up">
 				<div class="rounded-2xl border p-8 space-y-5" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">

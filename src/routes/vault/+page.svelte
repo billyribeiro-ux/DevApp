@@ -143,7 +143,7 @@
 	ondrop={handleFileDrop}
 >
 	<!-- Header -->
-	<div class="flex items-center justify-between px-8 py-5 border-b shrink-0" style="border-color: var(--border-default);">
+	<div class="flex items-center justify-between border-b shrink-0" style="border-color: var(--border-default); height: var(--titlebar-height); padding: 0 var(--content-padding);">
 		<div class="flex items-center gap-2">
 			{#each breadcrumbs as crumb, i}
 				{#if i > 0}
@@ -171,7 +171,7 @@
 
 	<!-- New folder input -->
 	{#if showNewFolderInput}
-		<div class="flex items-center gap-2 px-8 py-3 border-b animate-slide-down" style="border-color: var(--border-default); background: var(--bg-surface);">
+		<div class="flex items-center gap-2 py-3 border-b animate-slide-down" style="border-color: var(--border-default); background: var(--bg-surface); padding-left: var(--content-padding); padding-right: var(--content-padding);">
 			<Icon icon="ph:folder-bold" width={18} height={18} style="color: var(--text-accent);" />
 			<input
 				type="text"
@@ -187,7 +187,7 @@
 	{/if}
 
 	<!-- Content -->
-	<div class="flex-1 overflow-y-auto px-8 py-6">
+	<div class="flex-1 overflow-y-auto" style="padding: var(--content-padding);">
 		{#if dragOver}
 			<div class="flex flex-col items-center justify-center h-full rounded-2xl border-2 border-dashed transition-all" style="border-color: var(--color-primary-500); background: var(--bg-active);">
 				<Icon icon="ph:upload-bold" width={56} height={56} style="color: var(--color-primary-500);" />
@@ -325,7 +325,7 @@
 	</div>
 
 	<!-- Status bar -->
-	<div class="flex items-center justify-between px-8 py-3 border-t text-[12px] shrink-0" style="border-color: var(--border-default); color: var(--text-tertiary); background: var(--bg-surface);">
+	<div class="flex items-center justify-between py-3 border-t text-[12px] shrink-0" style="border-color: var(--border-default); color: var(--text-tertiary); background: var(--bg-surface); padding-left: var(--content-padding); padding-right: var(--content-padding);">
 		<span>{currentFiles.length} file{currentFiles.length !== 1 ? 's' : ''} &middot; {subfolders.length} folder{subfolders.length !== 1 ? 's' : ''}</span>
 		<span>{vault.selectedFileIds.size > 0 ? `${vault.selectedFileIds.size} selected` : ''}</span>
 	</div>

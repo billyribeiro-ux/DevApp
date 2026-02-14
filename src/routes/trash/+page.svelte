@@ -51,7 +51,7 @@
 </script>
 
 <div class="flex flex-col h-full overflow-hidden">
-	<div class="flex items-center justify-between px-8 py-5 border-b shrink-0" style="border-color: var(--border-default);">
+	<div class="flex items-center justify-between border-b shrink-0" style="border-color: var(--border-default); height: var(--titlebar-height); padding: 0 var(--content-padding);">
 		<div class="flex items-center gap-3">
 			<Icon icon="ph:trash-bold" width={24} height={24} style="color: var(--color-error);" />
 			<h1 class="text-[22px] font-bold" style="color: var(--text-primary); letter-spacing: -0.02em;">Trash</h1>
@@ -64,7 +64,7 @@
 		{/if}
 	</div>
 
-	<div class="flex-1 overflow-y-auto px-8 py-6">
+	<div class="flex-1 overflow-y-auto" style="padding: var(--content-padding);">
 		{#if trashFiles.length > 0}
 			<p class="text-[14px] mb-5" style="color: var(--text-tertiary);">Items in trash will be permanently deleted after 30 days.</p>
 			<div class="space-y-3">
