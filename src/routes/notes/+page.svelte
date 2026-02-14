@@ -234,7 +234,7 @@
 			></textarea>
 		</div>
 		<!-- Footer -->
-		<div class="flex items-center justify-between px-8 py-3 border-t text-[12px] shrink-0" style="border-color: var(--border-default); color: var(--text-tertiary);">
+		<div class="flex items-center justify-between py-3 border-t text-[12px] shrink-0" style="border-color: var(--border-default); color: var(--text-tertiary); padding-left: var(--content-padding); padding-right: var(--content-padding);">
 			<span>{wordCount} words</span>
 			<span>{activeNote ? formatRelativeDate(activeNote.updated_at) : ''}</span>
 		</div>
