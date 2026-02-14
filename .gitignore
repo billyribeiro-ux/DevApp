@@ -10,3 +10,4 @@ node_modules
 Thumbs.db
 dist/
 src-tauri/target/
+sync-server/target/

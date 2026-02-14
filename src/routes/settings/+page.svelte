@@ -1,10 +1,48 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
-	import { ui, theme, sync, nav } from '$stores/app.svelte';
+	import { ui, theme, sync, nav, toasts } from '$stores/app.svelte';
 	import { APP_NAME, APP_VERSION } from '$config/constants';
+	import { login, register, logout, checkServerHealth, restoreSession, isAuthenticated, getStoredUser } from '$services/supabase';
 
 	let activeTab = $state('general');
+	let serverOnline = $state(false);
+	let authEmail = $state('');
+	let authPassword = $state('');
+	let authMode = $state<'login' | 'register'>('login');
+	let authLoading = $state(false);
+
+	async function checkServer() {
+		serverOnline = await checkServerHealth();
+	}
+
+	async function handleAuth() {
+		if (!authEmail || !authPassword) return;
+		authLoading = true;
+		try {
+			if (authMode === 'register') {
+				await register(authEmail, authPassword);
+				toasts.success('Account Created', 'You are now logged in');
+			} else {
+				await login(authEmail, authPassword);
+				toasts.success('Logged In');
+			}
+			sync.isAuthenticated = true;
+			sync.userEmail = authEmail;
+			authEmail = '';
+			authPassword = '';
+		} catch (e: any) {
+			toasts.error('Auth Failed', e.message);
+		}
+		authLoading = false;
+	}
+
+	function handleLogout() {
+		logout();
+		sync.isAuthenticated = false;
+		sync.userEmail = null;
+		toasts.info('Logged Out');
+	}
 
 	const tabs = [
 		{ id: 'general', label: 'General', icon: 'ph:gear' },
@@ -37,7 +75,17 @@
 		{ keys: 'Escape', action: 'Close Modal/Panel' },
 	];
 
-	onMount(() => nav.navigate('/settings'));
+	onMount(() => {
+		nav.navigate('/settings');
+		checkServer();
+		if (restoreSession()) {
+			const user = getStoredUser();
+			if (user) {
+				sync.isAuthenticated = true;
+				sync.userEmail = user.email;
+			}
+		}
+	});
 </script>
 
 <div class="flex h-full overflow-hidden">
@@ -108,20 +156,56 @@
 		{:else if activeTab === 'sync'}
 			<h2 class="text-lg font-bold mb-6" style="color: var(--text-primary);">Sync & Account</h2>
 			<div class="space-y-6 max-w-lg">
-				<div class="rounded-xl border p-6" style="background: var(--bg-card); border-color: var(--border-default);">
-					<div class="flex items-center gap-3 mb-4">
-						<div class="h-3 w-3 rounded-full" style="background: {sync.isAuthenticated ? 'var(--color-success)' : 'var(--color-neutral-400)'};"></div>
-						<span class="text-sm font-medium" style="color: var(--text-primary);">{sync.isAuthenticated ? 'Connected' : 'Not Connected'}</span>
+				<!-- Server Status -->
+				<div class="rounded-xl border p-5" style="background: var(--bg-card); border-color: var(--border-default);">
+					<div class="flex items-center justify-between mb-3">
+						<div class="flex items-center gap-2">
+							<div class="h-2.5 w-2.5 rounded-full" style="background: {serverOnline ? 'var(--color-success)' : 'var(--color-error)'};"></div>
+							<span class="text-sm font-medium" style="color: var(--text-primary);">Sync Server</span>
+						</div>
+						<button onclick={checkServer} class="rounded-md px-2 py-1 text-[11px]" style="color: var(--text-secondary); border: 1px solid var(--border-default);">Refresh</button>
+					</div>
+					<p class="text-xs" style="color: var(--text-tertiary);">{serverOnline ? 'Server is reachable' : 'Server offline — run `cargo run` in sync-server/'}</p>
+				</div>
+
+				<!-- Auth -->
+				<div class="rounded-xl border p-5" style="background: var(--bg-card); border-color: var(--border-default);">
+					<div class="flex items-center gap-2 mb-4">
+						<Icon icon="ph:user-circle-bold" width={20} height={20} style="color: var(--text-accent);" />
+						<span class="text-sm font-semibold" style="color: var(--text-primary);">Account</span>
 					</div>
 					{#if sync.isAuthenticated}
-						<p class="text-xs mb-2" style="color: var(--text-secondary);">{sync.userEmail}</p>
-						<p class="text-xs" style="color: var(--text-tertiary);">Last synced: {sync.lastSyncedAt ?? 'Never'}</p>
+						<div class="space-y-3">
+							<div class="flex items-center gap-2">
+								<div class="h-2 w-2 rounded-full" style="background: var(--color-success);"></div>
+								<span class="text-sm" style="color: var(--text-primary);">Signed in as <strong>{sync.userEmail}</strong></span>
+							</div>
+							<p class="text-xs" style="color: var(--text-tertiary);">Last synced: {sync.lastSyncedAt ?? 'Never'}</p>
+							<button onclick={handleLogout} class="rounded-lg px-3 py-1.5 text-xs font-medium" style="color: var(--color-error); border: 1px solid var(--color-error);">
+								<Icon icon="ph:sign-out-bold" width={14} height={14} style="display: inline; vertical-align: -2px;" /> Sign Out
+							</button>
+						</div>
 					{:else}
-						<p class="text-xs mb-4" style="color: var(--text-secondary);">Connect to Supabase to enable cross-device sync. Your files, notes, and settings will sync automatically.</p>
-						<button class="rounded-lg px-4 py-2 text-xs font-medium text-white" style="background: var(--color-primary-600);">
-							<Icon icon="ph:cloud-bold" width={14} height={14} style="display: inline; vertical-align: -2px;" /> Connect Account
-						</button>
+						<p class="text-xs mb-4" style="color: var(--text-secondary);">Sign in to enable cross-device sync. Your data syncs to your self-hosted server — no third-party services, zero cost.</p>
+						<div class="space-y-3">
+							<div class="flex gap-2">
+								<button onclick={() => { authMode = 'login'; }} class="rounded-md px-3 py-1 text-xs font-medium" style="background: {authMode === 'login' ? 'var(--bg-active)' : 'transparent'}; color: {authMode === 'login' ? 'var(--text-accent)' : 'var(--text-secondary)'};">Sign In</button>
+								<button onclick={() => { authMode = 'register'; }} class="rounded-md px-3 py-1 text-xs font-medium" style="background: {authMode === 'register' ? 'var(--bg-active)' : 'transparent'}; color: {authMode === 'register' ? 'var(--text-accent)' : 'var(--text-secondary)'};">Register</button>
+							</div>
+							<input type="email" bind:value={authEmail} placeholder="Email" class="w-full rounded-lg border px-3 py-2 text-sm outline-none" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);" />
+							<input type="password" bind:value={authPassword} placeholder="Password (8+ chars)" class="w-full rounded-lg border px-3 py-2 text-sm outline-none" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);" onkeydown={(e) => { if (e.key === 'Enter') handleAuth(); }} />
+							<button onclick={handleAuth} disabled={authLoading} class="w-full rounded-lg px-4 py-2 text-xs font-medium text-white disabled:opacity-50" style="background: var(--color-primary-600);">
+								{authLoading ? 'Please wait...' : authMode === 'register' ? 'Create Account' : 'Sign In'}
+							</button>
+						</div>
 					{/if}
+				</div>
+
+				<!-- Info -->
+				<div class="rounded-xl border p-5" style="background: var(--bg-card); border-color: var(--border-default);">
+					<p class="text-xs leading-relaxed" style="color: var(--text-secondary);">
+						<strong>Self-hosted sync.</strong> DevVault uses its own Rust sync server — no Supabase, no Firebase, no subscriptions. Run <code class="font-mono rounded px-1 py-0.5 text-[10px]" style="background: var(--bg-surface-raised);">cd sync-server && cargo run</code> to start the server. Your data stays on your infrastructure.
+					</p>
 				</div>
 			</div>
 
@@ -152,10 +236,11 @@
 					DevVault is a personal developer workspace & cloud sync desktop app. Built with Tauri v2, SvelteKit, Svelte 5, TailwindCSS v4, and GSAP.
 				</p>
 				<div class="space-y-2 text-sm" style="color: var(--text-secondary);">
-					<p><strong>Stack:</strong> Tauri v2 + SvelteKit + Svelte 5 (Runes) + TailwindCSS v4 + Supabase</p>
+					<p><strong>Desktop:</strong> Tauri v2 + SvelteKit + Svelte 5 (Runes) + TailwindCSS v4</p>
+					<p><strong>Sync Server:</strong> Custom Rust (Axum + SQLite + JWT + WebSocket)</p>
 					<p><strong>Icons:</strong> Phosphor Icons + Iconify</p>
 					<p><strong>Animations:</strong> GSAP</p>
-					<p><strong>Database:</strong> SQLite (local) + PostgreSQL (cloud)</p>
+					<p><strong>Database:</strong> SQLite (both local + server) — zero cost, self-hosted</p>
 				</div>
 			</div>
 		{/if}
