@@ -79,8 +79,8 @@
 	<div class="flex items-center justify-between px-8 py-5 border-b shrink-0" style="border-color: var(--border-default);">
 		<div class="flex items-center gap-3">
 			<Icon icon="ph:graduation-cap-bold" width={24} height={24} style="color: #14b8a6;" />
-			<h1 class="text-xl font-bold" style="color: var(--text-primary);">Courses</h1>
-			<span class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold" style="background: rgba(20, 184, 166, 0.1); color: #14b8a6;">{courses.length}</span>
+			<h1 class="text-[22px] font-bold" style="color: var(--text-primary); letter-spacing: -0.02em;">Courses</h1>
+			<span class="rounded-full px-2.5 py-0.5 text-[12px] font-semibold" style="background: rgba(20, 184, 166, 0.1); color: #14b8a6;">{courses.length}</span>
 		</div>
 		<button onclick={() => startEdit()} class="btn-primary">
 			<Icon icon="ph:plus-bold" width={15} height={15} /> New Course
@@ -124,32 +124,32 @@
 					<div class="rounded-2xl border p-6 transition-all duration-150 hover:shadow-md" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
 						<div class="flex items-start justify-between mb-3">
 							<div>
-								<h3 class="text-[15px] font-semibold" style="color: var(--text-primary);">{course.name}</h3>
+								<h3 class="text-[16px] font-semibold" style="color: var(--text-primary);">{course.name}</h3>
 								{#if course.instructor}
 									<p class="text-[13px] mt-0.5" style="color: var(--text-tertiary);">by {course.instructor}</p>
 								{/if}
 							</div>
-							<button onclick={() => toggleStatus(course)} class="rounded-full px-2.5 py-1 text-[10px] font-semibold" style="background: {getStatusColor(course.status)}20; color: {getStatusColor(course.status)};">
+							<button onclick={() => toggleStatus(course)} class="rounded-full px-2.5 py-1 text-[11px] font-semibold" style="background: {getStatusColor(course.status)}20; color: {getStatusColor(course.status)};">
 								{course.status.replace('_', ' ')}
 							</button>
 						</div>
 						{#if course.platform}
-							<span class="inline-block rounded-lg px-2.5 py-1 text-[11px] font-medium mb-3" style="background: var(--bg-surface-raised); color: var(--text-secondary);">{course.platform}</span>
+							<span class="inline-block rounded-lg px-2.5 py-1 text-[12px] font-medium mb-3" style="background: var(--bg-surface-raised); color: var(--text-secondary);">{course.platform}</span>
 						{/if}
 						{#if course.description}
 							<p class="text-[13px] mb-4 line-clamp-2" style="color: var(--text-secondary);">{course.description}</p>
 						{/if}
 						<div class="mb-3">
 							<div class="flex items-center justify-between mb-1.5">
-								<span class="text-[11px]" style="color: var(--text-tertiary);">Progress</span>
-								<span class="text-[11px] font-semibold" style="color: var(--text-primary);">{course.progress_percent}%</span>
+								<span class="text-[12px]" style="color: var(--text-tertiary);">Progress</span>
+								<span class="text-[12px] font-semibold" style="color: var(--text-primary);">{course.progress_percent}%</span>
 							</div>
 							<div class="h-2 rounded-full overflow-hidden" style="background: var(--bg-surface-raised);">
 								<div class="h-full rounded-full transition-all duration-300" style="width: {course.progress_percent}%; background: {getStatusColor(course.status)};"></div>
 							</div>
 						</div>
 						<div class="flex items-center justify-between">
-							<span class="text-[11px]" style="color: var(--text-tertiary);">{course.completed_lessons}/{course.total_lessons} lessons</span>
+							<span class="text-[12px]" style="color: var(--text-tertiary);">{course.completed_lessons}/{course.total_lessons} lessons</span>
 							<div class="flex items-center gap-1">
 								<button onclick={() => startEdit(course)} class="rounded-xl p-2" style="color: var(--text-tertiary);">
 									<Icon icon="ph:pencil" width={16} height={16} />

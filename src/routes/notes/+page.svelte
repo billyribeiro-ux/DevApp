@@ -112,8 +112,8 @@
 <div class="flex h-full overflow-hidden">
 	<!-- Notes list sidebar -->
 	<div class="w-[300px] shrink-0 border-r flex flex-col" style="border-color: var(--border-default); background: var(--bg-surface);">
-		<div class="flex items-center justify-between px-5 py-4 border-b" style="border-color: var(--border-default);">
-			<h2 class="text-base font-bold" style="color: var(--text-primary);">Notes</h2>
+		<div class="flex items-center justify-between px-5 py-5 border-b" style="border-color: var(--border-default);">
+			<h2 class="text-lg font-bold" style="color: var(--text-primary);">Notes</h2>
 			<button onclick={handleCreate} class="rounded-xl p-2 transition-colors" style="color: var(--text-accent);" title="New Note (Cmd+N)">
 				<Icon icon="ph:plus-bold" width={20} height={20} />
 			</button>
@@ -137,8 +137,8 @@
 							<Icon icon="ph:push-pin-fill" width={12} height={12} style="color: var(--text-tertiary);" />
 						{/if}
 					</div>
-					<p class="text-[12px] mt-1 truncate" style="color: var(--text-tertiary);">{note.content_text?.slice(0, 80) || 'Empty note'}</p>
-					<p class="text-[11px] mt-1.5" style="color: var(--text-tertiary);">{formatRelativeDate(note.updated_at)} &middot; {note.word_count} words</p>
+					<p class="text-[13px] mt-1 truncate" style="color: var(--text-tertiary);">{note.content_text?.slice(0, 80) || 'Empty note'}</p>
+					<p class="text-[12px] mt-1.5" style="color: var(--text-tertiary);">{formatRelativeDate(note.updated_at)} &middot; {note.word_count} words</p>
 				</button>
 			{/each}
 			{#if filteredNotes.length === 0}
@@ -190,7 +190,7 @@
 				></textarea>
 			</div>
 			<!-- Footer -->
-			<div class="flex items-center justify-between px-10 py-3 border-t text-[11px] shrink-0" style="border-color: var(--border-default); color: var(--text-tertiary);">
+			<div class="flex items-center justify-between px-10 py-3 border-t text-[12px] shrink-0" style="border-color: var(--border-default); color: var(--text-tertiary);">
 				<span>{wordCount} words</span>
 				<span>{formatRelativeDate(activeNote.updated_at)}</span>
 			</div>
@@ -207,6 +207,6 @@
 </div>
 
 <style>
-	button:hover { background: var(--bg-card-hover); }
+	button:not(.btn-primary):not(.btn-secondary):not(.btn-ghost):hover { background: var(--bg-card-hover); }
 	textarea::placeholder { color: var(--text-tertiary); }
 </style>

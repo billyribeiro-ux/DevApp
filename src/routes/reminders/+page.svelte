@@ -86,8 +86,8 @@
 	<div class="flex items-center justify-between px-8 py-5 border-b shrink-0" style="border-color: var(--border-default);">
 		<div class="flex items-center gap-3">
 			<Icon icon="ph:bell-bold" width={24} height={24} style="color: #FF9500;" />
-			<h1 class="text-xl font-bold" style="color: var(--text-primary);">Reminders</h1>
-			<span class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold" style="background: var(--color-warning-light); color: var(--color-warning);">{reminders.filter(r => r.status === 'pending').length} pending</span>
+			<h1 class="text-[22px] font-bold" style="color: var(--text-primary); letter-spacing: -0.02em;">Reminders</h1>
+			<span class="rounded-full px-2.5 py-0.5 text-[12px] font-semibold" style="background: var(--color-warning-light); color: var(--color-warning);">{reminders.filter(r => r.status === 'pending').length} pending</span>
 		</div>
 		<button onclick={() => startEdit()} class="btn-primary">
 			<Icon icon="ph:plus-bold" width={15} height={15} /> New Reminder
@@ -156,24 +156,24 @@
 							{/if}
 						</button>
 						<div class="flex-1 min-w-0">
-							<p class="text-[15px] font-medium" style="color: var(--text-primary); text-decoration: {reminder.status === 'completed' ? 'line-through' : 'none'}; opacity: {reminder.status === 'completed' ? 0.5 : 1};">{reminder.title}</p>
+							<p class="text-[16px] font-medium" style="color: var(--text-primary); text-decoration: {reminder.status === 'completed' ? 'line-through' : 'none'}; opacity: {reminder.status === 'completed' ? 0.5 : 1};">{reminder.title}</p>
 							{#if reminder.description}
 								<p class="text-[13px] mt-0.5 truncate" style="color: var(--text-tertiary);">{reminder.description}</p>
 							{/if}
 							<div class="flex items-center gap-3 mt-2">
 								{#if reminder.due_date}
-									<span class="text-[11px] flex items-center gap-1" style="color: var(--text-tertiary);">
-										<Icon icon="ph:calendar" width={12} height={12} /> {formatDate(reminder.due_date)}
-									</span>
-								{/if}
-								{#if reminder.recurrence !== 'none'}
-									<span class="text-[11px] flex items-center gap-1" style="color: var(--text-tertiary);">
-										<Icon icon="ph:arrows-clockwise" width={12} height={12} /> {reminder.recurrence}
-									</span>
-								{/if}
+								<span class="text-[12px] flex items-center gap-1" style="color: var(--text-tertiary);">
+									<Icon icon="ph:calendar" width={13} height={13} /> {formatDate(reminder.due_date)}
+								</span>
+							{/if}
+							{#if reminder.recurrence !== 'none'}
+								<span class="text-[12px] flex items-center gap-1" style="color: var(--text-tertiary);">
+									<Icon icon="ph:arrows-clockwise" width={13} height={13} /> {reminder.recurrence}
+								</span>
+							{/if}
 							</div>
 						</div>
-						<span class="rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase shrink-0" style="background: {getPriorityColor(reminder.priority)}20; color: {getPriorityColor(reminder.priority)};">{reminder.priority}</span>
+						<span class="rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase shrink-0" style="background: {getPriorityColor(reminder.priority)}20; color: {getPriorityColor(reminder.priority)};">{reminder.priority}</span>
 						<div class="flex items-center gap-1 shrink-0">
 							<button onclick={() => startEdit(reminder)} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);">
 								<Icon icon="ph:pencil" width={16} height={16} />

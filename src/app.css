@@ -227,6 +227,41 @@ pre,
   font-size: 0.8125rem;
 }
 
+/* Typography scale — enterprise-grade minimums */
+.text-page-title {
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  color: var(--text-primary);
+}
+
+.text-section-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+}
+
+.text-body {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.text-caption {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+}
+
+.text-card-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
 /* ============================================
    VIBRANCY & GLASS
    ============================================ */
@@ -263,7 +298,7 @@ pre,
   border: 1px solid var(--border-default);
   background: var(--bg-input);
   color: var(--text-primary);
-  padding: 10px 14px;
+  padding: 11px 14px;
   font-size: 0.875rem;
   line-height: 1.5;
   outline: none;
@@ -280,7 +315,7 @@ pre,
 }
 
 .input-field-sm {
-  padding: 8px 12px;
+  padding: 9px 12px;
   font-size: 0.8125rem;
 }
 
@@ -294,8 +329,8 @@ pre,
   justify-content: center;
   gap: 6px;
   border-radius: var(--radius-md);
-  padding: 8px 18px;
-  font-size: 0.8125rem;
+  padding: 9px 20px;
+  font-size: 0.875rem;
   font-weight: 600;
   color: white;
   background: #007AFF;
@@ -318,8 +353,8 @@ pre,
   justify-content: center;
   gap: 6px;
   border-radius: var(--radius-md);
-  padding: 8px 18px;
-  font-size: 0.8125rem;
+  padding: 9px 20px;
+  font-size: 0.875rem;
   font-weight: 500;
   color: var(--text-secondary);
   background: transparent;
@@ -339,8 +374,8 @@ pre,
   justify-content: center;
   gap: 6px;
   border-radius: var(--radius-md);
-  padding: 6px 12px;
-  font-size: 0.8125rem;
+  padding: 7px 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   color: var(--text-secondary);
   background: transparent;
@@ -365,12 +400,13 @@ pre,
   padding: 20px var(--content-padding);
   border-bottom: 1px solid var(--border-default);
   flex-shrink: 0;
-  min-height: 68px;
+  min-height: 72px;
 }
 
 .page-header h1 {
-  font-size: 1.25rem;
+  font-size: 1.375rem;
   font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--text-primary);
 }
 

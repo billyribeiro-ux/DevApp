@@ -37,7 +37,7 @@
 <div class="flex flex-col h-full overflow-hidden">
 	<div class="flex items-center gap-3 px-8 py-5 border-b shrink-0" style="border-color: var(--border-default);">
 		<Icon icon="ph:clock-counter-clockwise-bold" width={24} height={24} style="color: var(--text-accent);" />
-		<h1 class="text-xl font-bold" style="color: var(--text-primary);">Activity</h1>
+		<h1 class="text-[22px] font-bold" style="color: var(--text-primary); letter-spacing: -0.02em;">Activity</h1>
 	</div>
 
 	<div class="flex-1 overflow-y-auto px-8 py-6">
@@ -49,13 +49,13 @@
 							<Icon icon={entityIcons[activity.entity_type] ?? 'ph:circle'} width={18} height={18} style="color: var(--text-secondary);" />
 						</div>
 						<div class="flex-1 min-w-0">
-							<p class="text-[15px]" style="color: var(--text-primary);">
+							<p class="text-[14px]" style="color: var(--text-primary);">
 								<span class="font-medium capitalize">{activity.action}</span>
 								{#if activity.entity_name}
 									<span> "{activity.entity_name}"</span>
 								{/if}
 							</p>
-							<p class="text-[12px] mt-0.5" style="color: var(--text-tertiary);">{activity.entity_type} &middot; {formatRelativeDate(activity.created_at)}</p>
+							<p class="text-[13px] mt-0.5" style="color: var(--text-tertiary);">{activity.entity_type} &middot; {formatRelativeDate(activity.created_at)}</p>
 						</div>
 						<Icon icon={actionIcons[activity.action] ?? 'ph:circle'} width={16} height={16} style="color: var(--text-tertiary);" />
 					</div>

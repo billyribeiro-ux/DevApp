@@ -41,7 +41,7 @@
 <div class="flex flex-col h-full overflow-y-auto">
 	<!-- Header -->
 	<div class="px-10 pt-10 pb-2">
-		<p class="text-[11px] font-semibold uppercase tracking-widest" style="color: var(--text-tertiary);">{dateStr}</p>
+		<p class="text-[12px] font-semibold uppercase tracking-widest" style="color: var(--text-tertiary);">{dateStr}</p>
 		<h1 class="text-[32px] font-bold mt-1.5" style="color: var(--text-primary); letter-spacing: -0.02em;">{greeting}</h1>
 		<p class="text-[15px] mt-1" style="color: var(--text-secondary);">Welcome back to your workspace</p>
 	</div>
@@ -49,7 +49,7 @@
 	<div class="px-10 py-6 space-y-10">
 		<!-- Quick Actions -->
 		<section>
-			<h2 class="text-[11px] font-semibold uppercase tracking-widest mb-4" style="color: var(--text-tertiary);">Quick Actions</h2>
+			<h2 class="text-[12px] font-semibold uppercase tracking-widest mb-4" style="color: var(--text-tertiary);">Quick Actions</h2>
 			<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
 				{#each quickActions as action}
 					<a
@@ -61,7 +61,7 @@
 						<div class="rounded-2xl p-3 transition-transform duration-200 group-hover:scale-110" style="background: {action.color}15;">
 							<Icon icon={action.icon} width={28} height={28} style="color: {action.color};" />
 						</div>
-						<span class="text-xs font-medium" style="color: var(--text-secondary);">{action.label}</span>
+						<span class="text-[13px] font-medium" style="color: var(--text-secondary);">{action.label}</span>
 					</a>
 				{/each}
 			</div>
@@ -76,7 +76,7 @@
 					</div>
 					<div>
 						<p class="text-[28px] font-bold leading-none" style="color: var(--text-primary);">{vault.folders.length}</p>
-						<p class="text-xs mt-1" style="color: var(--text-tertiary);">Folders</p>
+						<p class="text-[13px] mt-1" style="color: var(--text-tertiary);">Folders</p>
 					</div>
 				</div>
 			</div>
@@ -87,7 +87,7 @@
 					</div>
 					<div>
 						<p class="text-[28px] font-bold leading-none" style="color: var(--text-primary);">{recentFiles.length}</p>
-						<p class="text-xs mt-1" style="color: var(--text-tertiary);">Recent Files</p>
+						<p class="text-[13px] mt-1" style="color: var(--text-tertiary);">Recent Files</p>
 					</div>
 				</div>
 			</div>
@@ -98,7 +98,7 @@
 					</div>
 					<div>
 						<p class="text-[28px] font-bold leading-none" style="color: var(--text-primary);">{upcomingReminders.length}</p>
-						<p class="text-xs mt-1" style="color: var(--text-tertiary);">Pending Reminders</p>
+						<p class="text-[13px] mt-1" style="color: var(--text-tertiary);">Pending Reminders</p>
 					</div>
 				</div>
 			</div>
@@ -109,7 +109,7 @@
 					</div>
 					<div>
 						<p class="text-[28px] font-bold leading-none" style="color: var(--text-primary);">{activeCourses.length}</p>
-						<p class="text-xs mt-1" style="color: var(--text-tertiary);">Active Courses</p>
+						<p class="text-[13px] mt-1" style="color: var(--text-tertiary);">Active Courses</p>
 					</div>
 				</div>
 			</div>
@@ -118,7 +118,7 @@
 		<!-- Recent Files -->
 		<section>
 			<div class="flex items-center justify-between mb-4">
-				<h2 class="text-[11px] font-semibold uppercase tracking-widest" style="color: var(--text-tertiary);">Recent Files</h2>
+				<h2 class="text-[12px] font-semibold uppercase tracking-widest" style="color: var(--text-tertiary);">Recent Files</h2>
 				<a href="/vault" onclick={() => nav.navigate('/vault')} class="text-xs font-medium" style="color: var(--text-accent);">View all</a>
 			</div>
 			{#if recentFiles.length > 0}
@@ -149,7 +149,7 @@
 		<!-- Upcoming Reminders -->
 		<section>
 			<div class="flex items-center justify-between mb-4">
-				<h2 class="text-[11px] font-semibold uppercase tracking-widest" style="color: var(--text-tertiary);">Upcoming Reminders</h2>
+				<h2 class="text-[12px] font-semibold uppercase tracking-widest" style="color: var(--text-tertiary);">Upcoming Reminders</h2>
 				<a href="/reminders" onclick={() => nav.navigate('/reminders')} class="text-xs font-medium" style="color: var(--text-accent);">View all</a>
 			</div>
 			{#if upcomingReminders.length > 0}
@@ -180,7 +180,7 @@
 		{#if activeCourses.length > 0}
 			<section class="pb-10">
 				<div class="flex items-center justify-between mb-4">
-					<h2 class="text-[11px] font-semibold uppercase tracking-widest" style="color: var(--text-tertiary);">Active Courses</h2>
+					<h2 class="text-[12px] font-semibold uppercase tracking-widest" style="color: var(--text-tertiary);">Active Courses</h2>
 					<a href="/courses" onclick={() => nav.navigate('/courses')} class="text-xs font-medium" style="color: var(--text-accent);">View all</a>
 				</div>
 				<div class="rounded-2xl border overflow-hidden" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
@@ -199,9 +199,9 @@
 								<div class="h-full rounded-full transition-all duration-500" style="width: {course.progress_percent}%; background: var(--color-primary-500);"></div>
 							</div>
 							<div class="flex items-center justify-between mt-2">
-								<span class="text-[10px]" style="color: var(--text-tertiary);">{course.completed_lessons}/{course.total_lessons} lessons</span>
+								<span class="text-[12px]" style="color: var(--text-tertiary);">{course.completed_lessons}/{course.total_lessons} lessons</span>
 								{#if course.platform}
-									<span class="text-[10px] rounded-md px-2 py-0.5" style="background: var(--bg-surface-raised); color: var(--text-secondary);">{course.platform}</span>
+									<span class="text-[12px] rounded-md px-2 py-0.5" style="background: var(--bg-surface-raised); color: var(--text-secondary);">{course.platform}</span>
 								{/if}
 							</div>
 						</div>

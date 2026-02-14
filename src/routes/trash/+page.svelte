@@ -39,8 +39,8 @@
 	<div class="flex items-center justify-between px-8 py-5 border-b shrink-0" style="border-color: var(--border-default);">
 		<div class="flex items-center gap-3">
 			<Icon icon="ph:trash-bold" width={24} height={24} style="color: var(--color-error);" />
-			<h1 class="text-xl font-bold" style="color: var(--text-primary);">Trash</h1>
-			<span class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold" style="background: var(--color-error-light); color: var(--color-error);">{trashFiles.length}</span>
+			<h1 class="text-[22px] font-bold" style="color: var(--text-primary); letter-spacing: -0.02em;">Trash</h1>
+			<span class="rounded-full px-2.5 py-0.5 text-[12px] font-semibold" style="background: var(--color-error-light); color: var(--color-error);">{trashFiles.length}</span>
 		</div>
 		{#if trashFiles.length > 0}
 			<button onclick={emptyTrash} class="flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium" style="color: var(--color-error); border: 1px solid var(--color-error);">
@@ -51,7 +51,7 @@
 
 	<div class="flex-1 overflow-y-auto px-8 py-6">
 		{#if trashFiles.length > 0}
-			<p class="text-[13px] mb-5" style="color: var(--text-tertiary);">Items in trash will be permanently deleted after 30 days.</p>
+			<p class="text-[14px] mb-5" style="color: var(--text-tertiary);">Items in trash will be permanently deleted after 30 days.</p>
 			<div class="space-y-3">
 				{#each trashFiles as file (file.id)}
 					{@const typeInfo = getFileTypeInfo(file.extension)}

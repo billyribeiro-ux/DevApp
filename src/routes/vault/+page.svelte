@@ -305,14 +305,14 @@
 	</div>
 
 	<!-- Status bar -->
-	<div class="flex items-center justify-between px-8 py-3 border-t text-[11px] shrink-0" style="border-color: var(--border-default); color: var(--text-tertiary); background: var(--bg-surface);">
+	<div class="flex items-center justify-between px-8 py-3 border-t text-[12px] shrink-0" style="border-color: var(--border-default); color: var(--text-tertiary); background: var(--bg-surface);">
 		<span>{currentFiles.length} file{currentFiles.length !== 1 ? 's' : ''} &middot; {subfolders.length} folder{subfolders.length !== 1 ? 's' : ''}</span>
 		<span>{vault.selectedFileIds.size > 0 ? `${vault.selectedFileIds.size} selected` : ''}</span>
 	</div>
 </div>
 
 <style>
-	button:hover {
+	button:not(.btn-primary):not(.btn-secondary):not(.btn-ghost):hover {
 		background: var(--bg-card-hover);
 	}
 </style>

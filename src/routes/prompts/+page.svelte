@@ -7,6 +7,7 @@
 	import { formatRelativeDate } from '$utils/formatters';
 	import type { Prompt } from '$types';
 	import { v4 as uuid } from 'uuid';
+	import ConfirmDialog from '$lib/components/ui/ConfirmDialog.svelte';
 
 	let prompts = $state<Prompt[]>([]);
 	let activeCategory = $state('all');
@@ -19,6 +20,8 @@
 	let edContent = $state('');
 	let edCategory = $state('general');
 	let edLanguage = $state('');
+	let confirmDeleteOpen = $state(false);
+	let pendingDeleteId = $state<string | null>(null);
 
 	let filteredPrompts = $derived(() => {
 		let filtered = prompts;
@@ -73,9 +76,16 @@
 		toasts.success(editingPrompt ? 'Prompt Updated' : 'Prompt Created');
 	}
 
-	async function handleDelete(id: string) {
-		await deletePrompt(id);
+	function requestDelete(id: string) {
+		pendingDeleteId = id;
+		confirmDeleteOpen = true;
+	}
+
+	async function handleDelete() {
+		if (!pendingDeleteId) return;
+		await deletePrompt(pendingDeleteId);
 		prompts = await getPrompts();
+		pendingDeleteId = null;
 		toasts.success('Prompt Deleted');
 	}
 
@@ -90,13 +100,13 @@
 	<div class="flex items-center justify-between px-8 py-5 border-b shrink-0" style="border-color: var(--border-default);">
 		<div class="flex items-center gap-3">
 			<Icon icon="ph:chat-dots-bold" width={24} height={24} style="color: var(--text-accent);" />
-			<h1 class="text-xl font-bold" style="color: var(--text-primary);">Prompts Library</h1>
-			<span class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold" style="background: var(--bg-active); color: var(--text-accent);">{prompts.length}</span>
+			<h1 class="text-[22px] font-bold" style="color: var(--text-primary); letter-spacing: -0.02em;">Prompts Library</h1>
+			<span class="rounded-full px-2.5 py-0.5 text-[12px] font-semibold" style="background: var(--bg-active); color: var(--text-accent);">{prompts.length}</span>
 		</div>
 		<div class="flex items-center gap-3">
 			<div class="flex items-center gap-2 rounded-xl px-3 py-2" style="background: var(--bg-input); border: 1px solid var(--border-default);">
-				<Icon icon="ph:magnifying-glass" width={15} height={15} style="color: var(--text-tertiary);" />
-				<input type="text" bind:value={searchQuery} placeholder="Search prompts..." class="bg-transparent text-[13px] outline-none w-48" style="color: var(--text-primary);" />
+				<Icon icon="ph:magnifying-glass" width={16} height={16} style="color: var(--text-tertiary);" />
+				<input type="text" bind:value={searchQuery} placeholder="Search prompts..." class="bg-transparent text-[14px] outline-none w-48" style="color: var(--text-primary);" />
 			</div>
 			<button onclick={() => startEdit()} class="btn-primary">
 				<Icon icon="ph:plus-bold" width={15} height={15} /> New Prompt
@@ -125,12 +135,12 @@
 					<h3 class="text-base font-semibold" style="color: var(--text-primary);">{editingPrompt ? 'Edit Prompt' : 'New Prompt'}</h3>
 					<input type="text" bind:value={edTitle} placeholder="Prompt title..." class="input-field" />
 					<div class="flex gap-3">
-						<select bind:value={edCategory} class="rounded-xl border px-4 py-2.5 text-[13px]" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);">
+						<select bind:value={edCategory} class="input-field input-field-sm" style="width: auto;">
 							{#each PROMPT_CATEGORIES as cat}
 								<option value={cat.value}>{cat.label}</option>
 							{/each}
 						</select>
-						<select bind:value={edLanguage} class="rounded-xl border px-4 py-2.5 text-[13px]" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);">
+						<select bind:value={edLanguage} class="input-field input-field-sm" style="width: auto;">
 							<option value="">No language</option>
 							{#each LANGUAGES as lang}
 								<option value={lang}>{lang}</option>
@@ -157,22 +167,25 @@
 				{#each filteredPrompts() as prompt (prompt.id)}
 					<div class="group rounded-2xl border p-5 transition-all duration-150 hover:shadow-md" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
 						<div class="flex items-start justify-between mb-2">
-							<h3 class="text-[15px] font-semibold" style="color: var(--text-primary);">{prompt.title}</h3>
+							<h3 class="text-[16px] font-semibold" style="color: var(--text-primary);">{prompt.title}</h3>
 							{#if prompt.is_favorited}
 								<Icon icon="ph:star-fill" width={16} height={16} style="color: var(--color-warning);" />
 							{/if}
 						</div>
 						<div class="flex items-center gap-2 mb-3">
-							<span class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold" style="background: var(--bg-active); color: var(--text-accent);">{prompt.category}</span>
+							<span class="rounded-full px-2.5 py-0.5 text-[12px] font-semibold" style="background: var(--bg-active); color: var(--text-accent);">{prompt.category}</span>
 							{#if prompt.language}
-								<span class="rounded-full px-2.5 py-0.5 text-[11px] font-mono" style="background: var(--bg-surface-raised); color: var(--text-secondary);">{prompt.language}</span>
+								<span class="rounded-full px-2.5 py-0.5 text-[12px] font-mono" style="background: var(--bg-surface-raised); color: var(--text-secondary);">{prompt.language}</span>
 							{/if}
 						</div>
-						<p class="text-[13px] leading-relaxed mb-4 line-clamp-3" style="color: var(--text-secondary);">{prompt.content.slice(0, 200)}</p>
+						<p class="text-[14px] leading-relaxed mb-4 line-clamp-3" style="color: var(--text-secondary);">{prompt.content.slice(0, 200)}</p>
 						<div class="flex items-center justify-between">
-							<span class="text-[11px]" style="color: var(--text-tertiary);">Used {prompt.usage_count}x</span>
+							<span class="text-[12px]" style="color: var(--text-tertiary);">Used {prompt.usage_count}x</span>
 							<div class="flex items-center gap-1.5">
 								<button onclick={() => startEdit(prompt)} class="rounded-xl px-3 py-1.5 text-[12px] transition-colors" style="color: var(--text-secondary);">Edit</button>
+								<button onclick={() => requestDelete(prompt.id)} class="rounded-xl p-1.5 transition-colors" style="color: var(--text-tertiary);" title="Delete">
+									<Icon icon="ph:trash" width={14} height={14} />
+								</button>
 								<button onclick={() => handleCopy(prompt)} class="rounded-xl px-4 py-1.5 text-[12px] font-medium text-white transition-colors" style="background: var(--color-primary-600);">
 									<Icon icon="ph:copy" width={13} height={13} style="display: inline; vertical-align: -1px;" /> Copy
 								</button>
@@ -191,3 +204,12 @@
 		{/if}
 	</div>
 </div>
+
+<ConfirmDialog
+	bind:open={confirmDeleteOpen}
+	title="Delete Prompt"
+	description="Are you sure you want to delete this prompt? This action cannot be undone."
+	confirmLabel="Delete"
+	variant="danger"
+	onconfirm={handleDelete}
+/>

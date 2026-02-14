@@ -104,7 +104,7 @@
 				overflow: hidden;
 			"
 		>
-			<div class="flex items-center gap-3 px-5 border-b shrink-0" style="border-color: var(--border-subtle); height: 60px;">
+			<div class="flex items-center gap-3 px-5 border-b shrink-0" style="border-color: var(--border-subtle); height: 64px;">
 				<div class="flex items-center justify-center rounded-xl p-2" style="background: var(--color-primary-600);">
 					<Icon icon="ph:vault-bold" width={22} height={22} style="color: white" />
 				</div>
@@ -114,17 +114,17 @@
 			<nav class="flex-1 overflow-y-auto px-3 py-2">
 				{#each navGroups as group, gi}
 					<div class="{gi > 0 ? 'mt-5' : 'mt-1'}">
-						<p class="px-4 py-2 text-[10px] uppercase tracking-widest font-semibold" style="color: var(--text-tertiary);">{group.label}</p>
+						<p class="px-4 py-2 text-[11px] uppercase tracking-widest font-semibold" style="color: var(--text-tertiary);">{group.label}</p>
 						<div class="space-y-0.5">
 							{#each group.items as item}
 								<a
 									href={item.href}
 									onclick={() => nav.navigate(item.href)}
-									class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] transition-all duration-150"
+									class="group flex items-center gap-3 rounded-xl px-3 py-3 text-[14px] transition-all duration-150"
 									class:nav-active={isActive(item.href)}
 									style="color: {isActive(item.href) ? 'var(--text-accent)' : 'var(--text-secondary)'}; background: {isActive(item.href) ? 'var(--bg-active)' : 'transparent'}; font-weight: {isActive(item.href) ? '600' : '500'}; {isActive(item.href) ? 'box-shadow: inset 0 0 0 1px rgba(0,122,255,0.08);' : ''}"
 								>
-									<Icon icon={item.icon} width={20} height={20} />
+									<Icon icon={item.icon} width={22} height={22} />
 									<span>{item.label}</span>
 								</a>
 							{/each}
@@ -138,9 +138,11 @@
 					<button onclick={() => theme.toggle()} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);" title="Toggle theme">
 						<Icon icon={theme.resolved === 'dark' ? 'ph:sun-bold' : 'ph:moon-bold'} width={18} height={18} />
 					</button>
-					<div class="flex items-center gap-1.5 text-[11px]" style="color: var(--text-tertiary);">
+					<div class="flex items-center gap-2 text-[12px]" style="color: var(--text-tertiary);">
 						<div class="h-1.5 w-1.5 rounded-full" style="background: var(--color-success);"></div>
 						<span>Local</span>
+						<span style="opacity: 0.5;">&middot;</span>
+						<span style="opacity: 0.5;">v0.1.0</span>
 					</div>
 				</div>
 			</div>
