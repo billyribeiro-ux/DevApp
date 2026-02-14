@@ -9,16 +9,37 @@
 
 	let initialized = $state(false);
 
-	const navItems = [
-		{ id: 'dashboard', label: 'Dashboard', icon: 'ph:house-bold', href: '/' },
-		{ id: 'vault', label: 'Vault Explorer', icon: 'ph:folder-open-bold', href: '/vault' },
-		{ id: 'notes', label: 'Notes', icon: 'ph:note-pencil-bold', href: '/notes' },
-		{ id: 'prompts', label: 'Prompts', icon: 'ph:chat-dots-bold', href: '/prompts' },
-		{ id: 'reminders', label: 'Reminders', icon: 'ph:bell-bold', href: '/reminders' },
-		{ id: 'courses', label: 'Courses', icon: 'ph:graduation-cap-bold', href: '/courses' },
-		{ id: 'snippets', label: 'Code Snippets', icon: 'ph:code-bold', href: '/snippets' },
-		{ id: 'activity', label: 'Activity', icon: 'ph:clock-counter-clockwise-bold', href: '/activity' },
-		{ id: 'trash', label: 'Trash', icon: 'ph:trash-bold', href: '/trash' },
+	const navGroups = [
+		{
+			label: 'Overview',
+			items: [
+				{ id: 'dashboard', label: 'Dashboard', icon: 'ph:house-bold', href: '/' },
+			]
+		},
+		{
+			label: 'Content',
+			items: [
+				{ id: 'vault', label: 'Vault Explorer', icon: 'ph:folder-open-bold', href: '/vault' },
+				{ id: 'notes', label: 'Notes', icon: 'ph:note-pencil-bold', href: '/notes' },
+				{ id: 'prompts', label: 'Prompts', icon: 'ph:chat-dots-bold', href: '/prompts' },
+				{ id: 'snippets', label: 'Code Snippets', icon: 'ph:code-bold', href: '/snippets' },
+			]
+		},
+		{
+			label: 'Organization',
+			items: [
+				{ id: 'reminders', label: 'Reminders', icon: 'ph:bell-bold', href: '/reminders' },
+				{ id: 'courses', label: 'Courses', icon: 'ph:graduation-cap-bold', href: '/courses' },
+			]
+		},
+		{
+			label: 'System',
+			items: [
+				{ id: 'activity', label: 'Activity', icon: 'ph:clock-counter-clockwise-bold', href: '/activity' },
+				{ id: 'trash', label: 'Trash', icon: 'ph:trash-bold', href: '/trash' },
+				{ id: 'settings', label: 'Settings', icon: 'ph:gear-bold', href: '/settings' },
+			]
+		},
 	];
 
 	function handleKeydown(e: KeyboardEvent) {
@@ -73,62 +94,54 @@
 	<div class="flex h-screen w-screen overflow-hidden" style="background: var(--bg-app);">
 		<!-- Sidebar -->
 		<aside
-			class="flex flex-col border-r transition-all duration-300 ease-in-out shrink-0"
+			class="vibrancy flex flex-col border-r transition-all duration-300 ease-in-out shrink-0"
 			style="
 				background: var(--bg-sidebar);
 				border-color: var(--border-default);
-				width: {ui.sidebarOpen ? '260px' : '0px'};
-				min-width: {ui.sidebarOpen ? '260px' : '0px'};
+				width: {ui.sidebarOpen ? '280px' : '0px'};
+				min-width: {ui.sidebarOpen ? '280px' : '0px'};
 				opacity: {ui.sidebarOpen ? 1 : 0};
 				overflow: hidden;
 			"
 		>
-			<div class="flex items-center gap-3 px-5 border-b shrink-0" style="border-color: var(--border-subtle); height: 56px;">
-				<div class="flex items-center justify-center rounded-xl p-1.5" style="background: var(--color-primary-600);">
-					<Icon icon="ph:vault-bold" width={20} height={20} style="color: white" />
+			<div class="flex items-center gap-3 px-5 border-b shrink-0" style="border-color: var(--border-subtle); height: 60px;">
+				<div class="flex items-center justify-center rounded-xl p-2" style="background: var(--color-primary-600);">
+					<Icon icon="ph:vault-bold" width={22} height={22} style="color: white" />
 				</div>
-				<span class="text-base font-bold tracking-tight" style="color: var(--text-primary);">DevVault</span>
-				<span class="ml-auto rounded-full px-2 py-0.5 text-[10px] font-semibold" style="background: var(--bg-active); color: var(--text-accent);">v0.1</span>
+				<span class="text-lg font-bold tracking-tight" style="color: var(--text-primary);">DevVault</span>
 			</div>
 
-			<nav class="flex-1 overflow-y-auto px-3 py-3">
-				<div class="space-y-0.5">
-					{#each navItems as item}
-						<a
-							href={item.href}
-							onclick={() => nav.navigate(item.href)}
-							class="group flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-150"
-							class:nav-active={isActive(item.href)}
-							style="color: {isActive(item.href) ? 'var(--text-accent)' : 'var(--text-secondary)'}; background: {isActive(item.href) ? 'var(--bg-active)' : 'transparent'};"
-						>
-							<Icon icon={item.icon} width={18} height={18} />
-							<span>{item.label}</span>
-						</a>
-					{/each}
-				</div>
+			<nav class="flex-1 overflow-y-auto px-3 py-2">
+				{#each navGroups as group, gi}
+					<div class="{gi > 0 ? 'mt-5' : 'mt-1'}">
+						<p class="px-4 py-2 text-[10px] uppercase tracking-widest font-semibold" style="color: var(--text-tertiary);">{group.label}</p>
+						<div class="space-y-0.5">
+							{#each group.items as item}
+								<a
+									href={item.href}
+									onclick={() => nav.navigate(item.href)}
+									class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] transition-all duration-150"
+									class:nav-active={isActive(item.href)}
+									style="color: {isActive(item.href) ? 'var(--text-accent)' : 'var(--text-secondary)'}; background: {isActive(item.href) ? 'var(--bg-active)' : 'transparent'}; font-weight: {isActive(item.href) ? '600' : '500'}; {isActive(item.href) ? 'box-shadow: inset 0 0 0 1px rgba(0,122,255,0.08);' : ''}"
+								>
+									<Icon icon={item.icon} width={20} height={20} />
+									<span>{item.label}</span>
+								</a>
+							{/each}
+						</div>
+					</div>
+				{/each}
 			</nav>
 
-			<div class="border-t px-3 py-3 space-y-1 shrink-0" style="border-color: var(--border-subtle);">
-				<a
-					href="/settings"
-					onclick={() => nav.navigate('/settings')}
-					class="flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] transition-all duration-150"
-					style="color: var(--text-secondary);"
-				>
-					<Icon icon="ph:gear-bold" width={18} height={18} />
-					<span>Settings</span>
-				</a>
-				<div class="flex items-center justify-between px-3 py-1.5">
-					<button onclick={() => theme.toggle()} class="rounded-lg p-1.5 transition-colors" style="color: var(--text-tertiary);" title="Toggle theme">
-						<Icon icon={theme.resolved === 'dark' ? 'ph:sun-bold' : 'ph:moon-bold'} width={16} height={16} />
+			<div class="border-t px-4 py-3 shrink-0" style="border-color: var(--border-subtle);">
+				<div class="flex items-center justify-between">
+					<button onclick={() => theme.toggle()} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);" title="Toggle theme">
+						<Icon icon={theme.resolved === 'dark' ? 'ph:sun-bold' : 'ph:moon-bold'} width={18} height={18} />
 					</button>
 					<div class="flex items-center gap-1.5 text-[11px]" style="color: var(--text-tertiary);">
 						<div class="h-1.5 w-1.5 rounded-full" style="background: var(--color-success);"></div>
 						<span>Local</span>
 					</div>
-					<button onclick={() => ui.toggleSidebar()} class="rounded-lg p-1.5 transition-colors" style="color: var(--text-tertiary);" title="Toggle sidebar">
-						<Icon icon="ph:sidebar-bold" width={16} height={16} />
-					</button>
 				</div>
 			</div>
 		</aside>
@@ -141,24 +154,24 @@
 
 	<!-- Toasts -->
 	{#if toasts.toasts.length > 0}
-		<div class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none" style="max-width: 380px;">
+		<div class="fixed top-4 right-4 z-50 flex flex-col gap-3 pointer-events-none" style="max-width: 420px;">
 			{#each toasts.toasts as toast (toast.id)}
 				<div
-					class="pointer-events-auto flex items-start gap-3 rounded-xl border px-4 py-3 shadow-lg animate-slide-down"
+					class="vibrancy pointer-events-auto flex items-start gap-3 rounded-2xl border px-5 py-4 shadow-lg animate-slide-down"
 					style="background: var(--bg-card); border-color: var(--border-default);"
 				>
 					<Icon
 						icon={toast.type === 'success' ? 'ph:check-circle-bold' : toast.type === 'error' ? 'ph:x-circle-bold' : toast.type === 'warning' ? 'ph:warning-bold' : 'ph:info-bold'}
-						width={20} height={20}
+						width={22} height={22}
 						style="color: {toast.type === 'success' ? 'var(--color-success)' : toast.type === 'error' ? 'var(--color-error)' : toast.type === 'warning' ? 'var(--color-warning)' : 'var(--color-info)'}; flex-shrink: 0; margin-top: 1px;"
 					/>
 					<div class="flex-1 min-w-0">
-						<p class="text-sm font-medium" style="color: var(--text-primary);">{toast.title}</p>
+						<p class="text-sm font-semibold" style="color: var(--text-primary);">{toast.title}</p>
 						{#if toast.description}
 							<p class="text-xs mt-0.5" style="color: var(--text-secondary);">{toast.description}</p>
 						{/if}
 					</div>
-					<button onclick={() => toasts.remove(toast.id)} class="shrink-0 rounded-md p-0.5 transition-colors" style="color: var(--text-tertiary);">
+					<button onclick={() => toasts.remove(toast.id)} class="shrink-0 rounded-lg p-1 transition-colors" style="color: var(--text-tertiary);">
 						<Icon icon="ph:x-bold" width={14} height={14} />
 					</button>
 				</div>

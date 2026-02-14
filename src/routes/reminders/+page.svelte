@@ -12,7 +12,6 @@
 	let showForm = $state(false);
 	let editingReminder = $state<Reminder | null>(null);
 
-	// Form state
 	let fTitle = $state('');
 	let fDescription = $state('');
 	let fDueDate = $state('');
@@ -84,47 +83,47 @@
 </script>
 
 <div class="flex flex-col h-full overflow-hidden">
-	<div class="flex items-center justify-between px-6 py-4 border-b shrink-0" style="border-color: var(--border-default);">
+	<div class="flex items-center justify-between px-8 py-5 border-b shrink-0" style="border-color: var(--border-default);">
 		<div class="flex items-center gap-3">
-			<Icon icon="ph:bell-bold" width={22} height={22} style="color: #f59e0b;" />
-			<h1 class="text-lg font-bold" style="color: var(--text-primary);">Reminders</h1>
-			<span class="rounded-full px-2 py-0.5 text-[10px] font-semibold" style="background: var(--color-warning-light); color: var(--color-warning);">{reminders.filter(r => r.status === 'pending').length} pending</span>
+			<Icon icon="ph:bell-bold" width={24} height={24} style="color: #FF9500;" />
+			<h1 class="text-xl font-bold" style="color: var(--text-primary);">Reminders</h1>
+			<span class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold" style="background: var(--color-warning-light); color: var(--color-warning);">{reminders.filter(r => r.status === 'pending').length} pending</span>
 		</div>
-		<button onclick={() => startEdit()} class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-white" style="background: var(--color-primary-600);">
-			<Icon icon="ph:plus-bold" width={14} height={14} /> New Reminder
+		<button onclick={() => startEdit()} class="btn-primary">
+			<Icon icon="ph:plus-bold" width={15} height={15} /> New Reminder
 		</button>
 	</div>
 
-	<div class="flex items-center gap-1 px-6 py-2 border-b shrink-0" style="border-color: var(--border-default);">
+	<div class="flex items-center gap-1.5 px-8 py-3 border-b shrink-0" style="border-color: var(--border-default);">
 		{#each filters as f}
-			<button onclick={() => { activeFilter = f.value; }} class="flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors" style="background: {activeFilter === f.value ? 'var(--bg-active)' : 'transparent'}; color: {activeFilter === f.value ? 'var(--text-accent)' : 'var(--text-secondary)'};">
-				<Icon icon={f.icon} width={12} height={12} />
+			<button onclick={() => { activeFilter = f.value; }} class="flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors" style="background: {activeFilter === f.value ? 'var(--bg-active)' : 'transparent'}; color: {activeFilter === f.value ? 'var(--text-accent)' : 'var(--text-secondary)'};">
+				<Icon icon={f.icon} width={14} height={14} />
 				{f.label}
 			</button>
 		{/each}
 	</div>
 
-	<div class="flex-1 overflow-y-auto px-6 py-4">
+	<div class="flex-1 overflow-y-auto px-8 py-6">
 		{#if showForm}
 			<div class="max-w-lg mx-auto animate-slide-up">
-				<div class="rounded-xl border p-6 space-y-4" style="background: var(--bg-card); border-color: var(--border-default);">
-					<h3 class="text-sm font-semibold" style="color: var(--text-primary);">{editingReminder ? 'Edit Reminder' : 'New Reminder'}</h3>
-					<input type="text" bind:value={fTitle} placeholder="Reminder title..." class="w-full rounded-lg border px-3 py-2 text-sm outline-none" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);" />
-					<textarea bind:value={fDescription} placeholder="Description (optional)" rows={3} class="w-full rounded-lg border px-3 py-2 text-sm outline-none resize-none" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);"></textarea>
-					<div class="grid grid-cols-2 gap-3">
+				<div class="rounded-2xl border p-8 space-y-5" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
+					<h3 class="text-base font-semibold" style="color: var(--text-primary);">{editingReminder ? 'Edit Reminder' : 'New Reminder'}</h3>
+					<input type="text" bind:value={fTitle} placeholder="Reminder title..." class="input-field" />
+					<textarea bind:value={fDescription} placeholder="Description (optional)" rows={3} class="input-field resize-none"></textarea>
+					<div class="grid grid-cols-2 gap-4">
 						<div>
-							<label for="reminder-date" class="text-[11px] font-medium mb-1 block" style="color: var(--text-tertiary);">Due Date</label>
-							<input id="reminder-date" type="date" bind:value={fDueDate} class="w-full rounded-lg border px-3 py-2 text-xs" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);" />
+							<label class="text-[11px] font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-tertiary);">Due Date</label>
+							<input type="date" bind:value={fDueDate} class="input-field input-field-sm" />
 						</div>
 						<div>
-							<label for="reminder-time" class="text-[11px] font-medium mb-1 block" style="color: var(--text-tertiary);">Due Time</label>
-							<input id="reminder-time" type="time" bind:value={fDueTime} class="w-full rounded-lg border px-3 py-2 text-xs" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);" />
+							<label class="text-[11px] font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-tertiary);">Due Time</label>
+							<input type="time" bind:value={fDueTime} class="input-field input-field-sm" />
 						</div>
 					</div>
-					<div class="grid grid-cols-2 gap-3">
+					<div class="grid grid-cols-2 gap-4">
 						<div>
-							<label for="reminder-priority" class="text-[11px] font-medium mb-1 block" style="color: var(--text-tertiary);">Priority</label>
-							<select id="reminder-priority" bind:value={fPriority} class="w-full rounded-lg border px-3 py-2 text-xs" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);">
+							<label class="text-[11px] font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-tertiary);">Priority</label>
+							<select bind:value={fPriority} class="input-field input-field-sm">
 								<option value="low">Low</option>
 								<option value="medium">Medium</option>
 								<option value="high">High</option>
@@ -132,8 +131,8 @@
 							</select>
 						</div>
 						<div>
-							<label for="reminder-recurrence" class="text-[11px] font-medium mb-1 block" style="color: var(--text-tertiary);">Recurrence</label>
-							<select id="reminder-recurrence" bind:value={fRecurrence} class="w-full rounded-lg border px-3 py-2 text-xs" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);">
+							<label class="text-[11px] font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-tertiary);">Recurrence</label>
+							<select bind:value={fRecurrence} class="input-field input-field-sm">
 								<option value="none">None</option>
 								<option value="daily">Daily</option>
 								<option value="weekly">Weekly</option>
@@ -141,55 +140,55 @@
 							</select>
 						</div>
 					</div>
-					<div class="flex justify-end gap-2">
-						<button onclick={() => { showForm = false; }} class="rounded-lg px-4 py-2 text-xs" style="color: var(--text-secondary);">Cancel</button>
-						<button onclick={handleSave} class="rounded-lg px-4 py-2 text-xs font-medium text-white" style="background: var(--color-primary-600);">Save</button>
+					<div class="flex justify-end gap-2 pt-2">
+						<button onclick={() => { showForm = false; }} class="btn-ghost">Cancel</button>
+						<button onclick={handleSave} class="btn-primary">Save</button>
 					</div>
 				</div>
 			</div>
 		{:else}
-			<div class="space-y-2">
+			<div class="space-y-3">
 				{#each filteredReminders() as reminder (reminder.id)}
-					<div class="flex items-center gap-3 rounded-xl border p-4 transition-all duration-150" style="background: var(--bg-card); border-color: var(--border-default); border-left: 3px solid {getPriorityColor(reminder.priority)};">
-						<button onclick={() => handleComplete(reminder.id)} class="shrink-0 rounded-md border-2 w-5 h-5 flex items-center justify-center transition-colors" style="border-color: {reminder.status === 'completed' ? 'var(--color-success)' : 'var(--border-default)'}; background: {reminder.status === 'completed' ? 'var(--color-success)' : 'transparent'};">
+					<div class="flex items-center gap-4 rounded-2xl border p-5 transition-all duration-150" style="background: var(--bg-card); border-color: var(--border-default); border-left: 3px solid {getPriorityColor(reminder.priority)}; box-shadow: var(--shadow-card);">
+						<button onclick={() => handleComplete(reminder.id)} class="shrink-0 rounded-lg border-2 w-6 h-6 flex items-center justify-center transition-colors" style="border-color: {reminder.status === 'completed' ? 'var(--color-success)' : 'var(--border-default)'}; background: {reminder.status === 'completed' ? 'var(--color-success)' : 'transparent'};">
 							{#if reminder.status === 'completed'}
-								<Icon icon="ph:check-bold" width={12} height={12} style="color: white;" />
+								<Icon icon="ph:check-bold" width={14} height={14} style="color: white;" />
 							{/if}
 						</button>
 						<div class="flex-1 min-w-0">
-							<p class="text-sm font-medium" style="color: var(--text-primary); text-decoration: {reminder.status === 'completed' ? 'line-through' : 'none'}; opacity: {reminder.status === 'completed' ? 0.5 : 1};">{reminder.title}</p>
+							<p class="text-[15px] font-medium" style="color: var(--text-primary); text-decoration: {reminder.status === 'completed' ? 'line-through' : 'none'}; opacity: {reminder.status === 'completed' ? 0.5 : 1};">{reminder.title}</p>
 							{#if reminder.description}
-								<p class="text-xs mt-0.5 truncate" style="color: var(--text-tertiary);">{reminder.description}</p>
+								<p class="text-[13px] mt-0.5 truncate" style="color: var(--text-tertiary);">{reminder.description}</p>
 							{/if}
-							<div class="flex items-center gap-2 mt-1.5">
+							<div class="flex items-center gap-3 mt-2">
 								{#if reminder.due_date}
-									<span class="text-[10px] flex items-center gap-1" style="color: var(--text-tertiary);">
-										<Icon icon="ph:calendar" width={10} height={10} /> {formatDate(reminder.due_date)}
+									<span class="text-[11px] flex items-center gap-1" style="color: var(--text-tertiary);">
+										<Icon icon="ph:calendar" width={12} height={12} /> {formatDate(reminder.due_date)}
 									</span>
 								{/if}
 								{#if reminder.recurrence !== 'none'}
-									<span class="text-[10px] flex items-center gap-1" style="color: var(--text-tertiary);">
-										<Icon icon="ph:arrows-clockwise" width={10} height={10} /> {reminder.recurrence}
+									<span class="text-[11px] flex items-center gap-1" style="color: var(--text-tertiary);">
+										<Icon icon="ph:arrows-clockwise" width={12} height={12} /> {reminder.recurrence}
 									</span>
 								{/if}
 							</div>
 						</div>
-						<span class="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase shrink-0" style="background: {getPriorityColor(reminder.priority)}20; color: {getPriorityColor(reminder.priority)};">{reminder.priority}</span>
+						<span class="rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase shrink-0" style="background: {getPriorityColor(reminder.priority)}20; color: {getPriorityColor(reminder.priority)};">{reminder.priority}</span>
 						<div class="flex items-center gap-1 shrink-0">
-							<button onclick={() => startEdit(reminder)} class="rounded-md p-1.5 transition-colors" style="color: var(--text-tertiary);">
-								<Icon icon="ph:pencil" width={14} height={14} />
+							<button onclick={() => startEdit(reminder)} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);">
+								<Icon icon="ph:pencil" width={16} height={16} />
 							</button>
-							<button onclick={() => handleDelete(reminder.id)} class="rounded-md p-1.5 transition-colors" style="color: var(--text-tertiary);">
-								<Icon icon="ph:trash" width={14} height={14} />
+							<button onclick={() => handleDelete(reminder.id)} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);">
+								<Icon icon="ph:trash" width={16} height={16} />
 							</button>
 						</div>
 					</div>
 				{/each}
 			</div>
 			{#if filteredReminders().length === 0}
-				<div class="flex flex-col items-center justify-center py-20">
-					<Icon icon="ph:bell" width={48} height={48} style="color: var(--text-tertiary); opacity: 0.3;" />
-					<p class="mt-3 text-sm" style="color: var(--text-tertiary);">{activeFilter === 'all' ? 'No reminders yet' : `No ${activeFilter} reminders`}</p>
+				<div class="flex flex-col items-center justify-center py-24">
+					<Icon icon="ph:bell" width={56} height={56} style="color: var(--text-tertiary); opacity: 0.3;" />
+					<p class="mt-4 text-sm" style="color: var(--text-tertiary);">{activeFilter === 'all' ? 'No reminders yet' : `No ${activeFilter} reminders`}</p>
 				</div>
 			{/if}
 		{/if}
