@@ -1,4 +1,3 @@
-use tauri::AppHandle;
 use tauri_plugin_sql::{Migration, MigrationKind};
 
 pub fn get_migrations() -> Vec<Migration> {
