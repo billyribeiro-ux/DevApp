@@ -45,7 +45,7 @@
       // Convert selected paths to upload entries
       const entries: UploadEntry[] = [];
       for (const filePath of selected) {
-        const pathStr = typeof filePath === 'string' ? filePath : filePath.path;
+        const pathStr = typeof filePath === 'string' ? filePath : (filePath as { path: string }).path;
         const name = pathStr.split(/[\\/]/).pop() ?? pathStr;
         let size = 0;
         try {

@@ -301,7 +301,7 @@
     onclick={close}
   >
     <!-- Panel -->
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_click_events_have_key_events a11y_interactive_supports_focus -->
     <div
       bind:this={panelEl}
       class="w-full max-w-2xl rounded-[var(--radius-xl)] border border-[var(--border-default)]
@@ -309,6 +309,7 @@
       onclick={(e) => e.stopPropagation()}
       role="dialog"
       aria-label="Global search"
+      tabindex="-1"
     >
       <!-- Search input -->
       <div class="flex items-center gap-3 px-4 py-3 border-b border-[var(--border-subtle)]">

@@ -2,7 +2,7 @@ import Database from '@tauri-apps/plugin-sql';
 import { DB_NAME } from '$config/constants';
 import type {
   Workspace, Folder, VaultFile, Note, Prompt, Reminder,
-  Course, CourseSection, CourseLesson, Tag, Snippet, Activity, SearchResult
+  Course, CourseSection, CourseLesson, Tag, Snippet, Activity, SearchResult, FolderType
 } from '$types';
 
 let db: Database | null = null;

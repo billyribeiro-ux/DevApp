@@ -113,18 +113,18 @@
 					<textarea bind:value={fDescription} placeholder="Description (optional)" rows={3} class="w-full rounded-lg border px-3 py-2 text-sm outline-none resize-none" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);"></textarea>
 					<div class="grid grid-cols-2 gap-3">
 						<div>
-							<label class="text-[11px] font-medium mb-1 block" style="color: var(--text-tertiary);">Due Date</label>
-							<input type="date" bind:value={fDueDate} class="w-full rounded-lg border px-3 py-2 text-xs" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);" />
+							<label for="reminder-date" class="text-[11px] font-medium mb-1 block" style="color: var(--text-tertiary);">Due Date</label>
+							<input id="reminder-date" type="date" bind:value={fDueDate} class="w-full rounded-lg border px-3 py-2 text-xs" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);" />
 						</div>
 						<div>
-							<label class="text-[11px] font-medium mb-1 block" style="color: var(--text-tertiary);">Due Time</label>
-							<input type="time" bind:value={fDueTime} class="w-full rounded-lg border px-3 py-2 text-xs" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);" />
+							<label for="reminder-time" class="text-[11px] font-medium mb-1 block" style="color: var(--text-tertiary);">Due Time</label>
+							<input id="reminder-time" type="time" bind:value={fDueTime} class="w-full rounded-lg border px-3 py-2 text-xs" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);" />
 						</div>
 					</div>
 					<div class="grid grid-cols-2 gap-3">
 						<div>
-							<label class="text-[11px] font-medium mb-1 block" style="color: var(--text-tertiary);">Priority</label>
-							<select bind:value={fPriority} class="w-full rounded-lg border px-3 py-2 text-xs" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);">
+							<label for="reminder-priority" class="text-[11px] font-medium mb-1 block" style="color: var(--text-tertiary);">Priority</label>
+							<select id="reminder-priority" bind:value={fPriority} class="w-full rounded-lg border px-3 py-2 text-xs" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);">
 								<option value="low">Low</option>
 								<option value="medium">Medium</option>
 								<option value="high">High</option>
@@ -132,8 +132,8 @@
 							</select>
 						</div>
 						<div>
-							<label class="text-[11px] font-medium mb-1 block" style="color: var(--text-tertiary);">Recurrence</label>
-							<select bind:value={fRecurrence} class="w-full rounded-lg border px-3 py-2 text-xs" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);">
+							<label for="reminder-recurrence" class="text-[11px] font-medium mb-1 block" style="color: var(--text-tertiary);">Recurrence</label>
+							<select id="reminder-recurrence" bind:value={fRecurrence} class="w-full rounded-lg border px-3 py-2 text-xs" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);">
 								<option value="none">None</option>
 								<option value="daily">Daily</option>
 								<option value="weekly">Weekly</option>

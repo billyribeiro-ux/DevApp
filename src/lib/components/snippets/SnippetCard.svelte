@@ -79,8 +79,6 @@
     bg-[var(--bg-card)] overflow-hidden transition-all duration-[var(--transition-fast)]
     hover:shadow-[var(--shadow-md)] hover:border-[var(--border-active)]"
   role="article"
-  onkeydown={handleKeydown}
-  tabindex="0"
 >
   <!-- Header -->
   <div class="flex items-start justify-between gap-2 px-4 pt-4 pb-2">

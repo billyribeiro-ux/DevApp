@@ -138,7 +138,7 @@
 							{/each}
 						</select>
 					</div>
-					<textarea bind:value={edContent} placeholder="Write your prompt... Use {{variable}} for template variables" rows={8} class="w-full rounded-lg border px-3 py-2 text-sm outline-none resize-none font-mono" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);"></textarea>
+					<textarea bind:value={edContent} placeholder="Write your prompt... Use {'{{'}variable{'}}'} for template variables" rows={8} class="w-full rounded-lg border px-3 py-2 text-sm outline-none resize-none font-mono" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);"></textarea>
 					{#if detectedVars().length > 0}
 						<div class="flex items-center gap-2 flex-wrap">
 							<span class="text-[11px] font-medium" style="color: var(--text-tertiary);">Variables:</span>

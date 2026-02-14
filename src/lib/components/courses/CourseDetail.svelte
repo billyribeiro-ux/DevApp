@@ -29,8 +29,11 @@
     paused: 'ph:pause-circle',
   };
 
+  // svelte-ignore state_referenced_locally
   let expandedSections = $state<Set<string>>(new Set(sections.map((s) => s.id)));
+  // svelte-ignore state_referenced_locally
   let editingNotes = $state<string | null>(null);
+  // svelte-ignore state_referenced_locally
   let noteText = $state('');
 
   let clampedProgress = $derived(Math.min(100, Math.max(0, course.progress_percent)));
@@ -74,6 +77,7 @@
 
   function openNotes(lesson: CourseLesson) {
     editingNotes = lesson.id;
+    // svelte-ignore state_referenced_locally
     noteText = lesson.notes ?? '';
   }
 

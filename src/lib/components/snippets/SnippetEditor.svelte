@@ -13,9 +13,13 @@
     oncancel: () => void;
   } = $props();
 
+  // svelte-ignore state_referenced_locally
   let title = $state(snippet?.title ?? '');
+  // svelte-ignore state_referenced_locally
   let language = $state(snippet?.language ?? 'javascript');
+  // svelte-ignore state_referenced_locally
   let description = $state(snippet?.description ?? '');
+  // svelte-ignore state_referenced_locally
   let code = $state(snippet?.code ?? '');
 
   let isEditing = $derived(snippet !== null);

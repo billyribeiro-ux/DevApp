@@ -6,7 +6,9 @@
 
 	let { note, onsave }: { note: Note | null; onsave: (note: Partial<Note>) => void } = $props();
 
+	// svelte-ignore state_referenced_locally
 	let title = $state(note?.title ?? '');
+	// svelte-ignore state_referenced_locally
 	let content = $state(note?.content_text ?? '');
 	let hasUnsavedChanges = $state(false);
 	let autoSaveTimer = $state<ReturnType<typeof setTimeout> | null>(null);

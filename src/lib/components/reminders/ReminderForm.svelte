@@ -12,11 +12,17 @@
 		oncancel: () => void;
 	} = $props();
 
+	// svelte-ignore state_referenced_locally
 	let title = $state(reminder?.title ?? '');
+	// svelte-ignore state_referenced_locally
 	let description = $state(reminder?.description ?? '');
+	// svelte-ignore state_referenced_locally
 	let due_date = $state(reminder?.due_date ?? '');
+	// svelte-ignore state_referenced_locally
 	let due_time = $state(reminder?.due_time ?? '');
+	// svelte-ignore state_referenced_locally
 	let priority = $state<Reminder['priority']>(reminder?.priority ?? 'medium');
+	// svelte-ignore state_referenced_locally
 	let recurrence = $state<Reminder['recurrence']>(reminder?.recurrence ?? 'none');
 
 	let isEditing = $derived(reminder !== null);

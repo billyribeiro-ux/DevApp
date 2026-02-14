@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FileHashResult {
@@ -12,9 +12,9 @@ pub struct FileHashResult {
 #[tauri::command]
 pub fn get_vault_path(app: AppHandle) -> Result<String, String> {
     let app_data = app
-        .path_resolver()
+        .path()
         .app_data_dir()
-        .ok_or("Could not get app data directory")?;
+        .map_err(|e| e.to_string())?;
     let vault_path = app_data.join("vault");
     if !vault_path.exists() {
         fs::create_dir_all(&vault_path).map_err(|e| e.to_string())?;

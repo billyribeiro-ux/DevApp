@@ -40,9 +40,9 @@
   },
   "plugins": {
     "sql": {
-      "preload": {
-        "db": "sqlite:devvault.db"
-      }
+      "preload": [
+        "sqlite:devvault.db"
+      ]
     }
   }
 }
