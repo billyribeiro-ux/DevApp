@@ -40,17 +40,17 @@
 
 <div class="flex flex-col h-full overflow-y-auto">
 	<!-- Header -->
-	<div class="px-8 pt-8 pb-4">
+	<div class="px-10 pt-10 pb-8">
 		<p class="text-[12px] font-semibold uppercase tracking-widest" style="color: var(--text-tertiary);">{dateStr}</p>
 		<h1 class="text-[32px] font-bold mt-1.5" style="color: var(--text-primary); letter-spacing: -0.02em;">{greeting}</h1>
 		<p class="text-[15px] mt-1" style="color: var(--text-secondary);">Welcome back to your workspace</p>
 	</div>
 
-	<div class="px-8 pb-10 space-y-8">
+	<div class="px-10 pb-12 space-y-12">
 		<!-- Quick Actions -->
 		<section>
-			<h2 class="text-[12px] font-semibold uppercase tracking-widest mb-4" style="color: var(--text-tertiary);">Quick Actions</h2>
-			<div class="grid grid-cols-3 md:grid-cols-6 gap-3">
+			<h2 class="text-[13px] font-semibold uppercase tracking-wider mb-5" style="color: var(--text-tertiary);">Quick Actions</h2>
+			<div class="grid grid-cols-3 md:grid-cols-6 gap-4">
 				{#each quickActions as action}
 					<a
 						href={action.href}
@@ -68,7 +68,7 @@
 		</section>
 
 		<!-- Stats Row -->
-		<section class="grid grid-cols-2 md:grid-cols-4 gap-3">
+		<section class="grid grid-cols-2 md:grid-cols-4 gap-4">
 			<div class="rounded-2xl border p-5" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
 				<div class="flex items-center gap-3">
 					<div class="rounded-xl p-2" style="background: rgba(0, 122, 255, 0.1);">
@@ -117,8 +117,8 @@
 
 		<!-- Recent Files -->
 		<section>
-			<div class="flex items-center justify-between mb-4">
-				<h2 class="text-[12px] font-semibold uppercase tracking-widest" style="color: var(--text-tertiary);">Recent Files</h2>
+			<div class="flex items-center justify-between mb-5">
+				<h2 class="text-[13px] font-semibold uppercase tracking-wider" style="color: var(--text-tertiary);">Recent Files</h2>
 				<a href="/vault" onclick={() => nav.navigate('/vault')} class="text-xs font-medium" style="color: var(--text-accent);">View all</a>
 			</div>
 			{#if recentFiles.length > 0}
@@ -148,8 +148,8 @@
 
 		<!-- Upcoming Reminders -->
 		<section>
-			<div class="flex items-center justify-between mb-4">
-				<h2 class="text-[12px] font-semibold uppercase tracking-widest" style="color: var(--text-tertiary);">Upcoming Reminders</h2>
+			<div class="flex items-center justify-between mb-5">
+				<h2 class="text-[13px] font-semibold uppercase tracking-wider" style="color: var(--text-tertiary);">Upcoming Reminders</h2>
 				<a href="/reminders" onclick={() => nav.navigate('/reminders')} class="text-xs font-medium" style="color: var(--text-accent);">View all</a>
 			</div>
 			{#if upcomingReminders.length > 0}
@@ -179,8 +179,8 @@
 		<!-- Active Courses -->
 		{#if activeCourses.length > 0}
 			<section class="pb-10">
-				<div class="flex items-center justify-between mb-4">
-					<h2 class="text-[12px] font-semibold uppercase tracking-widest" style="color: var(--text-tertiary);">Active Courses</h2>
+				<div class="flex items-center justify-between mb-5">
+					<h2 class="text-[13px] font-semibold uppercase tracking-wider" style="color: var(--text-tertiary);">Active Courses</h2>
 					<a href="/courses" onclick={() => nav.navigate('/courses')} class="text-xs font-medium" style="color: var(--text-accent);">View all</a>
 				</div>
 				<div class="rounded-2xl border overflow-hidden" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
