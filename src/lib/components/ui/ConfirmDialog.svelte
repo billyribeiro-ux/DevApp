@@ -59,17 +59,22 @@
 <svelte:window onkeydown={handleKeydown} />
 
 {#if open}
-	<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<div
 		class="fixed inset-0 z-[100] flex items-center justify-center"
 		style="background: var(--bg-overlay);"
 		onclick={handleCancel}
+		role="presentation"
 	>
-		<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<div
 			class="w-full max-w-sm rounded-2xl border p-6 animate-scale-in"
 			style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-xl);"
 			onclick={(e) => e.stopPropagation()}
+			role="dialog"
+			aria-modal="true"
+			aria-label={title}
+			tabindex="-1"
 		>
 			<div class="flex items-start gap-4 mb-5">
 				<div class="rounded-xl p-2.5 shrink-0" style="background: {bgMap[variant]};">
