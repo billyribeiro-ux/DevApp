@@ -38,9 +38,9 @@
 	});
 </script>
 
-<div class="flex flex-col h-full overflow-hidden">
+<div class="flex flex-col h-full overflow-hidden" style="background: var(--bg-app);">
 	<!-- Header -->
-	<div class="flex items-center justify-between border-b shrink-0" style="height: var(--titlebar-height); padding: 0 var(--content-padding); border-color: var(--border-default);">
+	<div class="flex items-center justify-between border-b shrink-0" style="height: var(--titlebar-height); padding: 0 var(--content-padding); border-color: var(--border-default); background: var(--bg-surface);">
 		<div>
 			<h1 class="text-lg font-semibold" style="color: var(--text-primary); letter-spacing: -0.02em;">{greeting}</h1>
 			<p style="font-size: var(--text-xs); color: var(--text-tertiary);">{dateStr}</p>
