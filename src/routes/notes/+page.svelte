@@ -180,7 +180,7 @@
 				/>
 			</div>
 			<!-- Content -->
-			<div class="flex-1 overflow-y-auto" style="padding: 24px var(--content-padding-lg);">
+			<div class="flex-1 overflow-y-auto" style="padding: var(--content-padding) var(--content-padding-lg);">
 				<textarea
 					bind:value={editContent}
 					oninput={autoSave}

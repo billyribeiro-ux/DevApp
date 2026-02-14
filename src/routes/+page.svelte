@@ -46,7 +46,7 @@
 		<p class="text-[15px] mt-1" style="color: var(--text-secondary);">Welcome back to your workspace</p>
 	</div>
 
-	<div style="padding: 24px var(--content-padding-lg); display: flex; flex-direction: column; gap: var(--section-gap);">
+	<div style="padding: var(--content-padding) var(--content-padding-lg); display: flex; flex-direction: column; gap: var(--section-gap);">
 		<!-- Quick Actions -->
 		<section>
 			<h2 class="text-[11px] font-semibold uppercase tracking-widest mb-4" style="color: var(--text-tertiary);">Quick Actions</h2>
@@ -104,8 +104,8 @@
 			</div>
 			<div class="rounded-2xl border p-5" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
 				<div class="flex items-center gap-3">
-					<div class="rounded-xl p-2.5" style="background: rgba(175, 82, 222, 0.1);">
-						<Icon icon="ph:graduation-cap-bold" width={22} height={22} style="color: #AF52DE;" />
+					<div class="rounded-xl p-2.5" style="background: var(--color-purple-light);">
+						<Icon icon="ph:graduation-cap-bold" width={22} height={22} style="color: var(--color-purple);" />
 					</div>
 					<div>
 						<p class="text-[28px] font-bold leading-none" style="color: var(--text-primary);">{activeCourses.length}</p>
