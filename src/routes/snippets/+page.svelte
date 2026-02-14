@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
 	import { nav, toasts } from '$stores/app.svelte';
-	import { getSnippets, createSnippet, updateSnippet, deleteSnippet } from '$services/database';
+	import { getSnippets, createSnippet, updateSnippet, deleteSnippet, logActivity } from '$services/database';
 	import { LANGUAGES } from '$config/constants';
 	import type { Snippet } from '$types';
 	import { v4 as uuid } from 'uuid';
@@ -59,8 +59,11 @@
 		if (!sTitle.trim() || !sCode.trim()) { toasts.warning('Title and code are required'); return; }
 		if (editingSnippet) {
 			await updateSnippet(editingSnippet.id, { title: sTitle, code: sCode, language: sLanguage, description: sDescription || null });
+			await logActivity({ id: uuid(), entity_type: 'snippet', entity_id: editingSnippet.id, entity_name: sTitle, action: 'updated' });
 		} else {
-			await createSnippet({ id: uuid(), title: sTitle, code: sCode, language: sLanguage, description: sDescription || null });
+			const newId = uuid();
+			await createSnippet({ id: newId, title: sTitle, code: sCode, language: sLanguage, description: sDescription || null });
+			await logActivity({ id: uuid(), entity_type: 'snippet', entity_id: newId, entity_name: sTitle, action: 'created' });
 		}
 		snippets = await getSnippets();
 		showEditor = false;
@@ -74,7 +77,9 @@
 
 	async function handleDelete() {
 		if (!pendingDeleteId) return;
+		const snippet = snippets.find(s => s.id === pendingDeleteId);
 		await deleteSnippet(pendingDeleteId);
+		await logActivity({ id: uuid(), entity_type: 'snippet', entity_id: pendingDeleteId, entity_name: snippet?.title, action: 'deleted' });
 		snippets = await getSnippets();
 		pendingDeleteId = null;
 		toasts.success('Snippet Deleted');

@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
 	import { nav, toasts } from '$stores/app.svelte';
-	import { getCourses, createCourse, updateCourse, deleteCourse } from '$services/database';
+	import { getCourses, createCourse, updateCourse, deleteCourse, logActivity } from '$services/database';
 	import { COURSE_PLATFORMS } from '$config/constants';
 	import { getStatusColor } from '$utils/formatters';
 	import type { Course } from '$types';
@@ -51,8 +51,11 @@
 		if (!cName.trim()) { toasts.warning('Course name is required'); return; }
 		if (editingCourse) {
 			await updateCourse(editingCourse.id, { name: cName, instructor: cInstructor || null, platform: cPlatform || null, url: cUrl || null, description: cDescription || null });
+			await logActivity({ id: uuid(), entity_type: 'course', entity_id: editingCourse.id, entity_name: cName, action: 'updated' });
 		} else {
-			await createCourse({ id: uuid(), folder_id: 'courses', name: cName, instructor: cInstructor || null, platform: cPlatform || null, url: cUrl || null, description: cDescription || null });
+			const newId = uuid();
+			await createCourse({ id: newId, folder_id: 'courses', name: cName, instructor: cInstructor || null, platform: cPlatform || null, url: cUrl || null, description: cDescription || null });
+			await logActivity({ id: uuid(), entity_type: 'course', entity_id: newId, entity_name: cName, action: 'created' });
 		}
 		courses = await getCourses();
 		showForm = false;
@@ -74,7 +77,9 @@
 
 	async function handleDelete() {
 		if (!pendingDeleteId) return;
+		const course = courses.find(c => c.id === pendingDeleteId);
 		await deleteCourse(pendingDeleteId);
+		await logActivity({ id: uuid(), entity_type: 'course', entity_id: pendingDeleteId, entity_name: course?.name, action: 'deleted' });
 		courses = await getCourses();
 		pendingDeleteId = null;
 		toasts.success('Course Deleted');

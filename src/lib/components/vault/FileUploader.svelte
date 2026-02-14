@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { VaultFile } from '$types';
   import { open } from '@tauri-apps/plugin-dialog';
-  import { readFile, stat } from '@tauri-apps/plugin-fs';
+  import { readFile, stat, writeFile } from '@tauri-apps/plugin-fs';
+  import { invoke } from '@tauri-apps/api/core';
   import { getExtension } from '$utils/formatters';
   import Icon from '@iconify/svelte';
   import DropZone from '$components/ui/DropZone.svelte';
@@ -104,12 +105,16 @@
       updateEntry(entry.id, { status: 'uploading', progress: 10 });
 
       try {
-        // Read the file to simulate/process upload
-        await readFile(pathStr);
-        updateEntry(entry.id, { progress: 50 });
+        // Get vault path and copy file
+        const vaultPath = await invoke<string>('get_vault_path');
+        const destFolder = `${vaultPath}/${folderId}`;
+        updateEntry(entry.id, { progress: 30 });
 
-        // Simulate processing delay for visual feedback
-        await delay(150);
+        const destPath = await invoke<string>('copy_file_to_vault', {
+          source: pathStr,
+          destFolder,
+          filename: entry.name,
+        });
         updateEntry(entry.id, { progress: 90 });
 
         const ext = getExtension(entry.name);
@@ -122,7 +127,7 @@
           extension: ext || null,
           mime_type: null,
           size_bytes: entry.size,
-          local_path: pathStr,
+          local_path: destPath,
           cloud_path: null,
           content_hash: null,
           thumbnail_path: null,
@@ -170,11 +175,15 @@
       updateEntry(entry.id, { status: 'uploading', progress: 10 });
 
       try {
-        // Read the file as ArrayBuffer to simulate processing
-        await file.arrayBuffer();
-        updateEntry(entry.id, { progress: 50 });
+        // Read file bytes and write to vault directory
+        const arrayBuf = await file.arrayBuffer();
+        updateEntry(entry.id, { progress: 30 });
 
-        await delay(150);
+        const vaultPath = await invoke<string>('get_vault_path');
+        const destFolder = `${vaultPath}/${folderId}`;
+        await invoke('ensure_directory', { path: destFolder });
+        const destPath = `${destFolder}/${entry.name}`;
+        await writeFile(destPath, new Uint8Array(arrayBuf));
         updateEntry(entry.id, { progress: 90 });
 
         const ext = getExtension(entry.name);
@@ -187,7 +196,7 @@
           extension: ext || null,
           mime_type: file.type || null,
           size_bytes: file.size,
-          local_path: null,
+          local_path: destPath,
           cloud_path: null,
           content_hash: null,
           thumbnail_path: null,

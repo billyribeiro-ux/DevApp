@@ -7,6 +7,8 @@
 	import { getFileTypeInfo, FOLDER_TYPE_META } from '$config/constants';
 	import type { Folder, VaultFile } from '$types';
 	import { v4 as uuid } from 'uuid';
+	import { invoke } from '@tauri-apps/api/core';
+	import { writeFile } from '@tauri-apps/plugin-fs';
 
 	let currentFiles = $state<VaultFile[]>([]);
 	let subfolders = $state<Folder[]>([]);
@@ -61,20 +63,38 @@
 		dragOver = false;
 		if (!e.dataTransfer?.files.length || !vault.currentFolderId) return;
 
-		for (const file of Array.from(e.dataTransfer.files)) {
-			const ext = getExtension(file.name);
-			const id = uuid();
-			await createFile({
-				id,
-				folder_id: vault.currentFolderId,
-				name: file.name,
-				extension: ext || null,
-				mime_type: file.type || null,
-				size_bytes: file.size,
-			});
+		const folderId = vault.currentFolderId;
+		let count = 0;
+		try {
+			const vaultPath = await invoke<string>('get_vault_path');
+			const destFolder = `${vaultPath}/${folderId}`;
+			await invoke('ensure_directory', { path: destFolder });
+
+			for (const file of Array.from(e.dataTransfer.files)) {
+				const ext = getExtension(file.name);
+				const id = uuid();
+				const arrayBuf = await file.arrayBuffer();
+				const destPath = `${destFolder}/${file.name}`;
+				await writeFile(destPath, new Uint8Array(arrayBuf));
+				await createFile({
+					id,
+					folder_id: folderId,
+					name: file.name,
+					extension: ext || null,
+					mime_type: file.type || null,
+					size_bytes: file.size,
+					local_path: destPath,
+				});
+				count++;
+			}
+		} catch (err) {
+			console.error('File drop error:', err);
+			toasts.warning('Some files could not be uploaded');
 		}
-		toasts.success('Files Added', `${e.dataTransfer.files.length} file(s) added to vault`);
-		await loadFolder(vault.currentFolderId);
+		if (count > 0) {
+			toasts.success('Files Added', `${count} file(s) added to vault`);
+		}
+		await loadFolder(folderId);
 	}
 
 	async function handleCreateFolder() {

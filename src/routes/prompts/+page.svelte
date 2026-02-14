@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
 	import { nav, toasts } from '$stores/app.svelte';
-	import { getPrompts, createPrompt, updatePrompt, deletePrompt, incrementPromptUsage } from '$services/database';
+	import { getPrompts, createPrompt, updatePrompt, deletePrompt, incrementPromptUsage, logActivity } from '$services/database';
 	import { PROMPT_CATEGORIES, LANGUAGES } from '$config/constants';
 	import { formatRelativeDate } from '$utils/formatters';
 	import type { Prompt } from '$types';
@@ -69,8 +69,11 @@
 		const vars = detectedVars();
 		if (editingPrompt) {
 			await updatePrompt(editingPrompt.id, { title: edTitle, content: edContent, category: edCategory as Prompt['category'], language: edLanguage || null, variables: vars.length ? JSON.stringify(vars.map(v => ({ name: v, default_value: '' }))) : null });
+			await logActivity({ id: uuid(), entity_type: 'prompt', entity_id: editingPrompt.id, entity_name: edTitle, action: 'updated' });
 		} else {
-			await createPrompt({ id: uuid(), title: edTitle, content: edContent, category: edCategory as Prompt['category'], language: edLanguage || null, variables: vars.length ? JSON.stringify(vars.map(v => ({ name: v, default_value: '' }))) : null });
+			const newId = uuid();
+			await createPrompt({ id: newId, title: edTitle, content: edContent, category: edCategory as Prompt['category'], language: edLanguage || null, variables: vars.length ? JSON.stringify(vars.map(v => ({ name: v, default_value: '' }))) : null });
+			await logActivity({ id: uuid(), entity_type: 'prompt', entity_id: newId, entity_name: edTitle, action: 'created' });
 		}
 		prompts = await getPrompts();
 		showEditor = false;
@@ -84,7 +87,9 @@
 
 	async function handleDelete() {
 		if (!pendingDeleteId) return;
+		const prompt = prompts.find(p => p.id === pendingDeleteId);
 		await deletePrompt(pendingDeleteId);
+		await logActivity({ id: uuid(), entity_type: 'prompt', entity_id: pendingDeleteId, entity_name: prompt?.title, action: 'deleted' });
 		prompts = await getPrompts();
 		pendingDeleteId = null;
 		toasts.success('Prompt Deleted');

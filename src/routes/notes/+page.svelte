@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
 	import { nav, toasts } from '$stores/app.svelte';
-	import { getNotes, createNote, updateNote, deleteNote } from '$services/database';
+	import { getNotes, createNote, updateNote, deleteNote, logActivity } from '$services/database';
 	import { formatRelativeDate, countWords } from '$utils/formatters';
 	import type { Note } from '$types';
 	import { v4 as uuid } from 'uuid';
@@ -48,6 +48,7 @@
 	async function handleCreate() {
 		const id = uuid();
 		await createNote({ id, folder_id: 'default', title: 'Untitled Note', content_text: '', word_count: 0 });
+		await logActivity({ id: uuid(), entity_type: 'note', entity_id: id, entity_name: 'Untitled Note', action: 'created' });
 		notes = await getNotes();
 		selectNote(id);
 		toasts.success('Note Created');
@@ -74,7 +75,9 @@
 
 	async function handleDelete() {
 		if (!pendingDeleteId) return;
+		const note = notes.find(n => n.id === pendingDeleteId);
 		await deleteNote(pendingDeleteId);
+		await logActivity({ id: uuid(), entity_type: 'note', entity_id: pendingDeleteId, entity_name: note?.title, action: 'deleted' });
 		if (activeNoteId === pendingDeleteId) {
 			activeNoteId = null;
 			editTitle = '';

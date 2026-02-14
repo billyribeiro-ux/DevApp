@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
 	import { nav, toasts } from '$stores/app.svelte';
-	import { getReminders, createReminder, updateReminder, completeReminder, uncompleteReminder, deleteReminder } from '$services/database';
+	import { getReminders, createReminder, updateReminder, completeReminder, uncompleteReminder, deleteReminder, logActivity } from '$services/database';
 	import { formatRelativeDate, formatDate, getPriorityColor } from '$utils/formatters';
 	import type { Reminder } from '$types';
 	import { v4 as uuid } from 'uuid';
@@ -63,6 +63,11 @@
 		} else {
 			await createReminder({ id: uuid(), title: fTitle, description: fDescription || null, due_date: fDueDate || null, due_time: fDueTime || null, priority: fPriority, recurrence: fRecurrence });
 		}
+		if (editingReminder) {
+			await logActivity({ id: uuid(), entity_type: 'reminder', entity_id: editingReminder.id, entity_name: fTitle, action: 'updated' });
+		} else {
+			await logActivity({ id: uuid(), entity_type: 'reminder', entity_id: 'new', entity_name: fTitle, action: 'created' });
+		}
 		reminders = await getReminders();
 		showForm = false;
 		toasts.success(editingReminder ? 'Reminder Updated' : 'Reminder Created');
@@ -71,10 +76,12 @@
 	async function handleToggleComplete(reminder: Reminder) {
 		if (reminder.status === 'completed') {
 			await uncompleteReminder(reminder.id);
+			await logActivity({ id: uuid(), entity_type: 'reminder', entity_id: reminder.id, entity_name: reminder.title, action: 'reopened' });
 			reminders = await getReminders();
 			toasts.info('Reminder Reopened');
 		} else {
 			await completeReminder(reminder.id);
+			await logActivity({ id: uuid(), entity_type: 'reminder', entity_id: reminder.id, entity_name: reminder.title, action: 'completed' });
 			reminders = await getReminders();
 			toasts.success('Reminder Completed');
 		}
@@ -87,7 +94,9 @@
 
 	async function handleDelete() {
 		if (!pendingDeleteId) return;
+		const reminder = reminders.find(r => r.id === pendingDeleteId);
 		await deleteReminder(pendingDeleteId);
+		await logActivity({ id: uuid(), entity_type: 'reminder', entity_id: pendingDeleteId, entity_name: reminder?.title, action: 'deleted' });
 		reminders = await getReminders();
 		pendingDeleteId = null;
 		toasts.success('Reminder Deleted');
