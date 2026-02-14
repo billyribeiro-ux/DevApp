@@ -112,6 +112,7 @@
 </script>
 
 <div class="flex flex-col h-full overflow-hidden">
+	<!-- Header -->
 	<div class="flex items-center justify-between px-8 py-5 border-b shrink-0" style="border-color: var(--border-default);">
 		<div class="flex items-center gap-3">
 			<Icon icon="ph:graduation-cap-bold" width={24} height={24} style="color: #14b8a6;" />
@@ -122,8 +123,8 @@
 			<Icon icon="ph:plus-bold" width={15} height={15} /> New Course
 		</button>
 	</div>
-
-	<div class="flex items-center gap-1.5 px-8 py-3 border-b shrink-0" style="border-color: var(--border-default);">
+	<!-- Filters -->
+	<div class="flex items-center gap-1 px-8 py-4 border-b overflow-x-auto shrink-0" style="border-color: var(--border-default);">
 		{#each [{ v: 'all', l: 'All' }, { v: 'not_started', l: 'Not Started' }, { v: 'in_progress', l: 'In Progress' }, { v: 'completed', l: 'Completed' }, { v: 'paused', l: 'Paused' }] as f}
 			<button onclick={() => { activeFilter = f.v; }} class="rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors" style="background: {activeFilter === f.v ? 'var(--bg-active)' : 'transparent'}; color: {activeFilter === f.v ? 'var(--text-accent)' : 'var(--text-secondary)'};">
 				{f.l}

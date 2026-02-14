@@ -120,10 +120,11 @@
 </script>
 
 <div class="flex flex-col h-full overflow-hidden">
-	<div class="flex items-center justify-between px-8 py-5 border-b shrink-0" style="border-color: var(--border-default);">
+	<!-- Header -->
+	<div class="flex items-center justify-between px-8 border-b shrink-0" style="border-color: var(--border-default); height: 64px;">
 		<div class="flex items-center gap-3">
 			<Icon icon="ph:code-bold" width={24} height={24} style="color: #14b8a6;" />
-			<h1 class="text-[22px] font-bold" style="color: var(--text-primary); letter-spacing: -0.02em;">Code Snippets</h1>
+			<h1 class="text-xl font-bold" style="color: var(--text-primary); letter-spacing: -0.02em;">Code Snippets</h1>
 			<span class="rounded-full px-2.5 py-0.5 text-[12px] font-semibold" style="background: rgba(20, 184, 166, 0.1); color: #14b8a6;">{snippets.length}</span>
 		</div>
 		<div class="flex items-center gap-3">
@@ -136,8 +137,8 @@
 			</button>
 		</div>
 	</div>
-
-	<div class="flex items-center gap-1.5 px-8 py-3 border-b overflow-x-auto shrink-0" style="border-color: var(--border-default);">
+	<!-- Filters -->
+	<div class="flex items-center gap-1 px-8 py-4 border-b overflow-x-auto shrink-0" style="border-color: var(--border-default);">
 		<button onclick={() => { activeLanguage = 'all'; }} class="rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors shrink-0" style="background: {activeLanguage === 'all' ? 'var(--bg-active)' : 'transparent'}; color: {activeLanguage === 'all' ? 'var(--text-accent)' : 'var(--text-secondary)'};">All</button>
 		{#each ['javascript', 'typescript', 'python', 'rust', 'css', 'html', 'sql', 'bash'] as lang}
 			<button onclick={() => { activeLanguage = lang; }} class="rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors shrink-0" style="background: {activeLanguage === lang ? 'var(--bg-active)' : 'transparent'}; color: {activeLanguage === lang ? 'var(--text-accent)' : 'var(--text-secondary)'};">{lang}</button>

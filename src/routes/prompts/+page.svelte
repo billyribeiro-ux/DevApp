@@ -130,10 +130,10 @@
 
 <div class="flex flex-col h-full overflow-hidden">
 	<!-- Header -->
-	<div class="flex items-center justify-between px-8 py-5 border-b shrink-0" style="border-color: var(--border-default);">
+	<div class="flex items-center justify-between px-8 border-b shrink-0" style="border-color: var(--border-default); height: 64px;">
 		<div class="flex items-center gap-3">
 			<Icon icon="ph:chat-dots-bold" width={24} height={24} style="color: var(--text-accent);" />
-			<h1 class="text-[22px] font-bold" style="color: var(--text-primary); letter-spacing: -0.02em;">Prompts Library</h1>
+			<h1 class="text-xl font-bold" style="color: var(--text-primary); letter-spacing: -0.02em;">Prompts Library</h1>
 			<span class="rounded-full px-2.5 py-0.5 text-[12px] font-semibold" style="background: var(--bg-active); color: var(--text-accent);">{prompts.length}</span>
 		</div>
 		<div class="flex items-center gap-3">
@@ -148,7 +148,7 @@
 	</div>
 
 	<!-- Categories -->
-	<div class="flex items-center gap-1 px-8 py-3 border-b overflow-x-auto shrink-0" style="border-color: var(--border-default);">
+	<div class="flex items-center gap-1 px-8 py-4 border-b overflow-x-auto shrink-0" style="border-color: var(--border-default);">
 		<button onclick={() => { activeCategory = 'all'; }} class="rounded-full px-4 py-1.5 text-[13px] font-medium whitespace-nowrap transition-colors" style="background: {activeCategory === 'all' ? 'var(--bg-active)' : 'transparent'}; color: {activeCategory === 'all' ? 'var(--text-accent)' : 'var(--text-secondary)'};">
 			All
 		</button>

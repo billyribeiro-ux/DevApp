@@ -38,176 +38,157 @@
 	});
 </script>
 
-<div class="flex flex-col h-full overflow-y-auto">
+<div class="flex flex-col h-full overflow-hidden">
 	<!-- Header -->
-	<div class="px-10 pt-10 pb-8">
-		<p class="text-[12px] font-semibold uppercase tracking-widest" style="color: var(--text-tertiary);">{dateStr}</p>
-		<h1 class="text-[32px] font-bold mt-1.5" style="color: var(--text-primary); letter-spacing: -0.02em;">{greeting}</h1>
-		<p class="text-[15px] mt-1" style="color: var(--text-secondary);">Welcome back to your workspace</p>
+	<div class="flex items-center justify-between px-6 shrink-0" style="height: 56px;">
+		<div>
+			<h1 class="text-lg font-semibold" style="color: var(--text-primary); letter-spacing: -0.02em;">{greeting}</h1>
+			<p class="text-[12px]" style="color: var(--text-tertiary);">{dateStr}</p>
+		</div>
 	</div>
 
-	<div class="px-10 pb-12 space-y-12">
-		<!-- Quick Actions -->
-		<section>
-			<h2 class="text-[13px] font-semibold uppercase tracking-wider mb-5" style="color: var(--text-tertiary);">Quick Actions</h2>
-			<div class="grid grid-cols-3 md:grid-cols-6 gap-4">
-				{#each quickActions as action}
-					<a
-						href={action.href}
-						onclick={() => nav.navigate(action.href)}
-						class="group flex flex-col items-center gap-2 rounded-2xl border px-3 py-4 transition-all duration-200 hover:shadow-md"
-						style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);"
-					>
-						<div class="rounded-xl p-2.5 transition-transform duration-200 group-hover:scale-110" style="background: {action.color}15;">
-							<Icon icon={action.icon} width={24} height={24} style="color: {action.color};" />
-						</div>
-						<span class="text-[12px] font-medium text-center" style="color: var(--text-secondary);">{action.label}</span>
-					</a>
-				{/each}
-			</div>
-		</section>
+	<div class="flex-1 overflow-y-auto">
+		<div class="mx-auto w-full max-w-[860px] px-6 py-4 space-y-10">
 
-		<!-- Stats Row -->
-		<section class="grid grid-cols-2 md:grid-cols-4 gap-4">
-			<div class="rounded-2xl border p-5" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
-				<div class="flex items-center gap-3">
-					<div class="rounded-xl p-2" style="background: rgba(0, 122, 255, 0.1);">
-						<Icon icon="ph:files-bold" width={20} height={20} style="color: #007AFF;" />
-					</div>
-					<div>
-						<p class="text-[24px] font-bold leading-none" style="color: var(--text-primary);">{vault.folders.length}</p>
-						<p class="text-[12px] mt-0.5" style="color: var(--text-tertiary);">Folders</p>
-					</div>
-				</div>
-			</div>
-			<div class="rounded-2xl border p-5" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
-				<div class="flex items-center gap-3">
-					<div class="rounded-xl p-2" style="background: rgba(48, 209, 88, 0.1);">
-						<Icon icon="ph:note-pencil-bold" width={20} height={20} style="color: #30D158;" />
-					</div>
-					<div>
-						<p class="text-[24px] font-bold leading-none" style="color: var(--text-primary);">{recentFiles.length}</p>
-						<p class="text-[12px] mt-0.5" style="color: var(--text-tertiary);">Recent Files</p>
-					</div>
-				</div>
-			</div>
-			<div class="rounded-2xl border p-5" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
-				<div class="flex items-center gap-3">
-					<div class="rounded-xl p-2" style="background: rgba(255, 149, 0, 0.1);">
-						<Icon icon="ph:bell-bold" width={20} height={20} style="color: #FF9500;" />
-					</div>
-					<div>
-						<p class="text-[24px] font-bold leading-none" style="color: var(--text-primary);">{upcomingReminders.length}</p>
-						<p class="text-[12px] mt-0.5" style="color: var(--text-tertiary);">Pending Reminders</p>
-					</div>
-				</div>
-			</div>
-			<div class="rounded-2xl border p-5" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
-				<div class="flex items-center gap-3">
-					<div class="rounded-xl p-2" style="background: rgba(175, 82, 222, 0.1);">
-						<Icon icon="ph:graduation-cap-bold" width={20} height={20} style="color: #AF52DE;" />
-					</div>
-					<div>
-						<p class="text-[24px] font-bold leading-none" style="color: var(--text-primary);">{activeCourses.length}</p>
-						<p class="text-[12px] mt-0.5" style="color: var(--text-tertiary);">Active Courses</p>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<!-- Recent Files -->
-		<section>
-			<div class="flex items-center justify-between mb-5">
-				<h2 class="text-[13px] font-semibold uppercase tracking-wider" style="color: var(--text-tertiary);">Recent Files</h2>
-				<a href="/vault" onclick={() => nav.navigate('/vault')} class="text-xs font-medium" style="color: var(--text-accent);">View all</a>
-			</div>
-			{#if recentFiles.length > 0}
-				<div class="rounded-2xl border overflow-hidden" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
-					{#each recentFiles as file, i}
-						{@const typeInfo = getFileTypeInfo(file.extension)}
-						<div class="flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-[var(--bg-card-hover)]" style="{i < recentFiles.length - 1 ? 'border-bottom: 1px solid var(--border-subtle);' : ''}">
-							<div class="rounded-xl p-2 shrink-0" style="background: {typeInfo.color}12;">
-								<Icon icon={typeInfo.icon} width={20} height={20} style="color: {typeInfo.color};" />
-							</div>
-							<div class="min-w-0 flex-1">
-								<p class="text-sm font-medium truncate" style="color: var(--text-primary);">{file.name}</p>
-								<p class="text-xs mt-0.5" style="color: var(--text-tertiary);">{formatFileSize(file.size_bytes)}</p>
-							</div>
-							<span class="text-xs shrink-0" style="color: var(--text-tertiary);">{formatRelativeDate(file.updated_at)}</span>
-						</div>
-					{/each}
-				</div>
-			{:else}
-				<div class="flex flex-col items-center justify-center rounded-2xl border border-dashed p-16" style="border-color: var(--border-default);">
-					<Icon icon="ph:folder-open" width={56} height={56} style="color: var(--text-tertiary); opacity: 0.4;" />
-					<p class="mt-4 text-sm font-medium" style="color: var(--text-tertiary);">No files yet</p>
-					<p class="text-xs mt-1" style="color: var(--text-tertiary);">Upload files to your vault to see them here</p>
-				</div>
-			{/if}
-		</section>
-
-		<!-- Upcoming Reminders -->
-		<section>
-			<div class="flex items-center justify-between mb-5">
-				<h2 class="text-[13px] font-semibold uppercase tracking-wider" style="color: var(--text-tertiary);">Upcoming Reminders</h2>
-				<a href="/reminders" onclick={() => nav.navigate('/reminders')} class="text-xs font-medium" style="color: var(--text-accent);">View all</a>
-			</div>
-			{#if upcomingReminders.length > 0}
-				<div class="rounded-2xl border overflow-hidden" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
-					{#each upcomingReminders as reminder, i}
-						<div class="flex items-center gap-4 px-5 py-4" style="{i < upcomingReminders.length - 1 ? 'border-bottom: 1px solid var(--border-subtle);' : ''} border-left: 3px solid {reminder.priority === 'urgent' ? 'var(--color-error)' : reminder.priority === 'high' ? 'var(--color-warning)' : 'var(--color-primary-500)'};">
-							<div class="flex-1 min-w-0">
-								<p class="text-sm font-medium" style="color: var(--text-primary);">{reminder.title}</p>
-								{#if reminder.due_date}
-									<p class="text-xs mt-0.5" style="color: var(--text-tertiary);">Due {formatRelativeDate(reminder.due_date)}</p>
-								{/if}
-							</div>
-							<span class="rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase" style="background: {reminder.priority === 'urgent' ? 'var(--color-error-light)' : reminder.priority === 'high' ? 'var(--color-warning-light)' : 'var(--bg-active)'}; color: {reminder.priority === 'urgent' ? 'var(--color-error)' : reminder.priority === 'high' ? 'var(--color-warning)' : 'var(--text-accent)'};">
-								{reminder.priority}
-							</span>
-						</div>
-					{/each}
-				</div>
-			{:else}
-				<div class="flex items-center gap-3 rounded-2xl border border-dashed p-8 justify-center" style="border-color: var(--border-default);">
-					<Icon icon="ph:check-circle" width={28} height={28} style="color: var(--color-success); opacity: 0.5;" />
-					<p class="text-sm" style="color: var(--text-tertiary);">No pending reminders. You're all caught up!</p>
-				</div>
-			{/if}
-		</section>
-
-		<!-- Active Courses -->
-		{#if activeCourses.length > 0}
-			<section class="pb-10">
-				<div class="flex items-center justify-between mb-5">
-					<h2 class="text-[13px] font-semibold uppercase tracking-wider" style="color: var(--text-tertiary);">Active Courses</h2>
-					<a href="/courses" onclick={() => nav.navigate('/courses')} class="text-xs font-medium" style="color: var(--text-accent);">View all</a>
-				</div>
-				<div class="rounded-2xl border overflow-hidden" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
-					{#each activeCourses as course, i}
-						<div class="px-5 py-4" style="{i < activeCourses.length - 1 ? 'border-bottom: 1px solid var(--border-subtle);' : ''}">
-							<div class="flex items-center justify-between mb-2">
-								<div>
-									<p class="text-sm font-medium" style="color: var(--text-primary);">{course.name}</p>
-									{#if course.instructor}
-										<p class="text-xs mt-0.5" style="color: var(--text-tertiary);">by {course.instructor}</p>
-									{/if}
-								</div>
-								<span class="text-xs font-semibold" style="color: var(--text-accent);">{course.progress_percent}%</span>
-							</div>
-							<div class="h-2 rounded-full overflow-hidden" style="background: var(--bg-surface-raised);">
-								<div class="h-full rounded-full transition-all duration-500" style="width: {course.progress_percent}%; background: var(--color-primary-500);"></div>
-							</div>
-							<div class="flex items-center justify-between mt-2">
-								<span class="text-[12px]" style="color: var(--text-tertiary);">{course.completed_lessons}/{course.total_lessons} lessons</span>
-								{#if course.platform}
-									<span class="text-[12px] rounded-md px-2 py-0.5" style="background: var(--bg-surface-raised); color: var(--text-secondary);">{course.platform}</span>
-								{/if}
-							</div>
-						</div>
+			<!-- Quick Actions -->
+			<section>
+				<div class="flex flex-wrap gap-2">
+					{#each quickActions as action}
+						
+							href={action.href}
+							onclick={() => nav.navigate(action.href)}
+							class="group inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-[13px] transition-colors duration-100"
+							style="border-color: var(--border-default); color: var(--text-secondary); background: var(--bg-card);"
+						>
+							<Icon icon={action.icon} width={16} height={16} style="color: {action.color}; opacity: 0.85;" />
+							<span class="font-medium">{action.label}</span>
+						</a>
 					{/each}
 				</div>
 			</section>
-		{/if}
+
+			<!-- Stats -->
+			<section class="grid grid-cols-4 gap-px rounded-xl border overflow-hidden" style="border-color: var(--border-default); background: var(--border-default);">
+				{@const stats = [
+					{ label: 'Folders', value: vault.folders.length, icon: 'ph:files-bold', color: '#007AFF' },
+					{ label: 'Recent Files', value: recentFiles.length, icon: 'ph:note-pencil-bold', color: '#30D158' },
+					{ label: 'Reminders', value: upcomingReminders.length, icon: 'ph:bell-bold', color: '#FF9500' },
+					{ label: 'Courses', value: activeCourses.length, icon: 'ph:graduation-cap-bold', color: '#AF52DE' },
+				]}
+				{#each stats as stat}
+					<div class="flex items-center gap-3 px-4 py-4" style="background: var(--bg-card);">
+						<Icon icon={stat.icon} width={18} height={18} style="color: {stat.color}; opacity: 0.8;" />
+						<div>
+							<p class="text-[18px] font-semibold leading-none" style="color: var(--text-primary);">{stat.value}</p>
+							<p class="text-[11px] mt-1" style="color: var(--text-tertiary);">{stat.label}</p>
+						</div>
+					</div>
+				{/each}
+			</section>
+
+			<!-- Two Column Layout -->
+			<div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+
+				<!-- Left: Recent Files (3 cols) -->
+				<section class="lg:col-span-3">
+					<div class="flex items-center justify-between mb-3">
+						<h2 class="text-[13px] font-medium" style="color: var(--text-secondary);">Recent Files</h2>
+						<a href="/vault" onclick={() => nav.navigate('/vault')} class="text-[12px] font-medium" style="color: var(--text-accent);">View all</a>
+					</div>
+					{#if recentFiles.length > 0}
+						<div class="rounded-xl border overflow-hidden" style="border-color: var(--border-default); background: var(--bg-card);">
+							{#each recentFiles as file, i}
+								{@const typeInfo = getFileTypeInfo(file.extension)}
+								<div
+									class="flex items-center gap-3 px-4 py-3 transition-colors duration-75 hover:bg-[var(--bg-card-hover)] cursor-default"
+									style="{i < recentFiles.length - 1 ? 'border-bottom: 1px solid var(--border-subtle);' : ''}"
+								>
+									<Icon icon={typeInfo.icon} width={16} height={16} style="color: {typeInfo.color}; opacity: 0.75;" />
+									<div class="min-w-0 flex-1">
+										<p class="text-[13px] font-medium truncate" style="color: var(--text-primary);">{file.name}</p>
+									</div>
+									<span class="text-[11px] shrink-0" style="color: var(--text-tertiary);">{formatFileSize(file.size_bytes)}</span>
+									<span class="text-[11px] shrink-0" style="color: var(--text-tertiary);">{formatRelativeDate(file.updated_at)}</span>
+								</div>
+							{/each}
+						</div>
+					{:else}
+						<div class="flex flex-col items-center justify-center rounded-xl border border-dashed py-14" style="border-color: var(--border-default);">
+							<Icon icon="ph:folder-open" width={40} height={40} style="color: var(--text-tertiary); opacity: 0.3;" />
+							<p class="mt-3 text-[13px]" style="color: var(--text-tertiary);">No files yet</p>
+						</div>
+					{/if}
+				</section>
+
+				<!-- Right: Reminders (2 cols) -->
+				<section class="lg:col-span-2">
+					<div class="flex items-center justify-between mb-3">
+						<h2 class="text-[13px] font-medium" style="color: var(--text-secondary);">Reminders</h2>
+						<a href="/reminders" onclick={() => nav.navigate('/reminders')} class="text-[12px] font-medium" style="color: var(--text-accent);">View all</a>
+					</div>
+					{#if upcomingReminders.length > 0}
+						<div class="rounded-xl border overflow-hidden" style="border-color: var(--border-default); background: var(--bg-card);">
+							{#each upcomingReminders as reminder, i}
+								<div
+									class="flex items-start gap-3 px-4 py-3"
+									style="{i < upcomingReminders.length - 1 ? 'border-bottom: 1px solid var(--border-subtle);' : ''}"
+								>
+									<div
+										class="mt-1.5 h-2 w-2 rounded-full shrink-0"
+										style="background: {reminder.priority === 'urgent' ? 'var(--color-error)' : reminder.priority === 'high' ? 'var(--color-warning)' : 'var(--color-primary-500)'};"
+									></div>
+									<div class="min-w-0 flex-1">
+										<p class="text-[13px] font-medium" style="color: var(--text-primary);">{reminder.title}</p>
+										{#if reminder.due_date}
+											<p class="text-[11px] mt-0.5" style="color: var(--text-tertiary);">Due {formatRelativeDate(reminder.due_date)}</p>
+										{/if}
+									</div>
+								</div>
+							{/each}
+						</div>
+					{:else}
+						<div class="flex items-center gap-2 rounded-xl border border-dashed px-4 py-8 justify-center" style="border-color: var(--border-default);">
+							<Icon icon="ph:check-circle" width={18} height={18} style="color: var(--color-success); opacity: 0.5;" />
+							<p class="text-[13px]" style="color: var(--text-tertiary);">All caught up</p>
+						</div>
+					{/if}
+				</section>
+			</div>
+
+			<!-- Active Courses -->
+			{#if activeCourses.length > 0}
+				<section class="pb-8">
+					<div class="flex items-center justify-between mb-3">
+						<h2 class="text-[13px] font-medium" style="color: var(--text-secondary);">Active Courses</h2>
+						<a href="/courses" onclick={() => nav.navigate('/courses')} class="text-[12px] font-medium" style="color: var(--text-accent);">View all</a>
+					</div>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+						{#each activeCourses as course}
+							<div class="rounded-xl border px-4 py-3.5" style="border-color: var(--border-default); background: var(--bg-card);">
+								<div class="flex items-start justify-between mb-2.5">
+									<div class="min-w-0 flex-1">
+										<p class="text-[13px] font-medium truncate" style="color: var(--text-primary);">{course.name}</p>
+										{#if course.instructor}
+											<p class="text-[11px] mt-0.5" style="color: var(--text-tertiary);">{course.instructor}</p>
+										{/if}
+									</div>
+									<span class="text-[12px] font-semibold shrink-0 ml-3" style="color: var(--text-accent);">{course.progress_percent}%</span>
+								</div>
+								<div class="h-1.5 rounded-full overflow-hidden" style="background: var(--bg-surface-raised);">
+									<div class="h-full rounded-full transition-all duration-500" style="width: {course.progress_percent}%; background: var(--color-primary-500);"></div>
+								</div>
+								<div class="flex items-center justify-between mt-2">
+									<span class="text-[11px]" style="color: var(--text-tertiary);">{course.completed_lessons}/{course.total_lessons} lessons</span>
+									{#if course.platform}
+										<span class="text-[11px]" style="color: var(--text-tertiary);">{course.platform}</span>
+									{/if}
+								</div>
+							</div>
+						{/each}
+					</div>
+				</section>
+			{/if}
+
+		</div>
 	</div>
 </div>
