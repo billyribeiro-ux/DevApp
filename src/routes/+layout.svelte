@@ -4,6 +4,9 @@
 	import Icon from '@iconify/svelte';
 	import { ui, theme, vault, toasts, nav } from '$stores/app.svelte';
 	import { getWorkspaces, getFolders, seedDefaultData } from '$services/database';
+	import ErrorBoundary from '$lib/components/ui/ErrorBoundary.svelte';
+	import { handleError } from '$lib/utils/error-handler';
+	import { logger } from '$lib/utils/logger';
 
 	let { children } = $props();
 
@@ -51,6 +54,7 @@
 	}
 
 	onMount(async () => {
+		logger.info('Application initializing');
 		theme.apply();
 		try {
 			await seedDefaultData();
@@ -60,9 +64,9 @@
 				vault.currentWorkspaceId = workspaces[0].id;
 				vault.folders = await getFolders(workspaces[0].id);
 			}
+			logger.info('Application initialized successfully');
 		} catch (err) {
-			console.error('Init error:', err);
-			toasts.error('Initialization Error', 'Failed to load database.');
+			handleError(err, 'Application Initialization');
 		}
 		initialized = true;
 	});
@@ -148,7 +152,9 @@
 
 		<!-- Main -->
 		<main class="flex flex-1 flex-col overflow-hidden min-w-0">
-			{@render children()}
+			<ErrorBoundary context="Main Application">
+				{@render children()}
+			</ErrorBoundary>
 		</main>
 	</div>
 

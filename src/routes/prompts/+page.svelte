@@ -91,12 +91,12 @@
 		<div class="flex items-center gap-3">
 			<Icon icon="ph:chat-dots-bold" width={24} height={24} style="color: var(--text-accent);" />
 			<h1>Prompts Library</h1>
-			<span class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold" style="background: var(--bg-active); color: var(--text-accent);">{prompts.length}</span>
+			<span class="rounded-full px-2.5 py-0.5 font-semibold" style="font-size: var(--text-xs); background: var(--bg-active); color: var(--text-accent);">{prompts.length}</span>
 		</div>
 		<div class="flex items-center gap-3">
 			<div class="flex items-center gap-2 rounded-xl px-3 py-2" style="background: var(--bg-input); border: 1px solid var(--border-default);">
 				<Icon icon="ph:magnifying-glass" width={15} height={15} style="color: var(--text-tertiary);" />
-				<input type="text" bind:value={searchQuery} placeholder="Search prompts..." class="bg-transparent text-[13px] outline-none w-48" style="color: var(--text-primary);" />
+				<input type="text" bind:value={searchQuery} placeholder="Search prompts..." class="bg-transparent outline-none w-48" style="font-size: var(--text-sm); color: var(--text-primary);" />
 			</div>
 			<button onclick={() => startEdit()} class="btn-primary">
 				<Icon icon="ph:plus-bold" width={15} height={15} /> New Prompt
@@ -106,11 +106,11 @@
 
 	<!-- Categories -->
 	<div class="page-tabs">
-		<button onclick={() => { activeCategory = 'all'; }} class="rounded-full px-4 py-1.5 text-[13px] font-medium whitespace-nowrap transition-colors" style="background: {activeCategory === 'all' ? 'var(--bg-active)' : 'transparent'}; color: {activeCategory === 'all' ? 'var(--text-accent)' : 'var(--text-secondary)'};">
+		<button onclick={() => { activeCategory = 'all'; }} class="rounded-full px-4 py-1.5 font-medium whitespace-nowrap transition-colors" style="font-size: var(--text-sm); background: {activeCategory === 'all' ? 'var(--bg-active)' : 'transparent'}; color: {activeCategory === 'all' ? 'var(--text-accent)' : 'var(--text-secondary)'};">
 			All
 		</button>
 		{#each PROMPT_CATEGORIES as cat}
-			<button onclick={() => { activeCategory = cat.value; }} class="flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[13px] font-medium whitespace-nowrap transition-colors" style="background: {activeCategory === cat.value ? 'var(--bg-active)' : 'transparent'}; color: {activeCategory === cat.value ? 'var(--text-accent)' : 'var(--text-secondary)'};">
+			<button onclick={() => { activeCategory = cat.value; }} class="flex items-center gap-1.5 rounded-full px-4 py-1.5 font-medium whitespace-nowrap transition-colors" style="font-size: var(--text-sm); background: {activeCategory === cat.value ? 'var(--bg-active)' : 'transparent'}; color: {activeCategory === cat.value ? 'var(--text-accent)' : 'var(--text-secondary)'};">
 				<Icon icon={cat.icon} width={14} height={14} />
 				{cat.label}
 			</button>
@@ -125,24 +125,24 @@
 					<h3 class="text-base font-semibold" style="color: var(--text-primary);">{editingPrompt ? 'Edit Prompt' : 'New Prompt'}</h3>
 					<input type="text" bind:value={edTitle} placeholder="Prompt title..." class="input-field" />
 					<div class="flex gap-3">
-						<select bind:value={edCategory} class="rounded-xl border px-4 py-2.5 text-[13px]" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);">
+						<select bind:value={edCategory} class="rounded-xl border px-4 py-2.5" style="font-size: var(--text-sm); background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);">
 							{#each PROMPT_CATEGORIES as cat}
 								<option value={cat.value}>{cat.label}</option>
 							{/each}
 						</select>
-						<select bind:value={edLanguage} class="rounded-xl border px-4 py-2.5 text-[13px]" style="background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);">
+						<select bind:value={edLanguage} class="rounded-xl border px-4 py-2.5" style="font-size: var(--text-sm); background: var(--bg-input); border-color: var(--border-default); color: var(--text-primary);">
 							<option value="">No language</option>
 							{#each LANGUAGES as lang}
 								<option value={lang}>{lang}</option>
 							{/each}
 						</select>
 					</div>
-					<textarea bind:value={edContent} placeholder="Write your prompt... Use {'{{'}variable{'}}'} for template variables" rows={10} class="input-field resize-none font-mono" style="font-size: 0.8125rem;"></textarea>
+					<textarea bind:value={edContent} placeholder="Write your prompt... Use {'{{'}variable{'}}'} for template variables" rows={10} class="input-field resize-none font-mono" style="font-size: var(--text-sm);"></textarea>
 					{#if detectedVars().length > 0}
 						<div class="flex items-center gap-2 flex-wrap">
-							<span class="text-[11px] font-medium" style="color: var(--text-tertiary);">Variables:</span>
+							<span class="font-medium" style="font-size: var(--text-xs); color: var(--text-tertiary);">Variables:</span>
 							{#each detectedVars() as v}
-								<span class="rounded-lg px-2.5 py-1 text-[11px] font-mono" style="background: var(--bg-active); color: var(--text-accent);">{`{{${v}}}`}</span>
+								<span class="rounded-lg px-2.5 py-1 font-mono" style="font-size: var(--text-xs); background: var(--bg-active); color: var(--text-accent);">{`{{${v}}}`}</span>
 							{/each}
 						</div>
 					{/if}

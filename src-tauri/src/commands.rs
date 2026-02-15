@@ -1,7 +1,13 @@
+use crate::error::{CommandError, CommandResult};
+use crate::validation::{
+    sanitize_filename, validate_file_extension, validate_file_size, validate_filename,
+    validate_path,
+};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager};
+use tracing::{info, warn};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FileHashResult {
@@ -9,78 +15,244 @@ pub struct FileHashResult {
     pub size: u64,
 }
 
+/// Get the vault path, creating it if it doesn't exist
 #[tauri::command]
-pub fn get_vault_path(app: AppHandle) -> Result<String, String> {
+pub fn get_vault_path(app: AppHandle) -> CommandResult<String> {
+    info!("Getting vault path");
+
     let app_data = app
         .path()
         .app_data_dir()
-        .map_err(|e| e.to_string())?;
+        .map_err(|e| CommandError::OperationFailed(format!("Failed to get app data dir: {}", e)))?;
+
     let vault_path = app_data.join("vault");
+
     if !vault_path.exists() {
-        fs::create_dir_all(&vault_path).map_err(|e| e.to_string())?;
+        info!("Creating vault directory: {:?}", vault_path);
+        fs::create_dir_all(&vault_path)?;
     }
+
     Ok(vault_path.to_string_lossy().to_string())
 }
 
+/// Hash a file using Blake3 and return hash + size
 #[tauri::command]
-pub fn hash_file(path: String) -> Result<FileHashResult, String> {
-    let data = fs::read(&path).map_err(|e| format!("Failed to read file: {}", e))?;
-    let hash = blake3::hash(&data);
+pub fn hash_file(path: String, app: AppHandle) -> CommandResult<FileHashResult> {
+    info!("Hashing file: {}", path);
+
+    // Get vault path for validation
+    let vault_path = get_vault_base_path(&app)?;
+
+    // Validate path
+    let validated_path = validate_path(&path, &vault_path)?;
+
+    // Check if file exists
+    if !validated_path.exists() {
+        return Err(CommandError::FileNotFound(path));
+    }
+
+    // Read and hash file
+    let data = fs::read(&validated_path)?;
     let size = data.len() as u64;
+
+    // Validate file size
+    validate_file_size(size)?;
+
+    let hash = blake3::hash(&data);
+
+    info!("File hashed successfully: {} bytes", size);
+
     Ok(FileHashResult {
         hash: hash.to_hex().to_string(),
         size,
     })
 }
 
+/// Copy a file to the vault with validation
 #[tauri::command]
 pub fn copy_file_to_vault(
     source: String,
     dest_folder: String,
     filename: String,
-) -> Result<String, String> {
-    let dest_dir = PathBuf::from(&dest_folder);
+    app: AppHandle,
+) -> CommandResult<String> {
+    info!("Copying file to vault: {} -> {}/{}", source, dest_folder, filename);
+
+    // Validate filename
+    let validated_filename = validate_filename(&filename)?;
+    validate_file_extension(&validated_filename)?;
+    let safe_filename = sanitize_filename(&validated_filename);
+
+    // Get vault path
+    let vault_path = get_vault_base_path(&app)?;
+
+    // Validate destination folder
+    let dest_dir = validate_path(&dest_folder, &vault_path)?;
+
+    // Create destination directory if needed
     if !dest_dir.exists() {
-        fs::create_dir_all(&dest_dir).map_err(|e| e.to_string())?;
+        info!("Creating destination directory: {:?}", dest_dir);
+        fs::create_dir_all(&dest_dir)?;
     }
-    let dest_path = dest_dir.join(&filename);
-    fs::copy(&source, &dest_path).map_err(|e| format!("Failed to copy file: {}", e))?;
+
+    // Validate source file
+    let source_path = PathBuf::from(&source);
+    if !source_path.exists() {
+        return Err(CommandError::FileNotFound(source));
+    }
+
+    // Check source file size
+    let metadata = fs::metadata(&source_path)?;
+    validate_file_size(metadata.len())?;
+
+    // Copy file
+    let dest_path = dest_dir.join(&safe_filename);
+    fs::copy(&source_path, &dest_path)?;
+
+    info!("File copied successfully to: {:?}", dest_path);
+
     Ok(dest_path.to_string_lossy().to_string())
 }
 
+/// Delete a file from the vault
 #[tauri::command]
-pub fn delete_vault_file(path: String) -> Result<(), String> {
-    if PathBuf::from(&path).exists() {
-        fs::remove_file(&path).map_err(|e| format!("Failed to delete file: {}", e))?;
+pub fn delete_vault_file(path: String, app: AppHandle) -> CommandResult<()> {
+    info!("Deleting vault file: {}", path);
+
+    // Get vault path for validation
+    let vault_path = get_vault_base_path(&app)?;
+
+    // Validate path
+    let validated_path = validate_path(&path, &vault_path)?;
+
+    if validated_path.exists() {
+        fs::remove_file(&validated_path)?;
+        info!("File deleted successfully");
+    } else {
+        warn!("File not found, skipping deletion: {}", path);
     }
+
     Ok(())
 }
 
+/// Ensure a directory exists in the vault
 #[tauri::command]
-pub fn ensure_directory(path: String) -> Result<(), String> {
-    fs::create_dir_all(&path).map_err(|e| format!("Failed to create directory: {}", e))?;
+pub fn ensure_directory(path: String, app: AppHandle) -> CommandResult<()> {
+    info!("Ensuring directory exists: {}", path);
+
+    // Get vault path for validation
+    let vault_path = get_vault_base_path(&app)?;
+
+    // Validate path (allow creation of new paths)
+    let path_buf = PathBuf::from(&path);
+    let target_path = if path_buf.is_absolute() {
+        path_buf
+    } else {
+        vault_path.join(&path_buf)
+    };
+
+    // Ensure it's within vault
+    if !target_path.starts_with(&vault_path) {
+        return Err(CommandError::PathTraversal(format!(
+            "Path is outside vault: {}",
+            path
+        )));
+    }
+
+    fs::create_dir_all(&target_path)?;
+    info!("Directory created successfully");
+
     Ok(())
 }
 
+/// Read file bytes from vault
 #[tauri::command]
-pub fn read_file_bytes(path: String) -> Result<Vec<u8>, String> {
-    fs::read(&path).map_err(|e| format!("Failed to read file: {}", e))
+pub fn read_file_bytes(path: String, app: AppHandle) -> CommandResult<Vec<u8>> {
+    info!("Reading file bytes: {}", path);
+
+    // Get vault path for validation
+    let vault_path = get_vault_base_path(&app)?;
+
+    // Validate path
+    let validated_path = validate_path(&path, &vault_path)?;
+
+    if !validated_path.exists() {
+        return Err(CommandError::FileNotFound(path));
+    }
+
+    let data = fs::read(&validated_path)?;
+    validate_file_size(data.len() as u64)?;
+
+    info!("File read successfully: {} bytes", data.len());
+
+    Ok(data)
 }
 
+/// Get file size
 #[tauri::command]
-pub fn get_file_size(path: String) -> Result<u64, String> {
-    let metadata = fs::metadata(&path).map_err(|e| format!("Failed to get metadata: {}", e))?;
-    Ok(metadata.len())
+pub fn get_file_size(path: String, app: AppHandle) -> CommandResult<u64> {
+    info!("Getting file size: {}", path);
+
+    // Get vault path for validation
+    let vault_path = get_vault_base_path(&app)?;
+
+    // Validate path
+    let validated_path = validate_path(&path, &vault_path)?;
+
+    if !validated_path.exists() {
+        return Err(CommandError::FileNotFound(path));
+    }
+
+    let metadata = fs::metadata(&validated_path)?;
+    let size = metadata.len();
+
+    info!("File size: {} bytes", size);
+
+    Ok(size)
 }
 
+/// List directory contents
 #[tauri::command]
-pub fn list_directory(path: String) -> Result<Vec<String>, String> {
-    let entries = fs::read_dir(&path).map_err(|e| format!("Failed to read directory: {}", e))?;
+pub fn list_directory(path: String, app: AppHandle) -> CommandResult<Vec<String>> {
+    info!("Listing directory: {}", path);
+
+    // Get vault path for validation
+    let vault_path = get_vault_base_path(&app)?;
+
+    // Validate path
+    let validated_path = validate_path(&path, &vault_path)?;
+
+    if !validated_path.exists() {
+        return Err(CommandError::FileNotFound(path));
+    }
+
+    if !validated_path.is_dir() {
+        return Err(CommandError::InvalidPath(format!(
+            "Path is not a directory: {}",
+            path
+        )));
+    }
+
+    let entries = fs::read_dir(&validated_path)?;
     let mut files = Vec::new();
+
     for entry in entries {
         if let Ok(entry) = entry {
             files.push(entry.path().to_string_lossy().to_string());
         }
     }
+
+    info!("Listed {} entries", files.len());
+
     Ok(files)
+}
+
+/// Helper function to get vault base path
+fn get_vault_base_path(app: &AppHandle) -> CommandResult<PathBuf> {
+    let app_data = app
+        .path()
+        .app_data_dir()
+        .map_err(|e| CommandError::OperationFailed(format!("Failed to get app data dir: {}", e)))?;
+
+    Ok(app_data.join("vault"))
 }

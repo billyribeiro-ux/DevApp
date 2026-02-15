@@ -125,7 +125,7 @@
 		<div class="px-4 py-3">
 			<div class="flex items-center gap-2 rounded-xl px-3 py-2.5" style="background: var(--bg-input); border: 1px solid var(--border-default);">
 				<Icon icon="ph:magnifying-glass" width={16} height={16} style="color: var(--text-tertiary);" />
-				<input type="text" bind:value={searchQuery} placeholder="Search notes..." class="flex-1 bg-transparent text-[13px] outline-none" style="color: var(--text-primary);" />
+				<input type="text" bind:value={searchQuery} placeholder="Search notes..." class="flex-1 bg-transparent outline-none" style="font-size: var(--text-sm); color: var(--text-primary);" />
 			</div>
 		</div>
 		<div class="flex-1 overflow-y-auto px-3 py-1">
@@ -141,8 +141,8 @@
 							<Icon icon="ph:push-pin-fill" width={12} height={12} style="color: var(--text-tertiary);" />
 						{/if}
 					</div>
-					<p class="text-[12px] mt-1 truncate" style="color: var(--text-tertiary);">{note.content_text?.slice(0, 80) || 'Empty note'}</p>
-					<p class="text-[11px] mt-1.5" style="color: var(--text-tertiary);">{formatRelativeDate(note.updated_at)} &middot; {note.word_count} words</p>
+					<p class="mt-1 truncate" style="font-size: var(--text-xs); color: var(--text-tertiary);">{note.content_text?.slice(0, 80) || 'Empty note'}</p>
+					<p class="mt-1.5" style="font-size: var(--text-xs); color: var(--text-tertiary);">{formatRelativeDate(note.updated_at)} &middot; {note.word_count} words</p>
 				</button>
 			{/each}
 			{#if filteredNotes.length === 0}
@@ -179,8 +179,8 @@
 					bind:value={editTitle}
 					oninput={autoSave}
 					placeholder="Note title..."
-					class="w-full bg-transparent text-[28px] font-bold outline-none"
-					style="color: var(--text-primary); letter-spacing: -0.02em;"
+					class="w-full bg-transparent font-bold outline-none"
+					style="font-size: var(--text-2xl); color: var(--text-primary); letter-spacing: -0.02em;"
 				/>
 			</div>
 			<!-- Content -->
@@ -189,12 +189,12 @@
 					bind:value={editContent}
 					oninput={autoSave}
 					placeholder="Start writing... (Markdown supported)"
-					class="w-full h-full bg-transparent text-[15px] outline-none resize-none"
-					style="color: var(--text-primary); font-family: 'Inter', sans-serif; line-height: 1.8;"
+					class="w-full h-full bg-transparent outline-none resize-none"
+					style="font-size: var(--text-base); color: var(--text-primary); font-family: 'Inter', sans-serif; line-height: 1.8;"
 				></textarea>
 			</div>
 			<!-- Footer -->
-			<div class="flex items-center justify-between py-3 border-t text-[11px] shrink-0" style="border-color: var(--border-default); color: var(--text-tertiary); padding-left: var(--content-padding-lg); padding-right: var(--content-padding-lg);">
+			<div class="flex items-center justify-between py-3 border-t shrink-0" style="font-size: var(--text-xs); border-color: var(--border-default); color: var(--text-tertiary); padding-left: var(--content-padding-lg); padding-right: var(--content-padding-lg);">
 				<span>{wordCount} words</span>
 				<span>{formatRelativeDate(activeNote.updated_at)}</span>
 			</div>
