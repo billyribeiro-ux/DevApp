@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+
+  <!-- Preconnect for font performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Primary Meta Tags -->
+  <title>Shipforge &mdash; SEO, Web &amp; App Development Agency</title>
+  <meta name="description" content="Shipforge builds high-performance websites, apps, and SEO strategies that drive measurable growth. Expert development team delivering results since 2019.">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta name="author" content="Shipforge">
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://shipforge.dev/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://shipforge.dev/">
+  <meta property="og:title" content="Shipforge — SEO, Web & App Development Agency">
+  <meta property="og:description" content="High-performance websites, apps, and SEO strategies that drive measurable growth.">
+  <meta property="og:image" content="https://shipforge.dev/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="Shipforge">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Shipforge — SEO, Web & App Development Agency">
+  <meta name="twitter:description" content="High-performance websites, apps, and SEO strategies that drive measurable growth.">
+  <meta name="twitter:image" content="https://shipforge.dev/og-image.jpg">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>⚓</text></svg>">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v4 — Play CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <style type="text/tailwindcss">
+    /* ============================================================
+     * TAILWIND THEME — Shipforge Design Tokens
+     * Maps the same token values as vanilla/css/tokens.css
+     * ============================================================ */
+    @custom-variant dark (&:where(.dark, .dark *));
+
+    @theme {
+      --color-primary-50:  #f0f4ff;
+      --color-primary-100: #dbe4ff;
+      --color-primary-200: #bac8ff;
+      --color-primary-300: #91a7ff;
+      --color-primary-400: #748ffc;
+      --color-primary-500: #5c7cfa;
+      --color-primary-600: #4c6ef5;
+      --color-primary-700: #3b5bdb;
+      --color-primary-800: #364fc7;
+      --color-primary-900: #1e3a5f;
+      --color-primary-950: #0f1d30;
+
+      --color-accent-50:  #fff5f5;
+      --color-accent-100: #ffe3e3;
+      --color-accent-200: #ffc9c9;
+      --color-accent-300: #ffa8a8;
+      --color-accent-400: #ff8787;
+      --color-accent-500: #ff6b6b;
+      --color-accent-600: #fa5252;
+      --color-accent-700: #f03e3e;
+
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+    }
+
+    @keyframes fade-slide-up {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ============================================================
+     * SCROLL ANIMATION SYSTEM
+     * ============================================================ */
+    [data-animate] {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s cubic-bezier(0, 0, 0.2, 1),
+                  transform 0.6s cubic-bezier(0, 0, 0.2, 1);
+    }
+
+    [data-animate].animate-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    [data-animate="fade"] { transform: none; }
+    [data-animate="scale"] { transform: scale(0.95); }
+    [data-animate="scale"].animate-visible { transform: scale(1); }
+
+    [data-animate-delay="1"] { transition-delay: 0.1s; }
+    [data-animate-delay="2"] { transition-delay: 0.2s; }
+    [data-animate-delay="3"] { transition-delay: 0.3s; }
+    [data-animate-delay="4"] { transition-delay: 0.4s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      [data-animate] {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+    }
+
+    /* ============================================================
+     * SKIP LINK
+     * ============================================================ */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 1rem;
+      z-index: 9999;
+      padding: 0.5rem 1rem;
+      background: #4c6ef5;
+      color: #fff;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      font-size: 0.875rem;
+      text-decoration: none;
+      transition: top 150ms;
+    }
+    .skip-link:focus {
+      top: 1rem;
+      color: #fff;
+    }
+
+    /* ============================================================
+     * HAMBURGER ANIMATION
+     * ============================================================ */
+    .hamburger-line {
+      display: block;
+      width: 100%;
+      height: 2px;
+      background: currentColor;
+      border-radius: 9999px;
+      transition: transform 250ms, opacity 250ms;
+      transform-origin: center;
+    }
+
+    [aria-expanded="true"] .hamburger-line:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+    [aria-expanded="true"] .hamburger-line:nth-child(2) {
+      opacity: 0;
+    }
+    [aria-expanded="true"] .hamburger-line:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+
+    /* ============================================================
+     * PRINT STYLES
+     * ============================================================ */
+    @media print {
+      nav, .sf-cta, .skip-link, #theme-toggle { display: none !important; }
+      body { background: white !important; color: black !important; font-size: 12pt; }
+      a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.8em; color: #666; }
+      * { box-shadow: none !important; }
+    }
+  </style>
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://shipforge.dev/#organization",
+        "name": "Shipforge",
+        "url": "https://shipforge.dev",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://shipforge.dev/logo.svg",
+          "width": 512,
+          "height": 512
+        },
+        "description": "SEO, web development, and app development agency delivering high-performance digital products.",
+        "foundingDate": "2019",
+        "sameAs": [
+          "https://twitter.com/shipforge",
+          "https://linkedin.com/company/shipforge",
+          "https://github.com/shipforge"
+        ],
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+1-555-SHIP",
+          "contactType": "sales",
+          "availableLanguage": ["English"]
+        },
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "San Francisco",
+          "addressRegion": "CA",
+          "addressCountry": "US"
+        }
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://shipforge.dev/#website",
+        "url": "https://shipforge.dev",
+        "name": "Shipforge",
+        "publisher": { "@id": "https://shipforge.dev/#organization" },
+        "inLanguage": "en-US"
+      },
+      {
+        "@type": "Service",
+        "@id": "https://shipforge.dev/#seo-service",
+        "name": "SEO Strategy & Optimization",
+        "description": "Technical SEO audits, content strategy, and performance optimization to drive organic growth.",
+        "provider": { "@id": "https://shipforge.dev/#organization" },
+        "serviceType": "Search Engine Optimization",
+        "areaServed": { "@type": "Country", "name": "United States" }
+      },
+      {
+        "@type": "Service",
+        "@id": "https://shipforge.dev/#web-service",
+        "name": "Web Development",
+        "description": "Custom web applications built with modern frameworks, optimized for Core Web Vitals.",
+        "provider": { "@id": "https://shipforge.dev/#organization" },
+        "serviceType": "Web Development"
+      },
+      {
+        "@type": "Service",
+        "@id": "https://shipforge.dev/#app-service",
+        "name": "App Development",
+        "description": "Native and cross-platform mobile applications with exceptional user experience.",
+        "provider": { "@id": "https://shipforge.dev/#organization" },
+        "serviceType": "Mobile App Development"
+      }
+    ]
+  }
+  </script>
+</head>
+
+<body class="bg-white dark:bg-[#0d1117] text-gray-900 dark:text-gray-100 font-sans antialiased transition-colors duration-300">
+
+  <!-- ============================================================
+       SKIP NAVIGATION
+       ============================================================ -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- ============================================================
+       NAVIGATION
+       ============================================================ -->
+  <header id="site-nav" class="sticky top-0 z-40 bg-white/92 dark:bg-[#0d1117]/92 backdrop-blur-xl backdrop-saturate-[180%] border-b border-gray-100 dark:border-gray-800 transition-shadow duration-150" role="banner">
+    <div class="flex items-center justify-between max-w-7xl mx-auto px-4 lg:px-8 h-[72px]">
+
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-2 text-gray-900 dark:text-gray-100 no-underline shrink-0" aria-label="Shipforge Home">
+        <svg class="w-8 h-8 text-primary-600" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <rect width="32" height="32" rx="8" fill="currentColor" opacity="0.1"/>
+          <path d="M8 22L16 6l8 16H8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/>
+          <path d="M12 22l4-8 4 8" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="currentColor" opacity="0.2"/>
+          <line x1="16" y1="22" x2="16" y2="26" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="12" y1="26" x2="20" y2="26" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span class="text-lg font-bold tracking-tight">Shipforge</span>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <nav class="hidden lg:flex items-center" aria-label="Primary navigation">
+        <ul class="flex items-center gap-1" role="list">
+          <li><a href="/" class="block px-3 py-2 text-sm font-semibold text-primary-600 dark:text-primary-400 rounded-lg" aria-current="page">Home</a></li>
+          <li><a href="/services" class="block px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors duration-150">Services</a></li>
+          <li><a href="/work" class="block px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors duration-150">Work</a></li>
+          <li><a href="/about" class="block px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors duration-150">About</a></li>
+          <li><a href="/blog" class="block px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors duration-150">Blog</a></li>
+          <li><a href="/contact" class="block px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors duration-150">Contact</a></li>
+        </ul>
+      </nav>
+
+      <!-- Desktop CTA -->
+      <a href="/contact" class="hidden lg:inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-xl border border-primary-600 hover:border-primary-700 transition-all duration-150 hover:-translate-y-px hover:shadow-md no-underline motion-reduce:hover:translate-y-0">Get Started</a>
+
+      <!-- Theme Toggle -->
+      <button id="theme-toggle" class="flex items-center justify-center w-10 h-10 rounded-lg text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150" aria-label="Switch to dark mode" type="button">
+        <svg class="icon-sun w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <svg class="icon-moon w-5 h-5 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+
+      <!-- Mobile Hamburger -->
+      <button class="flex lg:hidden flex-col justify-center gap-[5px] w-10 h-10 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-menu" type="button">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="fixed inset-x-0 top-[72px] bottom-0 bg-white dark:bg-[#0d1117] z-50 p-8 flex flex-col translate-y-full opacity-0 invisible transition-all duration-250" aria-hidden="true" role="dialog" aria-label="Navigation menu">
+      <nav aria-label="Mobile navigation">
+        <ul class="flex flex-col gap-1 mb-8" role="list">
+          <li><a href="/" class="block px-4 py-4 text-lg font-medium text-primary-600 dark:text-primary-400 rounded-xl" aria-current="page">Home</a></li>
+          <li><a href="/services" class="block px-4 py-4 text-lg font-medium text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors">Services</a></li>
+          <li><a href="/work" class="block px-4 py-4 text-lg font-medium text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors">Work</a></li>
+          <li><a href="/about" class="block px-4 py-4 text-lg font-medium text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors">About</a></li>
+          <li><a href="/blog" class="block px-4 py-4 text-lg font-medium text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors">Blog</a></li>
+          <li><a href="/contact" class="block px-4 py-4 text-lg font-medium text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors">Contact</a></li>
+        </ul>
+        <a href="/contact" class="block w-full text-center px-8 py-4 text-base font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-2xl transition-colors no-underline">Get Started</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       MAIN CONTENT
+       ============================================================ -->
+  <main id="main-content">
+
+    <!-- ========================================================
+         HERO
+         ======================================================== -->
+    <section class="pt-16 pb-12 md:pt-20 md:pb-16 lg:pt-24 lg:pb-20 overflow-hidden" aria-labelledby="hero-heading">
+      <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 lg:grid lg:grid-cols-2 lg:items-center lg:gap-12">
+        <div>
+          <p class="inline-block text-sm font-semibold text-primary-600 dark:text-primary-400 uppercase tracking-widest mb-4" data-animate="fade">SEO &bull; Web &bull; App Development</p>
+          <h1 id="hero-heading" class="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tighter text-gray-900 dark:text-gray-100 mb-6" data-animate>
+            We Build Digital Products
+            <span class="block bg-gradient-to-br from-primary-500 to-accent-500 bg-clip-text text-transparent">That Ship Fast</span>
+          </h1>
+          <p class="text-lg text-gray-600 dark:text-gray-400 leading-relaxed max-w-xl mb-8" data-animate data-animate-delay="1">
+            From strategy to launch, Shipforge delivers high-performance
+            websites, apps, and SEO that drive measurable growth for
+            ambitious businesses.
+          </p>
+          <div class="flex flex-wrap gap-4" data-animate data-animate-delay="2">
+            <a href="/contact" class="inline-flex items-center gap-2 px-8 py-4 text-base font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-2xl border border-primary-600 hover:border-primary-700 transition-all duration-150 hover:-translate-y-px hover:shadow-md no-underline motion-reduce:hover:translate-y-0">
+              Start Your Project
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="/work" class="inline-flex items-center gap-2 px-8 py-4 text-base font-semibold text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-2xl transition-colors duration-150 no-underline">View Our Work</a>
+          </div>
+        </div>
+
+        <!-- Decorative hero visual (desktop only) -->
+        <div class="hidden lg:flex items-center justify-center" aria-hidden="true">
+          <div class="w-full max-w-md aspect-square rounded-3xl bg-gradient-to-br from-primary-100 via-primary-200 to-accent-100 dark:from-primary-900/20 dark:via-primary-800/15 dark:to-accent-700/10 relative overflow-hidden">
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,var(--color-primary-300)_0%,transparent_50%),radial-gradient(circle_at_70%_60%,var(--color-accent-300)_0%,transparent_50%)] opacity-50 dark:opacity-20"></div>
+            <div class="absolute inset-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl flex items-center justify-center">
+              <svg class="w-16 h-16 text-primary-600/60 dark:text-primary-400/40" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="8" y="8" width="48" height="48" rx="8"/>
+                <path d="M24 40l-8-8 8-8"/><path d="M40 24l8 8-8 8"/><line x1="28" y1="44" x2="36" y2="20"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         SERVICES
+         ======================================================== -->
+    <section class="py-16 md:py-20 lg:py-24 bg-gray-50 dark:bg-[#161b22]" aria-labelledby="services-heading">
+      <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+
+        <header class="text-center max-w-xl mx-auto mb-12" data-animate>
+          <p class="inline-block text-sm font-semibold text-primary-600 dark:text-primary-400 uppercase tracking-widest mb-3">What We Do</p>
+          <h2 id="services-heading" class="text-3xl md:text-4xl font-bold leading-tight tracking-tight text-gray-900 dark:text-gray-100 mb-4">Full-Stack Digital Services</h2>
+          <p class="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">Three disciplines. One team. Zero gaps.</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          <!-- SEO -->
+          <article class="p-8 rounded-2xl bg-white dark:bg-[#1c2128] border border-gray-100 dark:border-gray-700/50 transition-all duration-250 hover:-translate-y-1 hover:shadow-lg hover:border-gray-200 dark:hover:border-gray-600 motion-reduce:hover:translate-y-0" data-animate data-animate-delay="1">
+            <div class="w-12 h-12 rounded-xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center mb-5">
+              <svg class="w-6 h-6 text-primary-600 dark:text-primary-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">SEO Strategy</h3>
+            <p class="text-gray-600 dark:text-gray-400 leading-relaxed mb-5">Technical audits, content strategy, and Core Web Vitals optimization that moves the needle on organic traffic.</p>
+            <a href="/services#seo" class="inline-flex items-center gap-1 text-sm font-semibold text-primary-600 dark:text-primary-400 hover:gap-2 transition-all duration-150 no-underline" aria-label="Learn more about SEO Strategy">
+              Learn more
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </article>
+
+          <!-- Web Dev -->
+          <article class="p-8 rounded-2xl bg-white dark:bg-[#1c2128] border border-gray-100 dark:border-gray-700/50 transition-all duration-250 hover:-translate-y-1 hover:shadow-lg hover:border-gray-200 dark:hover:border-gray-600 motion-reduce:hover:translate-y-0" data-animate data-animate-delay="2">
+            <div class="w-12 h-12 rounded-xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center mb-5">
+              <svg class="w-6 h-6 text-primary-600 dark:text-primary-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">Web Development</h3>
+            <p class="text-gray-600 dark:text-gray-400 leading-relaxed mb-5">Custom web applications built with modern frameworks, optimized for performance and ready to scale from day one.</p>
+            <a href="/services#web" class="inline-flex items-center gap-1 text-sm font-semibold text-primary-600 dark:text-primary-400 hover:gap-2 transition-all duration-150 no-underline" aria-label="Learn more about Web Development">
+              Learn more
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </article>
+
+          <!-- App Dev -->
+          <article class="p-8 rounded-2xl bg-white dark:bg-[#1c2128] border border-gray-100 dark:border-gray-700/50 transition-all duration-250 hover:-translate-y-1 hover:shadow-lg hover:border-gray-200 dark:hover:border-gray-600 motion-reduce:hover:translate-y-0" data-animate data-animate-delay="3">
+            <div class="w-12 h-12 rounded-xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center mb-5">
+              <svg class="w-6 h-6 text-primary-600 dark:text-primary-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">App Development</h3>
+            <p class="text-gray-600 dark:text-gray-400 leading-relaxed mb-5">Native and cross-platform mobile apps with exceptional UX, built for the App Store and Google Play.</p>
+            <a href="/services#app" class="inline-flex items-center gap-1 text-sm font-semibold text-primary-600 dark:text-primary-400 hover:gap-2 transition-all duration-150 no-underline" aria-label="Learn more about App Development">
+              Learn more
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         STATS
+         ======================================================== -->
+    <section class="py-16 md:py-20 lg:py-24" aria-labelledby="stats-heading">
+      <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+        <h2 id="stats-heading" class="sr-only">Our Results in Numbers</h2>
+        <dl class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center" data-animate>
+          <div class="p-4">
+            <dd class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight leading-none mb-2" data-count="200">200+</dd>
+            <dt class="text-sm font-medium text-gray-500 dark:text-gray-500 uppercase tracking-wide">Projects Delivered</dt>
+          </div>
+          <div class="p-4">
+            <dd class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight leading-none mb-2" data-count="85">85+</dd>
+            <dt class="text-sm font-medium text-gray-500 dark:text-gray-500 uppercase tracking-wide">Happy Clients</dt>
+          </div>
+          <div class="p-4">
+            <dd class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight leading-none mb-2">340%</dd>
+            <dt class="text-sm font-medium text-gray-500 dark:text-gray-500 uppercase tracking-wide">Avg. Traffic Increase</dt>
+          </div>
+          <div class="p-4">
+            <dd class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight leading-none mb-2" data-count="7">7+</dd>
+            <dt class="text-sm font-medium text-gray-500 dark:text-gray-500 uppercase tracking-wide">Years of Experience</dt>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         FEATURED WORK
+         ======================================================== -->
+    <section class="py-16 md:py-20 lg:py-24 bg-gray-50 dark:bg-[#161b22]" aria-labelledby="work-heading">
+      <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+
+        <header class="text-center max-w-xl mx-auto mb-12" data-animate>
+          <p class="inline-block text-sm font-semibold text-primary-600 dark:text-primary-400 uppercase tracking-widest mb-3">Our Work</p>
+          <h2 id="work-heading" class="text-3xl md:text-4xl font-bold leading-tight tracking-tight text-gray-900 dark:text-gray-100">Featured Projects</h2>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+
+          <!-- Project 1 -->
+          <article class="rounded-2xl bg-white dark:bg-[#1c2128] border border-gray-100 dark:border-gray-700/50 overflow-hidden transition-all duration-250 hover:-translate-y-1 hover:shadow-lg motion-reduce:hover:translate-y-0" data-animate data-animate-delay="1">
+            <div class="aspect-video overflow-hidden">
+              <div class="w-full h-full bg-gradient-to-br from-indigo-400 to-purple-600" aria-hidden="true"></div>
+            </div>
+            <div class="p-6">
+              <span class="inline-block text-xs font-semibold text-primary-600 dark:text-primary-400 uppercase tracking-wider mb-2">E-Commerce</span>
+              <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">NovaBrew Coffee</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Full redesign and SEO overhaul resulting in 280% organic traffic increase within 6 months of launch.</p>
+              <div class="flex flex-wrap gap-2">
+                <span class="inline-block px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-full border border-gray-100 dark:border-gray-700">Next.js</span>
+                <span class="inline-block px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-full border border-gray-100 dark:border-gray-700">SEO</span>
+                <span class="inline-block px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-full border border-gray-100 dark:border-gray-700">Shopify</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Project 2 -->
+          <article class="rounded-2xl bg-white dark:bg-[#1c2128] border border-gray-100 dark:border-gray-700/50 overflow-hidden transition-all duration-250 hover:-translate-y-1 hover:shadow-lg motion-reduce:hover:translate-y-0" data-animate data-animate-delay="2">
+            <div class="aspect-video overflow-hidden">
+              <div class="w-full h-full bg-gradient-to-br from-pink-400 to-rose-500" aria-hidden="true"></div>
+            </div>
+            <div class="p-6">
+              <span class="inline-block text-xs font-semibold text-primary-600 dark:text-primary-400 uppercase tracking-wider mb-2">SaaS Platform</span>
+              <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">TechFlow Analytics</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Real-time analytics dashboard with 99.9% uptime. Serving 50K+ daily active users across 30 countries.</p>
+              <div class="flex flex-wrap gap-2">
+                <span class="inline-block px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-full border border-gray-100 dark:border-gray-700">React</span>
+                <span class="inline-block px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-full border border-gray-100 dark:border-gray-700">Node.js</span>
+                <span class="inline-block px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-full border border-gray-100 dark:border-gray-700">PostgreSQL</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Project 3 -->
+          <article class="rounded-2xl bg-white dark:bg-[#1c2128] border border-gray-100 dark:border-gray-700/50 overflow-hidden transition-all duration-250 hover:-translate-y-1 hover:shadow-lg motion-reduce:hover:translate-y-0" data-animate data-animate-delay="3">
+            <div class="aspect-video overflow-hidden">
+              <div class="w-full h-full bg-gradient-to-br from-sky-400 to-cyan-300" aria-hidden="true"></div>
+            </div>
+            <div class="p-6">
+              <span class="inline-block text-xs font-semibold text-primary-600 dark:text-primary-400 uppercase tracking-wider mb-2">Mobile App</span>
+              <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">FitPulse Health</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Cross-platform fitness app with 4.8-star rating. Featured in App Store "Apps We Love" collection.</p>
+              <div class="flex flex-wrap gap-2">
+                <span class="inline-block px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-full border border-gray-100 dark:border-gray-700">React Native</span>
+                <span class="inline-block px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-full border border-gray-100 dark:border-gray-700">Swift</span>
+                <span class="inline-block px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-full border border-gray-100 dark:border-gray-700">Kotlin</span>
+              </div>
+            </div>
+          </article>
+
+        </div>
+
+        <div class="text-center" data-animate>
+          <a href="/work" class="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-gray-900 dark:text-gray-100 bg-transparent border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-500 rounded-xl transition-colors duration-150 no-underline">View All Projects</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         TESTIMONIALS
+         ======================================================== -->
+    <section class="py-16 md:py-20 lg:py-24" aria-labelledby="testimonials-heading">
+      <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+
+        <header class="text-center max-w-xl mx-auto mb-12" data-animate>
+          <p class="inline-block text-sm font-semibold text-primary-600 dark:text-primary-400 uppercase tracking-widest mb-3">Testimonials</p>
+          <h2 id="testimonials-heading" class="text-3xl md:text-4xl font-bold leading-tight tracking-tight text-gray-900 dark:text-gray-100">What Our Clients Say</h2>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          <!-- Testimonial 1 -->
+          <blockquote class="p-8 rounded-2xl bg-white dark:bg-[#1c2128] border border-gray-100 dark:border-gray-700/50" data-animate data-animate-delay="1">
+            <div class="flex gap-1 mb-4 text-amber-400" aria-label="5 out of 5 stars">
+              <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>
+              <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>
+              <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>
+              <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>
+              <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>
+            </div>
+            <p class="text-base italic text-gray-900 dark:text-gray-100 leading-relaxed mb-6">&ldquo;Shipforge transformed our online presence. Our organic traffic tripled and conversions are through the roof. The team genuinely cares about results.&rdquo;</p>
+            <footer class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-sm font-bold text-white shrink-0" aria-hidden="true">SC</div>
+              <div>
+                <cite class="not-italic font-semibold text-gray-900 dark:text-gray-100 text-sm">Sarah Chen</cite>
+                <p class="text-xs text-gray-500 dark:text-gray-500 mt-0.5">CEO, NovaBrew Coffee</p>
+              </div>
+            </footer>
+          </blockquote>
+
+          <!-- Testimonial 2 -->
+          <blockquote class="p-8 rounded-2xl bg-white dark:bg-[#1c2128] border border-gray-100 dark:border-gray-700/50" data-animate data-animate-delay="2">
+            <div class="flex gap-1 mb-4 text-amber-400" aria-label="5 out of 5 stars">
+              <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>
+              <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>
+              <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>
+              <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>
+              <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>
+            </div>
+            <p class="text-base italic text-gray-900 dark:text-gray-100 leading-relaxed mb-6">&ldquo;The analytics dashboard they built handles our peak traffic without breaking a sweat. Their engineering quality is exceptional &mdash; truly senior-level work.&rdquo;</p>
+            <footer class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-full bg-gradient-to-br from-accent-500 to-accent-700 flex items-center justify-center text-sm font-bold text-white shrink-0" aria-hidden="true">MR</div>
+              <div>
+                <cite class="not-italic font-semibold text-gray-900 dark:text-gray-100 text-sm">Marcus Rivera</cite>
+                <p class="text-xs text-gray-500 dark:text-gray-500 mt-0.5">CTO, TechFlow Analytics</p>
+              </div>
+            </footer>
+          </blockquote>
+
+          <!-- Testimonial 3 -->
+          <blockquote class="p-8 rounded-2xl bg-white dark:bg-[#1c2128] border border-gray-100 dark:border-gray-700/50" data-animate data-animate-delay="3">
+            <div class="flex gap-1 mb-4 text-amber-400" aria-label="5 out of 5 stars">
+              <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>
+              <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>
+              <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>
+              <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>
+              <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>
+            </div>
+            <p class="text-base italic text-gray-900 dark:text-gray-100 leading-relaxed mb-6">&ldquo;Our FitPulse app launched on time and under budget. Shipforge&rsquo;s attention to detail on both iOS and Android was remarkable. Would hire again in a heartbeat.&rdquo;</p>
+            <footer class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-full bg-gradient-to-br from-green-400 to-green-700 flex items-center justify-center text-sm font-bold text-white shrink-0" aria-hidden="true">AK</div>
+              <div>
+                <cite class="not-italic font-semibold text-gray-900 dark:text-gray-100 text-sm">Aisha Khan</cite>
+                <p class="text-xs text-gray-500 dark:text-gray-500 mt-0.5">Founder, FitPulse Health</p>
+              </div>
+            </footer>
+          </blockquote>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         TECH STACK
+         ======================================================== -->
+    <section class="py-16 md:py-20 lg:py-24 bg-gray-50 dark:bg-[#161b22]" aria-labelledby="tech-heading">
+      <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+
+        <header class="text-center max-w-xl mx-auto mb-12" data-animate>
+          <p class="inline-block text-sm font-semibold text-primary-600 dark:text-primary-400 uppercase tracking-widest mb-3">Technology</p>
+          <h2 id="tech-heading" class="text-3xl md:text-4xl font-bold leading-tight tracking-tight text-gray-900 dark:text-gray-100">Built With the Best</h2>
+        </header>
+
+        <ul class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-4" role="list" data-animate>
+          <li class="flex flex-col items-center gap-2 p-5 rounded-xl bg-white dark:bg-[#1c2128] border border-gray-100 dark:border-gray-700/50 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-sm transition-all duration-150 text-center">
+            <svg class="w-8 h-8 text-gray-600 dark:text-gray-400" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="3" fill="currentColor"/><ellipse cx="16" cy="16" rx="14" ry="5" fill="none" stroke="currentColor" stroke-width="1.5"/><ellipse cx="16" cy="16" rx="14" ry="5" fill="none" stroke="currentColor" stroke-width="1.5" transform="rotate(60 16 16)"/><ellipse cx="16" cy="16" rx="14" ry="5" fill="none" stroke="currentColor" stroke-width="1.5" transform="rotate(120 16 16)"/></svg>
+            <span class="text-xs font-medium text-gray-600 dark:text-gray-400">React</span>
+          </li>
+          <li class="flex flex-col items-center gap-2 p-5 rounded-xl bg-white dark:bg-[#1c2128] border border-gray-100 dark:border-gray-700/50 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-sm transition-all duration-150 text-center">
+            <svg class="w-8 h-8 text-gray-600 dark:text-gray-400" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M12 10v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 10l11 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M21 10v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <span class="text-xs font-medium text-gray-600 dark:text-gray-400">Next.js</span>
+          </li>
+          <li class="flex flex-col items-center gap-2 p-5 rounded-xl bg-white dark:bg-[#1c2128] border border-gray-100 dark:border-gray-700/50 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-sm transition-all duration-150 text-center">
+            <svg class="w-8 h-8 text-gray-600 dark:text-gray-400" viewBox="0 0 32 32" aria-hidden="true"><path d="M24.5 6.5C21.5 2.5 15.5 2.5 12 6L7 12c-3 4-1 9.5 3.5 11.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M7.5 25.5c3 4 9 4 12.5.5l5-6c3-4 1-9.5-3.5-11.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span class="text-xs font-medium text-gray-600 dark:text-gray-400">Svelte</span>
+          </li>
+          <li class="flex flex-col items-center gap-2 p-5 rounded-xl bg-white dark:bg-[#1c2128] border border-gray-100 dark:border-gray-700/50 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-sm transition-all duration-150 text-center">
+            <svg class="w-8 h-8 text-gray-600 dark:text-gray-400" viewBox="0 0 32 32" aria-hidden="true"><path d="M9 16c1-5 4-7 9-7 7 0 8 5 11 6 2 .5 4 0 6-2-1 5-4 7-9 7-7 0-8-5-11-6-2-.5-4 0-6 2z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            <span class="text-xs font-medium text-gray-600 dark:text-gray-400">Tailwind</span>
+          </li>
+          <li class="flex flex-col items-center gap-2 p-5 rounded-xl bg-white dark:bg-[#1c2128] border border-gray-100 dark:border-gray-700/50 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-sm transition-all duration-150 text-center">
+            <svg class="w-8 h-8 text-gray-600 dark:text-gray-400" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3l12 7v12l-12 7-12-7V10z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M16 3v26" stroke="currentColor" stroke-width="1.5"/><path d="M4 10l12 7 12-7" stroke="currentColor" stroke-width="1.5"/></svg>
+            <span class="text-xs font-medium text-gray-600 dark:text-gray-400">Node.js</span>
+          </li>
+          <li class="flex flex-col items-center gap-2 p-5 rounded-xl bg-white dark:bg-[#1c2128] border border-gray-100 dark:border-gray-700/50 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-sm transition-all duration-150 text-center">
+            <svg class="w-8 h-8 text-gray-600 dark:text-gray-400" viewBox="0 0 32 32" aria-hidden="true"><ellipse cx="16" cy="9" rx="10" ry="4" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6 9v14c0 2.2 4.5 4 10 4s10-1.8 10-4V9" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6 16c0 2.2 4.5 4 10 4s10-1.8 10-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+            <span class="text-xs font-medium text-gray-600 dark:text-gray-400">PostgreSQL</span>
+          </li>
+          <li class="flex flex-col items-center gap-2 p-5 rounded-xl bg-white dark:bg-[#1c2128] border border-gray-100 dark:border-gray-700/50 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-sm transition-all duration-150 text-center">
+            <svg class="w-8 h-8 text-gray-600 dark:text-gray-400" viewBox="0 0 32 32" aria-hidden="true"><path d="M24 5c1 3-2 9-8 14C10 24 5 25 5 25s5-1 11-5c-3 1-8 2-12 1 5 4 14 4 17 1 4-3 6-10 3-17z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            <span class="text-xs font-medium text-gray-600 dark:text-gray-400">Swift</span>
+          </li>
+          <li class="flex flex-col items-center gap-2 p-5 rounded-xl bg-white dark:bg-[#1c2128] border border-gray-100 dark:border-gray-700/50 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-sm transition-all duration-150 text-center">
+            <svg class="w-8 h-8 text-gray-600 dark:text-gray-400" viewBox="0 0 32 32" aria-hidden="true"><polygon points="5,5 16,16 5,27" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><polygon points="5,5 27,5 16,16 27,27 5,27" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            <span class="text-xs font-medium text-gray-600 dark:text-gray-400">Kotlin</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         CTA
+         ======================================================== -->
+    <section class="py-16 md:py-24 bg-gradient-to-br from-primary-900 via-primary-800 to-primary-950 text-center" aria-labelledby="cta-heading">
+      <div class="max-w-3xl mx-auto px-4 md:px-6">
+        <h2 id="cta-heading" class="text-3xl md:text-4xl font-bold leading-tight tracking-tight text-white mb-4" data-animate>Ready to Ship Something Great?</h2>
+        <p class="text-lg text-primary-200 leading-relaxed mb-8" data-animate data-animate-delay="1">Let&rsquo;s talk about your next project. Free consultation, no strings attached.</p>
+        <div class="flex flex-wrap justify-center gap-4" data-animate data-animate-delay="2">
+          <a href="/contact" class="inline-flex items-center gap-2 px-8 py-4 text-base font-semibold text-white bg-accent-500 hover:bg-accent-600 rounded-2xl border border-accent-500 hover:border-accent-600 transition-all duration-150 hover:-translate-y-px hover:shadow-md no-underline motion-reduce:hover:translate-y-0">Book a Free Call</a>
+          <a href="mailto:hello@shipforge.dev" class="inline-flex items-center gap-2 px-8 py-4 text-base font-semibold text-primary-200 border border-white/20 hover:bg-white/10 hover:text-white rounded-2xl transition-colors duration-150 no-underline">hello@shipforge.dev</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="pt-16 md:pt-20 pb-8 border-t border-gray-100 dark:border-gray-800" role="contentinfo">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-[1.5fr_2fr] gap-10 mb-12">
+
+        <!-- Brand -->
+        <div class="max-w-xs">
+          <a href="/" class="flex items-center gap-2 text-gray-900 dark:text-gray-100 no-underline mb-4" aria-label="Shipforge Home">
+            <svg class="w-7 h-7 text-primary-600" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+              <rect width="32" height="32" rx="8" fill="currentColor" opacity="0.1"/>
+              <path d="M8 22L16 6l8 16H8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/>
+              <path d="M12 22l4-8 4 8" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="currentColor" opacity="0.2"/>
+              <line x1="16" y1="22" x2="16" y2="26" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <line x1="12" y1="26" x2="20" y2="26" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span class="text-lg font-bold tracking-tight">Shipforge</span>
+          </a>
+          <p class="text-sm text-gray-500 dark:text-gray-500 leading-relaxed mb-6">Building digital products that ship fast and scale further.</p>
+          <div class="flex gap-3">
+            <a href="https://twitter.com/shipforge" class="flex items-center justify-center w-9 h-9 rounded-lg text-gray-500 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150" aria-label="Shipforge on Twitter" rel="noopener noreferrer" target="_blank">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <a href="https://linkedin.com/company/shipforge" class="flex items-center justify-center w-9 h-9 rounded-lg text-gray-500 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150" aria-label="Shipforge on LinkedIn" rel="noopener noreferrer" target="_blank">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </a>
+            <a href="https://github.com/shipforge" class="flex items-center justify-center w-9 h-9 rounded-lg text-gray-500 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150" aria-label="Shipforge on GitHub" rel="noopener noreferrer" target="_blank">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Footer Nav -->
+        <nav class="grid grid-cols-2 md:grid-cols-3 gap-8" aria-label="Footer navigation">
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Services</h3>
+            <ul class="flex flex-col gap-3" role="list">
+              <li><a href="/services#seo" class="text-sm text-gray-500 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-150 no-underline">SEO Strategy</a></li>
+              <li><a href="/services#web" class="text-sm text-gray-500 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-150 no-underline">Web Development</a></li>
+              <li><a href="/services#app" class="text-sm text-gray-500 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-150 no-underline">App Development</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Company</h3>
+            <ul class="flex flex-col gap-3" role="list">
+              <li><a href="/about" class="text-sm text-gray-500 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-150 no-underline">About Us</a></li>
+              <li><a href="/work" class="text-sm text-gray-500 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-150 no-underline">Our Work</a></li>
+              <li><a href="/blog" class="text-sm text-gray-500 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-150 no-underline">Blog</a></li>
+              <li><a href="/contact" class="text-sm text-gray-500 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-150 no-underline">Contact</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Legal</h3>
+            <ul class="flex flex-col gap-3" role="list">
+              <li><a href="/privacy" class="text-sm text-gray-500 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-150 no-underline">Privacy Policy</a></li>
+              <li><a href="/terms" class="text-sm text-gray-500 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-150 no-underline">Terms of Service</a></li>
+            </ul>
+          </div>
+        </nav>
+
+      </div>
+
+      <!-- Bottom Bar -->
+      <div class="pt-8 border-t border-gray-100 dark:border-gray-800">
+        <p class="text-sm text-gray-500 dark:text-gray-500 text-center">&copy; <span id="current-year">2026</span> Shipforge. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script src="js/main.js" defer></script>
+</body>
+</html>

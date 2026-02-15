@@ -1,0 +1,134 @@
+/* ================================================================
+ * SHIPFORGE — CSS Reset
+ *
+ * Modern hybrid reset (Comeau + Bell). Wrapped in @layer reset
+ * to ensure it never overrides component or utility styles.
+ * ================================================================ */
+
+@layer reset {
+  /*
+   * 1. Use border-box by default — the only sane box model.
+   * 2. Prevent font-size inflation on mobile orientation change.
+   * 3. Use a readable tab size.
+   */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box; /* 1 */
+  }
+
+  /* Remove default margin and padding from everything */
+  * {
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    -moz-text-size-adjust: none;    /* 2 */
+    -webkit-text-size-adjust: none; /* 2 */
+    text-size-adjust: none;         /* 2 */
+    tab-size: 4;                    /* 3 */
+    -moz-tab-size: 4;              /* 3 */
+  }
+
+  /*
+   * 1. Use the system font stack as default.
+   * 2. Use a comfortable line height for readability.
+   * 3. Enable font smoothing for macOS.
+   * 4. Ensure body fills viewport (svh for mobile address bar).
+   */
+  body {
+    min-height: 100svh;                     /* 4 */
+    line-height: 1.5;                       /* 2 */
+    -webkit-font-smoothing: antialiased;    /* 3 */
+    -moz-osx-font-smoothing: grayscale;     /* 3 */
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Make media elements responsive by default */
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  /* Ensure media elements maintain aspect ratio */
+  img,
+  video {
+    height: auto;
+  }
+
+  /* Inherit fonts for form controls — normalizes across browsers */
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* Remove built-in button appearance */
+  button {
+    cursor: pointer;
+    background: none;
+    border: none;
+  }
+
+  /* Prevent text overflow on long words */
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    overflow-wrap: break-word;
+  }
+
+  /* Balanced text wrapping for headings, pretty wrapping for body */
+  h1, h2, h3, h4 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Reset link styles — they'll be styled in components */
+  a {
+    color: inherit;
+    text-decoration-skip-ink: auto;
+  }
+
+  /* Remove list styles when role="list" is set (a11y best practice) */
+  ul[role="list"],
+  ol[role="list"] {
+    list-style: none;
+  }
+
+  /* Ensure table border collapse */
+  table {
+    border-collapse: collapse;
+    border-spacing: 0;
+  }
+
+  /* Remove textarea resize handle (optional, often desired) */
+  textarea {
+    resize: vertical;
+  }
+
+  /* Respect user motion preferences globally */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

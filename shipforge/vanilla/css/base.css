@@ -1,0 +1,152 @@
+/* ================================================================
+ * SHIPFORGE — Base Styles
+ *
+ * Layer declarations (cascade order) and foundational element
+ * styles. All values reference design tokens from tokens.css.
+ * ================================================================ */
+
+/* Cascade layer order — lowest to highest priority */
+@layer reset, base, components, utilities;
+
+@layer base {
+
+  /* ----------------------------------------------------------------
+   * Root & Body
+   * ---------------------------------------------------------------- */
+  html {
+    font-family: var(--sf-font-sans);
+    font-size: 100%; /* 16px — never use a pixel value here */
+    line-height: var(--sf-leading-normal);
+    letter-spacing: var(--sf-tracking-tight);
+    scroll-padding-top: calc(var(--sf-nav-height) + var(--sf-space-4));
+    color-scheme: light dark;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    background-color: var(--sf-bg-body);
+    color: var(--sf-text-primary);
+    font-size: var(--sf-text-base);
+    transition: background-color var(--sf-transition-slow),
+                color var(--sf-transition-slow);
+  }
+
+  /* ----------------------------------------------------------------
+   * Selection
+   * ---------------------------------------------------------------- */
+  ::selection {
+    background: var(--sf-color-primary-200);
+    color: var(--sf-color-primary-900);
+  }
+
+  .dark ::selection,
+  :root:not(.light) ::selection {
+    background: var(--sf-color-primary-800);
+    color: var(--sf-color-primary-100);
+  }
+
+  /* ----------------------------------------------------------------
+   * Focus
+   * ---------------------------------------------------------------- */
+  :focus-visible {
+    outline: 2px solid var(--sf-border-active);
+    outline-offset: 2px;
+    border-radius: var(--sf-radius-sm);
+  }
+
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* ----------------------------------------------------------------
+   * Typography — Headings
+   * ---------------------------------------------------------------- */
+  h1 {
+    font-size: var(--sf-text-4xl);
+    font-weight: var(--sf-weight-extrabold);
+    line-height: var(--sf-leading-tight);
+    letter-spacing: var(--sf-tracking-tighter);
+  }
+
+  h2 {
+    font-size: var(--sf-text-3xl);
+    font-weight: var(--sf-weight-bold);
+    line-height: var(--sf-leading-tight);
+    letter-spacing: var(--sf-tracking-tight);
+  }
+
+  h3 {
+    font-size: var(--sf-text-xl);
+    font-weight: var(--sf-weight-bold);
+    line-height: var(--sf-leading-snug);
+  }
+
+  h4 {
+    font-size: var(--sf-text-lg);
+    font-weight: var(--sf-weight-semibold);
+    line-height: var(--sf-leading-snug);
+  }
+
+  @media (min-width: 768px) {
+    h1 { font-size: var(--sf-text-5xl); }
+    h2 { font-size: var(--sf-text-4xl); }
+  }
+
+  @media (min-width: 1024px) {
+    h1 { font-size: var(--sf-text-6xl); }
+  }
+
+  /* ----------------------------------------------------------------
+   * Typography — Body Elements
+   * ---------------------------------------------------------------- */
+  p {
+    line-height: var(--sf-leading-relaxed);
+    color: var(--sf-text-secondary);
+  }
+
+  strong {
+    font-weight: var(--sf-weight-semibold);
+  }
+
+  small {
+    font-size: var(--sf-text-sm);
+  }
+
+  /* ----------------------------------------------------------------
+   * Links
+   * ---------------------------------------------------------------- */
+  a {
+    color: var(--sf-text-link);
+    text-decoration: none;
+    transition: color var(--sf-transition-fast);
+  }
+
+  a:hover {
+    color: var(--sf-text-link-hover);
+  }
+
+  /* ----------------------------------------------------------------
+   * Code
+   * ---------------------------------------------------------------- */
+  code {
+    font-family: var(--sf-font-mono);
+    font-size: 0.875em;
+    background: var(--sf-bg-code);
+    padding: var(--sf-space-0-5) var(--sf-space-1);
+    border-radius: var(--sf-radius-sm);
+  }
+
+  /* ----------------------------------------------------------------
+   * Horizontal Rule
+   * ---------------------------------------------------------------- */
+  hr {
+    border: none;
+    border-top: 1px solid var(--sf-border-default);
+    margin-block: var(--sf-space-8);
+  }
+}
