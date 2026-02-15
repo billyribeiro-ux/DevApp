@@ -2,7 +2,7 @@
 	import '../app.css';
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
-	import { ui, theme, vault, toasts, nav } from '$stores/app.svelte';
+	import { ui, theme, vault, toasts, nav, sync } from '$stores/app.svelte';
 	import { getWorkspaces, getFolders, seedDefaultData } from '$services/database';
 	import ErrorBoundary from '$lib/components/ui/ErrorBoundary.svelte';
 	import { handleError } from '$lib/utils/error-handler';
@@ -56,6 +56,23 @@
 	onMount(async () => {
 		logger.info('Application initializing');
 		theme.apply();
+
+		// Restore auth session
+		try {
+			const { restoreSession, getStoredUser, connectRealtime } = await import('$services/supabase');
+			if (restoreSession()) {
+				const user = getStoredUser();
+				if (user) {
+					sync.isAuthenticated = true;
+					sync.userEmail = user.email;
+					connectRealtime();
+					logger.info('Session restored', { email: user.email });
+				}
+			}
+		} catch (err) {
+			logger.warn('Session restoration failed', { error: String(err) });
+		}
+
 		try {
 			await seedDefaultData();
 			const workspaces = await getWorkspaces();

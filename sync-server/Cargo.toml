@@ -14,7 +14,7 @@ path = "src/main.rs"
 axum = { version = "0.8", features = ["ws", "multipart", "macros"] }
 axum-extra = { version = "0.10", features = ["typed-header"] }
 tower = "0.5"
-tower-http = { version = "0.6", features = ["cors", "compression-gzip", "trace", "fs"] }
+tower-http = { version = "0.6", features = ["cors", "compression-gzip", "trace", "fs", "set-header"] }
 
 # Async runtime
 tokio = { version = "1", features = ["full"] }

@@ -14,6 +14,8 @@ use std::sync::Arc;
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::compression::CompressionLayer;
 use tower_http::trace::TraceLayer;
+use tower_http::set_header::SetResponseHeaderLayer;
+use axum::http::{HeaderValue, header::{CONTENT_SECURITY_POLICY, X_CONTENT_TYPE_OPTIONS, X_FRAME_OPTIONS, STRICT_TRANSPORT_SECURITY}};
 use tracing_subscriber::EnvFilter;
 
 pub struct AppState {
@@ -52,6 +54,25 @@ async fn main() {
 
     let auth_layer = axum_middleware::from_fn_with_state(state.clone(), middleware::require_auth);
 
+    // Security headers
+    let security_headers = tower::ServiceBuilder::new()
+        .layer(SetResponseHeaderLayer::overriding(
+            X_CONTENT_TYPE_OPTIONS,
+            HeaderValue::from_static("nosniff"),
+        ))
+        .layer(SetResponseHeaderLayer::overriding(
+            X_FRAME_OPTIONS,
+            HeaderValue::from_static("DENY"),
+        ))
+        .layer(SetResponseHeaderLayer::overriding(
+            CONTENT_SECURITY_POLICY,
+            HeaderValue::from_static("default-src 'self'"),
+        ))
+        .layer(SetResponseHeaderLayer::overriding(
+            STRICT_TRANSPORT_SECURITY,
+            HeaderValue::from_static("max-age=31536000; includeSubDomains"),
+        ));
+
     let app = Router::new()
         .merge(handlers::auth_routes())
         .merge(
@@ -64,6 +85,7 @@ async fn main() {
         )
         .merge(handlers::ws_routes())
         .merge(handlers::health_routes())
+        .layer(security_headers)
         .layer(cors)
         .layer(CompressionLayer::new())
         .layer(TraceLayer::new_for_http())
