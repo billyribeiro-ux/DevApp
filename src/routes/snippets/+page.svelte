@@ -80,12 +80,12 @@
 		<div class="flex items-center gap-3">
 			<Icon icon="ph:code-bold" width={24} height={24} style="color: var(--color-accent-500);" />
 			<h1>Code Snippets</h1>
-			<span class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold" style="background: var(--color-accent-light); color: var(--color-accent-500);">{snippets.length}</span>
+			<span class="rounded-full px-2.5 py-0.5 font-semibold" style="font-size: var(--text-xs); background: var(--color-accent-light); color: var(--color-accent-500);">{snippets.length}</span>
 		</div>
 		<div class="flex items-center gap-3">
 			<div class="flex items-center gap-2 rounded-xl px-3 py-2" style="background: var(--bg-input); border: 1px solid var(--border-default);">
 				<Icon icon="ph:magnifying-glass" width={15} height={15} style="color: var(--text-tertiary);" />
-				<input type="text" bind:value={searchQuery} placeholder="Search snippets..." class="bg-transparent text-[13px] outline-none w-44" style="color: var(--text-primary);" />
+				<input type="text" bind:value={searchQuery} placeholder="Search snippets..." class="bg-transparent outline-none w-44" style="font-size: var(--text-sm); color: var(--text-primary);" />
 			</div>
 			<button onclick={() => startEdit()} class="btn-primary">
 				<Icon icon="ph:plus-bold" width={15} height={15} /> New Snippet
@@ -94,9 +94,9 @@
 	</div>
 
 	<div class="page-tabs">
-		<button onclick={() => { activeLanguage = 'all'; }} class="rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors shrink-0" style="background: {activeLanguage === 'all' ? 'var(--bg-active)' : 'transparent'}; color: {activeLanguage === 'all' ? 'var(--text-accent)' : 'var(--text-secondary)'};">All</button>
+		<button onclick={() => { activeLanguage = 'all'; }} class="rounded-full px-4 py-1.5 font-medium transition-colors shrink-0" style="font-size: var(--text-sm); background: {activeLanguage === 'all' ? 'var(--bg-active)' : 'transparent'}; color: {activeLanguage === 'all' ? 'var(--text-accent)' : 'var(--text-secondary)'};">All</button>
 		{#each ['javascript', 'typescript', 'python', 'rust', 'css', 'html', 'sql', 'bash'] as lang}
-			<button onclick={() => { activeLanguage = lang; }} class="rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors shrink-0" style="background: {activeLanguage === lang ? 'var(--bg-active)' : 'transparent'}; color: {activeLanguage === lang ? 'var(--text-accent)' : 'var(--text-secondary)'};">{lang}</button>
+			<button onclick={() => { activeLanguage = lang; }} class="rounded-full px-4 py-1.5 font-medium transition-colors shrink-0" style="font-size: var(--text-sm); background: {activeLanguage === lang ? 'var(--bg-active)' : 'transparent'}; color: {activeLanguage === lang ? 'var(--text-accent)' : 'var(--text-secondary)'};">{lang}</button>
 		{/each}
 	</div>
 
@@ -127,18 +127,18 @@
 					<div class="group rounded-2xl border overflow-hidden transition-all duration-150 hover:shadow-md" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
 						<div class="flex items-center justify-between px-5 py-4 border-b" style="border-color: var(--border-subtle);">
 							<div class="flex items-center gap-2.5 min-w-0">
-								<h3 class="text-[15px] font-semibold truncate" style="color: var(--text-primary);">{snippet.title}</h3>
-								<span class="rounded-lg px-2 py-0.5 text-[11px] font-mono shrink-0" style="background: var(--bg-surface-raised); color: var(--text-secondary);">{snippet.language}</span>
+								<h3 class="font-semibold truncate" style="font-size: var(--text-base); color: var(--text-primary);">{snippet.title}</h3>
+								<span class="rounded-lg px-2 py-0.5 font-mono shrink-0" style="font-size: var(--text-xs); background: var(--bg-surface-raised); color: var(--text-secondary);">{snippet.language}</span>
 							</div>
 							<div class="flex items-center gap-1.5">
-								<button onclick={() => handleCopy(snippet)} class="rounded-xl px-3.5 py-1.5 text-[12px] font-medium text-white" style="background: var(--color-primary-600);">
+								<button onclick={() => handleCopy(snippet)} class="rounded-xl px-3.5 py-1.5 font-medium text-white" style="font-size: var(--text-xs); background: var(--color-primary-600);">
 									<Icon icon="ph:copy" width={13} height={13} style="display: inline; vertical-align: -1px;" /> Copy
 								</button>
 							</div>
 						</div>
-						<pre class="px-5 py-4 text-[13px] leading-relaxed overflow-x-auto max-h-44" style="color: var(--text-secondary); background: var(--bg-surface);">{snippet.code.slice(0, 500)}</pre>
+						<pre class="px-5 py-4 leading-relaxed overflow-x-auto max-h-44" style="font-size: var(--text-sm); color: var(--text-secondary); background: var(--bg-surface);">{snippet.code.slice(0, 500)}</pre>
 						<div class="flex items-center justify-between px-5 py-3 border-t" style="border-color: var(--border-subtle);">
-							<span class="text-[11px]" style="color: var(--text-tertiary);">Used {snippet.usage_count}x</span>
+							<span style="font-size: var(--text-xs); color: var(--text-tertiary);">Used {snippet.usage_count}x</span>
 							<div class="flex gap-1">
 								<button onclick={() => startEdit(snippet)} class="rounded-xl p-1.5" style="color: var(--text-tertiary);"><Icon icon="ph:pencil" width={14} height={14} /></button>
 								<button onclick={() => handleDelete(snippet.id)} class="rounded-xl p-1.5" style="color: var(--text-tertiary);"><Icon icon="ph:trash" width={14} height={14} /></button>

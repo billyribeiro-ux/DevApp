@@ -51,13 +51,13 @@
 							<Icon icon={entityIcons[activity.entity_type] ?? 'ph:circle'} width={18} height={18} style="color: var(--text-secondary);" />
 						</div>
 						<div class="flex-1 min-w-0">
-							<p class="text-[15px]" style="color: var(--text-primary);">
+							<p style="font-size: var(--text-base); color: var(--text-primary);">
 								<span class="font-medium capitalize">{activity.action}</span>
 								{#if activity.entity_name}
 									<span> "{activity.entity_name}"</span>
 								{/if}
 							</p>
-							<p class="text-[12px] mt-0.5" style="color: var(--text-tertiary);">{activity.entity_type} &middot; {formatRelativeDate(activity.created_at)}</p>
+							<p class="mt-0.5" style="font-size: var(--text-xs); color: var(--text-tertiary);">{activity.entity_type} &middot; {formatRelativeDate(activity.created_at)}</p>
 						</div>
 						<Icon icon={actionIcons[activity.action] ?? 'ph:circle'} width={16} height={16} style="color: var(--text-tertiary);" />
 					</div>

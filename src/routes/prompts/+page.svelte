@@ -157,23 +157,23 @@
 				{#each filteredPrompts() as prompt (prompt.id)}
 					<div class="group rounded-2xl border p-5 transition-all duration-150 hover:shadow-md" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
 						<div class="flex items-start justify-between mb-2">
-							<h3 class="text-[15px] font-semibold" style="color: var(--text-primary);">{prompt.title}</h3>
+							<h3 class="font-semibold" style="font-size: var(--text-base); color: var(--text-primary);">{prompt.title}</h3>
 							{#if prompt.is_favorited}
 								<Icon icon="ph:star-fill" width={16} height={16} style="color: var(--color-warning);" />
 							{/if}
 						</div>
 						<div class="flex items-center gap-2 mb-3">
-							<span class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold" style="background: var(--bg-active); color: var(--text-accent);">{prompt.category}</span>
+							<span class="rounded-full px-2.5 py-0.5 font-semibold" style="font-size: var(--text-xs); background: var(--bg-active); color: var(--text-accent);">{prompt.category}</span>
 							{#if prompt.language}
-								<span class="rounded-full px-2.5 py-0.5 text-[11px] font-mono" style="background: var(--bg-surface-raised); color: var(--text-secondary);">{prompt.language}</span>
+								<span class="rounded-full px-2.5 py-0.5 font-mono" style="font-size: var(--text-xs); background: var(--bg-surface-raised); color: var(--text-secondary);">{prompt.language}</span>
 							{/if}
 						</div>
-						<p class="text-[13px] leading-relaxed mb-4 line-clamp-3" style="color: var(--text-secondary);">{prompt.content.slice(0, 200)}</p>
+						<p class="leading-relaxed mb-4 line-clamp-3" style="font-size: var(--text-sm); color: var(--text-secondary);">{prompt.content.slice(0, 200)}</p>
 						<div class="flex items-center justify-between">
-							<span class="text-[11px]" style="color: var(--text-tertiary);">Used {prompt.usage_count}x</span>
+							<span style="font-size: var(--text-xs); color: var(--text-tertiary);">Used {prompt.usage_count}x</span>
 							<div class="flex items-center gap-1.5">
-								<button onclick={() => startEdit(prompt)} class="rounded-xl px-3 py-1.5 text-[12px] transition-colors" style="color: var(--text-secondary);">Edit</button>
-								<button onclick={() => handleCopy(prompt)} class="rounded-xl px-4 py-1.5 text-[12px] font-medium text-white transition-colors" style="background: var(--color-primary-600);">
+								<button onclick={() => startEdit(prompt)} class="rounded-xl px-3 py-1.5 transition-colors" style="font-size: var(--text-xs); color: var(--text-secondary);">Edit</button>
+								<button onclick={() => handleCopy(prompt)} class="rounded-xl px-4 py-1.5 font-medium text-white transition-colors" style="font-size: var(--text-xs); background: var(--color-primary-600);">
 									<Icon icon="ph:copy" width={13} height={13} style="display: inline; vertical-align: -1px;" /> Copy
 								</button>
 							</div>

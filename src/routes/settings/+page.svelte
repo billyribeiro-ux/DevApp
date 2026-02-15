@@ -94,8 +94,8 @@
 		{#each tabs as tab}
 			<button
 				onclick={() => { activeTab = tab.id; }}
-				class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-[14px] transition-colors"
-				style="color: {activeTab === tab.id ? 'var(--text-accent)' : 'var(--text-secondary)'}; background: {activeTab === tab.id ? 'var(--bg-active)' : 'transparent'}; font-weight: {activeTab === tab.id ? '600' : '500'};"
+				class="flex items-center gap-3 rounded-xl px-4 py-2.5 transition-colors"
+				style="font-size: var(--text-sm); color: {activeTab === tab.id ? 'var(--text-accent)' : 'var(--text-secondary)'}; background: {activeTab === tab.id ? 'var(--bg-active)' : 'transparent'}; font-weight: {activeTab === tab.id ? '600' : '500'};"
 			>
 				<Icon icon={tab.icon} width={20} height={20} />
 				{tab.label}
@@ -110,8 +110,8 @@
 			<div class="space-y-8 max-w-lg">
 				<div class="flex items-center justify-between">
 					<div>
-						<p class="text-[15px] font-medium" style="color: var(--text-primary);">Default View</p>
-						<p class="text-[13px] mt-0.5" style="color: var(--text-tertiary);">Choose grid or list view for files</p>
+						<p class="font-medium" style="font-size: var(--text-base); color: var(--text-primary);">Default View</p>
+						<p class="mt-0.5" style="font-size: var(--text-sm); color: var(--text-tertiary);">Choose grid or list view for files</p>
 					</div>
 					<select
 						onchange={(e) => ui.setViewMode((e.target as HTMLSelectElement).value as 'grid' | 'list')}
@@ -124,8 +124,8 @@
 				</div>
 				<div class="flex items-center justify-between">
 					<div>
-						<p class="text-[15px] font-medium" style="color: var(--text-primary);">Sidebar</p>
-						<p class="text-[13px] mt-0.5" style="color: var(--text-tertiary);">Show or hide the sidebar</p>
+						<p class="font-medium" style="font-size: var(--text-base); color: var(--text-primary);">Sidebar</p>
+						<p class="mt-0.5" style="font-size: var(--text-sm); color: var(--text-tertiary);">Show or hide the sidebar</p>
 					</div>
 					<button onclick={() => ui.toggleSidebar()} class="btn-secondary">
 						{ui.sidebarOpen ? 'Hide' : 'Show'}
@@ -137,7 +137,7 @@
 			<h2 class="text-xl font-bold mb-8" style="color: var(--text-primary);">Appearance</h2>
 			<div class="space-y-8 max-w-lg">
 				<div>
-					<p class="text-[15px] font-medium mb-4" style="color: var(--text-primary);">Theme</p>
+					<p class="font-medium mb-4" style="font-size: var(--text-base); color: var(--text-primary);">Theme</p>
 					<div class="grid grid-cols-3 gap-4">
 						{#each [{ value: 'light', label: 'Light', icon: 'ph:sun' }, { value: 'dark', label: 'Dark', icon: 'ph:moon' }, { value: 'system', label: 'System', icon: 'ph:desktop' }] as t}
 							<button
@@ -146,7 +146,7 @@
 								style="border-color: {theme.mode === t.value ? 'var(--color-primary-500)' : 'var(--border-default)'}; background: {theme.mode === t.value ? 'var(--bg-active)' : 'var(--bg-card)'}; box-shadow: {theme.mode === t.value ? '0 0 0 1px var(--color-primary-500)' : 'var(--shadow-card)'};"
 							>
 								<Icon icon={t.icon} width={28} height={28} style="color: {theme.mode === t.value ? 'var(--text-accent)' : 'var(--text-secondary)'};" />
-								<span class="text-[13px] font-medium" style="color: {theme.mode === t.value ? 'var(--text-accent)' : 'var(--text-secondary)'};">{t.label}</span>
+								<span class="font-medium" style="font-size: var(--text-sm); color: {theme.mode === t.value ? 'var(--text-accent)' : 'var(--text-secondary)'};">{t.label}</span>
 							</button>
 						{/each}
 					</div>
@@ -160,35 +160,35 @@
 					<div class="flex items-center justify-between mb-3">
 						<div class="flex items-center gap-2">
 							<div class="h-2.5 w-2.5 rounded-full" style="background: {serverOnline ? 'var(--color-success)' : 'var(--color-error)'};"></div>
-							<span class="text-[15px] font-medium" style="color: var(--text-primary);">Sync Server</span>
+							<span class="font-medium" style="font-size: var(--text-base); color: var(--text-primary);">Sync Server</span>
 						</div>
-						<button onclick={checkServer} class="btn-secondary text-[12px]">Refresh</button>
+						<button onclick={checkServer} class="btn-secondary" style="font-size: var(--text-xs);">Refresh</button>
 					</div>
-					<p class="text-[13px]" style="color: var(--text-tertiary);">{serverOnline ? 'Server is reachable' : 'Server offline — run `cargo run` in sync-server/'}</p>
+					<p style="font-size: var(--text-sm); color: var(--text-tertiary);">{serverOnline ? 'Server is reachable' : 'Server offline — run `cargo run` in sync-server/'}</p>
 				</div>
 
 				<div class="rounded-2xl border p-6" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
 					<div class="flex items-center gap-2 mb-5">
 						<Icon icon="ph:user-circle-bold" width={22} height={22} style="color: var(--text-accent);" />
-						<span class="text-[15px] font-semibold" style="color: var(--text-primary);">Account</span>
+						<span class="font-semibold" style="font-size: var(--text-base); color: var(--text-primary);">Account</span>
 					</div>
 					{#if sync.isAuthenticated}
 						<div class="space-y-4">
 							<div class="flex items-center gap-2">
 								<div class="h-2 w-2 rounded-full" style="background: var(--color-success);"></div>
-								<span class="text-[14px]" style="color: var(--text-primary);">Signed in as <strong>{sync.userEmail}</strong></span>
+								<span style="font-size: var(--text-sm); color: var(--text-primary);">Signed in as <strong>{sync.userEmail}</strong></span>
 							</div>
-							<p class="text-[13px]" style="color: var(--text-tertiary);">Last synced: {sync.lastSyncedAt ?? 'Never'}</p>
-							<button onclick={handleLogout} class="flex items-center gap-1.5 rounded-xl px-4 py-2 text-[13px] font-medium" style="color: var(--color-error); border: 1px solid var(--color-error);">
+							<p style="font-size: var(--text-sm); color: var(--text-tertiary);">Last synced: {sync.lastSyncedAt ?? 'Never'}</p>
+							<button onclick={handleLogout} class="flex items-center gap-1.5 rounded-xl px-4 py-2 font-medium" style="font-size: var(--text-sm); color: var(--color-error); border: 1px solid var(--color-error);">
 								<Icon icon="ph:sign-out-bold" width={16} height={16} /> Sign Out
 							</button>
 						</div>
 					{:else}
-						<p class="text-[13px] mb-5" style="color: var(--text-secondary);">Sign in to enable cross-device sync. Your data syncs to your self-hosted server — no third-party services, zero cost.</p>
+						<p class="mb-5" style="font-size: var(--text-sm); color: var(--text-secondary);">Sign in to enable cross-device sync. Your data syncs to your self-hosted server — no third-party services, zero cost.</p>
 						<div class="space-y-4">
 							<div class="flex gap-2">
-								<button onclick={() => { authMode = 'login'; }} class="rounded-lg px-4 py-1.5 text-[13px] font-medium" style="background: {authMode === 'login' ? 'var(--bg-active)' : 'transparent'}; color: {authMode === 'login' ? 'var(--text-accent)' : 'var(--text-secondary)'};">Sign In</button>
-								<button onclick={() => { authMode = 'register'; }} class="rounded-lg px-4 py-1.5 text-[13px] font-medium" style="background: {authMode === 'register' ? 'var(--bg-active)' : 'transparent'}; color: {authMode === 'register' ? 'var(--text-accent)' : 'var(--text-secondary)'};">Register</button>
+								<button onclick={() => { authMode = 'login'; }} class="rounded-lg px-4 py-1.5 font-medium" style="font-size: var(--text-sm); background: {authMode === 'login' ? 'var(--bg-active)' : 'transparent'}; color: {authMode === 'login' ? 'var(--text-accent)' : 'var(--text-secondary)'};">Sign In</button>
+								<button onclick={() => { authMode = 'register'; }} class="rounded-lg px-4 py-1.5 font-medium" style="font-size: var(--text-sm); background: {authMode === 'register' ? 'var(--bg-active)' : 'transparent'}; color: {authMode === 'register' ? 'var(--text-accent)' : 'var(--text-secondary)'};">Register</button>
 							</div>
 							<input type="email" bind:value={authEmail} placeholder="Email" class="input-field" />
 							<input type="password" bind:value={authPassword} placeholder="Password (8+ chars)" class="input-field" onkeydown={(e) => { if (e.key === 'Enter') handleAuth(); }} />
@@ -200,8 +200,8 @@
 				</div>
 
 				<div class="rounded-2xl border p-6" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
-					<p class="text-[13px] leading-relaxed" style="color: var(--text-secondary);">
-						<strong>Self-hosted sync.</strong> DevVault uses its own Rust sync server — no Supabase, no Firebase, no subscriptions. Run <code class="font-mono rounded-md px-1.5 py-0.5 text-[11px]" style="background: var(--bg-surface-raised);">cd sync-server && cargo run</code> to start the server. Your data stays on your infrastructure.
+					<p class="leading-relaxed" style="font-size: var(--text-sm); color: var(--text-secondary);">
+						<strong>Self-hosted sync.</strong> DevVault uses its own Rust sync server — no Supabase, no Firebase, no subscriptions. Run <code class="font-mono rounded-md px-1.5 py-0.5" style="font-size: var(--text-xs); background: var(--bg-surface-raised);">cd sync-server && cargo run</code> to start the server. Your data stays on your infrastructure.
 					</p>
 				</div>
 			</div>
@@ -211,8 +211,8 @@
 			<div class="max-w-lg rounded-2xl border overflow-hidden" style="border-color: var(--border-default); box-shadow: var(--shadow-card);">
 				{#each shortcuts as s, i}
 					<div class="flex items-center justify-between px-5 py-3.5" style="background: {i % 2 === 0 ? 'var(--bg-card)' : 'var(--bg-surface)'}; {i < shortcuts.length - 1 ? 'border-bottom: 1px solid var(--border-subtle);' : ''}">
-						<span class="text-[14px]" style="color: var(--text-primary);">{s.action}</span>
-						<kbd class="rounded-lg px-2.5 py-1 text-[12px] font-mono" style="background: var(--bg-surface-raised); color: var(--text-secondary); border: 1px solid var(--border-default);">{s.keys}</kbd>
+						<span style="font-size: var(--text-sm); color: var(--text-primary);">{s.action}</span>
+						<kbd class="rounded-lg px-2.5 py-1 font-mono" style="font-size: var(--text-xs); background: var(--bg-surface-raised); color: var(--text-secondary); border: 1px solid var(--border-default);">{s.keys}</kbd>
 					</div>
 				{/each}
 			</div>
@@ -226,13 +226,13 @@
 					</div>
 					<div>
 						<h3 class="text-2xl font-bold" style="color: var(--text-primary);">{APP_NAME}</h3>
-						<p class="text-[15px] mt-0.5" style="color: var(--text-secondary);">Version {APP_VERSION}</p>
+						<p class="mt-0.5" style="font-size: var(--text-base); color: var(--text-secondary);">Version {APP_VERSION}</p>
 					</div>
 				</div>
-				<p class="text-[15px] leading-relaxed mb-6" style="color: var(--text-secondary);">
+				<p class="leading-relaxed mb-6" style="font-size: var(--text-base); color: var(--text-secondary);">
 					DevVault is a personal developer workspace & cloud sync desktop app. Built with Tauri v2, SvelteKit, Svelte 5, TailwindCSS v4, and GSAP.
 				</p>
-				<div class="space-y-3 text-[14px]" style="color: var(--text-secondary);">
+				<div class="space-y-3" style="font-size: var(--text-sm); color: var(--text-secondary);">
 					<p><strong>Desktop:</strong> Tauri v2 + SvelteKit + Svelte 5 (Runes) + TailwindCSS v4</p>
 					<p><strong>Sync Server:</strong> Custom Rust (Axum + SQLite + JWT + WebSocket)</p>
 					<p><strong>Icons:</strong> Phosphor Icons + Iconify</p>

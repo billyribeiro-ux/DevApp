@@ -40,7 +40,7 @@
 		<div class="flex items-center gap-3">
 			<Icon icon="ph:trash-bold" width={24} height={24} style="color: var(--color-error);" />
 			<h1>Trash</h1>
-			<span class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold" style="background: var(--color-error-light); color: var(--color-error);">{trashFiles.length}</span>
+			<span class="rounded-full px-2.5 py-0.5 font-semibold" style="font-size: var(--text-xs); background: var(--color-error-light); color: var(--color-error);">{trashFiles.length}</span>
 		</div>
 		{#if trashFiles.length > 0}
 			<button onclick={emptyTrash} class="flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium" style="color: var(--color-error); border: 1px solid var(--color-error);">
@@ -51,7 +51,7 @@
 
 	<div class="page-content">
 		{#if trashFiles.length > 0}
-			<p class="text-[13px] mb-5" style="color: var(--text-tertiary);">Items in trash will be permanently deleted after 30 days.</p>
+			<p class="mb-5" style="font-size: var(--text-sm); color: var(--text-tertiary);">Items in trash will be permanently deleted after 30 days.</p>
 			<div class="space-y-3">
 				{#each trashFiles as file (file.id)}
 					{@const typeInfo = getFileTypeInfo(file.extension)}
@@ -60,12 +60,12 @@
 							<Icon icon={typeInfo.icon} width={20} height={20} style="color: {typeInfo.color};" />
 						</div>
 						<div class="flex-1 min-w-0">
-							<p class="text-[15px] font-medium truncate" style="color: var(--text-primary);">{file.name}</p>
-							<p class="text-[13px] mt-0.5" style="color: var(--text-tertiary);">{formatFileSize(file.size_bytes)} &middot; Deleted {formatRelativeDate(file.updated_at)}</p>
+							<p class="font-medium truncate" style="font-size: var(--text-base); color: var(--text-primary);">{file.name}</p>
+							<p class="mt-0.5" style="font-size: var(--text-sm); color: var(--text-tertiary);">{formatFileSize(file.size_bytes)} &middot; Deleted {formatRelativeDate(file.updated_at)}</p>
 						</div>
 						<div class="flex items-center gap-2 shrink-0">
-							<button onclick={() => handleRestore(file.id)} class="rounded-xl px-3 py-1.5 text-[12px] font-medium transition-colors" style="color: var(--text-accent);">Restore</button>
-							<button onclick={() => handlePermanentDelete(file.id)} class="rounded-xl px-3 py-1.5 text-[12px] font-medium transition-colors" style="color: var(--color-error);">Delete</button>
+							<button onclick={() => handleRestore(file.id)} class="rounded-xl px-3 py-1.5 font-medium transition-colors" style="font-size: var(--text-xs); color: var(--text-accent);">Restore</button>
+							<button onclick={() => handlePermanentDelete(file.id)} class="rounded-xl px-3 py-1.5 font-medium transition-colors" style="font-size: var(--text-xs); color: var(--color-error);">Delete</button>
 						</div>
 					</div>
 				{/each}

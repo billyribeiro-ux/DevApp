@@ -87,7 +87,7 @@
 		<div class="flex items-center gap-3">
 			<Icon icon="ph:bell-bold" width={24} height={24} style="color: var(--color-warning);" />
 			<h1>Reminders</h1>
-			<span class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold" style="background: var(--color-warning-light); color: var(--color-warning);">{reminders.filter(r => r.status === 'pending').length} pending</span>
+			<span class="rounded-full px-2.5 py-0.5 font-semibold" style="font-size: var(--text-xs); background: var(--color-warning-light); color: var(--color-warning);">{reminders.filter(r => r.status === 'pending').length} pending</span>
 		</div>
 		<button onclick={() => startEdit()} class="btn-primary">
 			<Icon icon="ph:plus-bold" width={15} height={15} /> New Reminder
@@ -96,7 +96,7 @@
 
 	<div class="page-tabs">
 		{#each filters as f}
-			<button onclick={() => { activeFilter = f.value; }} class="flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors" style="background: {activeFilter === f.value ? 'var(--bg-active)' : 'transparent'}; color: {activeFilter === f.value ? 'var(--text-accent)' : 'var(--text-secondary)'};">
+			<button onclick={() => { activeFilter = f.value; }} class="flex items-center gap-1.5 rounded-full px-4 py-1.5 font-medium transition-colors" style="font-size: var(--text-sm); background: {activeFilter === f.value ? 'var(--bg-active)' : 'transparent'}; color: {activeFilter === f.value ? 'var(--text-accent)' : 'var(--text-secondary)'};">
 				<Icon icon={f.icon} width={14} height={14} />
 				{f.label}
 			</button>
@@ -112,17 +112,17 @@
 					<textarea bind:value={fDescription} placeholder="Description (optional)" rows={3} class="input-field resize-none"></textarea>
 					<div class="grid grid-cols-2 gap-4">
 						<div>
-							<label for="due-date" class="text-[11px] font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-tertiary);">Due Date</label>
+							<label for="due-date" class="font-semibold mb-1.5 block uppercase tracking-wider" style="font-size: var(--text-xs); color: var(--text-tertiary);">Due Date</label>
 							<input id="due-date" type="date" bind:value={fDueDate} class="input-field input-field-sm" />
 						</div>
 						<div>
-							<label for="due-time" class="text-[11px] font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-tertiary);">Due Time</label>
+							<label for="due-time" class="font-semibold mb-1.5 block uppercase tracking-wider" style="font-size: var(--text-xs); color: var(--text-tertiary);">Due Time</label>
 							<input id="due-time" type="time" bind:value={fDueTime} class="input-field input-field-sm" />
 						</div>
 					</div>
 					<div class="grid grid-cols-2 gap-4">
 						<div>
-							<label for="priority" class="text-[11px] font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-tertiary);">Priority</label>
+							<label for="priority" class="font-semibold mb-1.5 block uppercase tracking-wider" style="font-size: var(--text-xs); color: var(--text-tertiary);">Priority</label>
 							<select id="priority" bind:value={fPriority} class="input-field input-field-sm">
 								<option value="low">Low</option>
 								<option value="medium">Medium</option>
@@ -131,7 +131,7 @@
 							</select>
 						</div>
 						<div>
-							<label for="recurrence" class="text-[11px] font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-tertiary);">Recurrence</label>
+							<label for="recurrence" class="font-semibold mb-1.5 block uppercase tracking-wider" style="font-size: var(--text-xs); color: var(--text-tertiary);">Recurrence</label>
 							<select id="recurrence" bind:value={fRecurrence} class="input-field input-field-sm">
 								<option value="none">None</option>
 								<option value="daily">Daily</option>
@@ -156,24 +156,24 @@
 							{/if}
 						</button>
 						<div class="flex-1 min-w-0">
-							<p class="text-[15px] font-medium" style="color: var(--text-primary); text-decoration: {reminder.status === 'completed' ? 'line-through' : 'none'}; opacity: {reminder.status === 'completed' ? 0.5 : 1};">{reminder.title}</p>
+							<p class="font-medium" style="font-size: var(--text-base); color: var(--text-primary); text-decoration: {reminder.status === 'completed' ? 'line-through' : 'none'}; opacity: {reminder.status === 'completed' ? 0.5 : 1};">{reminder.title}</p>
 							{#if reminder.description}
-								<p class="text-[13px] mt-0.5 truncate" style="color: var(--text-tertiary);">{reminder.description}</p>
+								<p class="mt-0.5 truncate" style="font-size: var(--text-sm); color: var(--text-tertiary);">{reminder.description}</p>
 							{/if}
 							<div class="flex items-center gap-3 mt-2">
 								{#if reminder.due_date}
-									<span class="text-[11px] flex items-center gap-1" style="color: var(--text-tertiary);">
+									<span class="flex items-center gap-1" style="font-size: var(--text-xs); color: var(--text-tertiary);">
 										<Icon icon="ph:calendar" width={12} height={12} /> {formatDate(reminder.due_date)}
 									</span>
 								{/if}
 								{#if reminder.recurrence !== 'none'}
-									<span class="text-[11px] flex items-center gap-1" style="color: var(--text-tertiary);">
+									<span class="flex items-center gap-1" style="font-size: var(--text-xs); color: var(--text-tertiary);">
 										<Icon icon="ph:arrows-clockwise" width={12} height={12} /> {reminder.recurrence}
 									</span>
 								{/if}
 							</div>
 						</div>
-						<span class="rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase shrink-0" style="background: {getPriorityColor(reminder.priority)}20; color: {getPriorityColor(reminder.priority)};">{reminder.priority}</span>
+						<span class="rounded-full px-2.5 py-1 font-semibold uppercase shrink-0" style="font-size: var(--text-xs); background: {getPriorityColor(reminder.priority)}20; color: {getPriorityColor(reminder.priority)};">{reminder.priority}</span>
 						<div class="flex items-center gap-1 shrink-0">
 							<button onclick={() => startEdit(reminder)} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);">
 								<Icon icon="ph:pencil" width={16} height={16} />

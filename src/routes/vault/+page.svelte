@@ -131,8 +131,8 @@
 				{/if}
 				<button
 					onclick={() => navigateToBreadcrumb(i)}
-					class="text-[14px] font-medium px-1.5 py-0.5 rounded-md transition-colors"
-					style="color: {i === breadcrumbs.length - 1 ? 'var(--text-primary)' : 'var(--text-secondary)'};"
+					class="font-medium px-1.5 py-0.5 rounded-md transition-colors"
+					style="font-size: var(--text-sm); color: {i === breadcrumbs.length - 1 ? 'var(--text-primary)' : 'var(--text-secondary)'};"
 				>
 					{crumb.name}
 				</button>
@@ -241,8 +241,8 @@
 									<div class="rounded-xl p-3" style="background: {typeInfo.color}10;">
 										<Icon icon={typeInfo.icon} width={36} height={36} style="color: {typeInfo.color};" />
 									</div>
-									<p class="text-xs font-medium text-center truncate w-full" style="color: var(--text-primary);">{file.name}</p>
-									<p class="text-[10px]" style="color: var(--text-tertiary);">{formatFileSize(file.size_bytes)}</p>
+									<p class="font-medium text-center truncate w-full" style="font-size: var(--text-xs); color: var(--text-primary);">{file.name}</p>
+									<p style="font-size: var(--text-xs); color: var(--text-tertiary);">{formatFileSize(file.size_bytes)}</p>
 									<!-- Hover actions -->
 									<div class="absolute bottom-2 right-2 hidden group-hover:flex items-center gap-1">
 										<button onclick={(e) => { e.stopPropagation(); toggleFavorite(file); }} class="rounded-md p-1" style="background: var(--bg-surface-raised);">
@@ -258,7 +258,7 @@
 					{:else}
 						<!-- List view -->
 						<div class="rounded-2xl border overflow-hidden" style="border-color: var(--border-default);">
-							<div class="grid grid-cols-[1fr,80px,80px,100px,60px] px-4 py-2 text-[11px] font-semibold uppercase tracking-wider border-b" style="color: var(--text-tertiary); border-color: var(--border-default); background: var(--bg-surface);">
+							<div class="grid grid-cols-[1fr,80px,80px,100px,60px] px-4 py-2 font-semibold uppercase tracking-wider border-b" style="font-size: var(--text-xs); color: var(--text-tertiary); border-color: var(--border-default); background: var(--bg-surface);">
 								<span>Name</span><span>Size</span><span>Type</span><span>Modified</span><span></span>
 							</div>
 							{#each sortedFiles() as file (file.id)}
@@ -305,7 +305,7 @@
 	</div>
 
 	<!-- Status bar -->
-	<div class="flex items-center justify-between px-8 py-3 border-t text-[11px] shrink-0" style="border-color: var(--border-default); color: var(--text-tertiary); background: var(--bg-surface);">
+	<div class="flex items-center justify-between px-8 py-3 border-t shrink-0" style="font-size: var(--text-xs); border-color: var(--border-default); color: var(--text-tertiary); background: var(--bg-surface);">
 		<span>{currentFiles.length} file{currentFiles.length !== 1 ? 's' : ''} &middot; {subfolders.length} folder{subfolders.length !== 1 ? 's' : ''}</span>
 		<span>{vault.selectedFileIds.size > 0 ? `${vault.selectedFileIds.size} selected` : ''}</span>
 	</div>
