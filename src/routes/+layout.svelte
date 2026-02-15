@@ -106,25 +106,25 @@
 		>
 			<div class="flex items-center gap-3 px-5 border-b shrink-0" style="border-color: var(--border-subtle); height: var(--titlebar-height);">
 				<div class="flex items-center justify-center rounded-xl p-2" style="background: var(--color-primary-600);">
-					<Icon icon="ph:vault-bold" width={22} height={22} style="color: white" />
+					<Icon icon="ph:vault-bold" width={24} height={24} style="color: white" />
 				</div>
-				<span class="text-lg font-bold tracking-tight" style="color: var(--text-primary);">DevVault</span>
+				<span class="font-bold tracking-tight" style="color: var(--text-primary); font-size: var(--text-lg);">DevVault</span>
 			</div>
 
-			<nav class="flex-1 overflow-y-auto px-3 py-2">
+			<nav class="flex-1 overflow-y-auto px-3 py-3">
 				{#each navGroups as group, gi}
-					<div class="{gi > 0 ? 'mt-5' : 'mt-1'}">
-						<p class="px-4 py-2 text-[10px] uppercase tracking-widest font-semibold" style="color: var(--text-tertiary);">{group.label}</p>
-						<div class="space-y-0.5">
+					<div class="{gi > 0 ? 'mt-6' : 'mt-1'}">
+						<p class="px-4 py-2 uppercase tracking-wider font-semibold" style="color: var(--text-tertiary); font-size: var(--text-xs); letter-spacing: 0.08em;">{group.label}</p>
+						<div class="space-y-1">
 							{#each group.items as item}
 								<a
 									href={item.href}
 									onclick={() => nav.navigate(item.href)}
-									class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] transition-all duration-150"
+									class="group flex items-center gap-3 rounded-lg px-3.5 py-2.5 transition-all duration-150"
 									class:nav-active={isActive(item.href)}
-									style="color: {isActive(item.href) ? 'var(--text-accent)' : 'var(--text-secondary)'}; background: {isActive(item.href) ? 'var(--bg-active)' : 'transparent'}; font-weight: {isActive(item.href) ? '600' : '500'}; {isActive(item.href) ? 'box-shadow: inset 0 0 0 1px rgba(0,122,255,0.08);' : ''}"
+									style="color: {isActive(item.href) ? 'var(--text-accent)' : 'var(--text-primary)'}; background: {isActive(item.href) ? 'var(--bg-active)' : 'transparent'}; font-weight: {isActive(item.href) ? '600' : '500'}; font-size: var(--text-sm); {isActive(item.href) ? 'box-shadow: inset 0 0 0 1px rgba(0,122,255,0.1);' : ''}"
 								>
-									<Icon icon={item.icon} width={20} height={20} />
+									<Icon icon={item.icon} width={18} height={18} />
 									<span>{item.label}</span>
 								</a>
 							{/each}

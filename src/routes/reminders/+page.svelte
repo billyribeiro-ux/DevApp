@@ -112,18 +112,18 @@
 					<textarea bind:value={fDescription} placeholder="Description (optional)" rows={3} class="input-field resize-none"></textarea>
 					<div class="grid grid-cols-2 gap-4">
 						<div>
-							<label class="text-[11px] font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-tertiary);">Due Date</label>
-							<input type="date" bind:value={fDueDate} class="input-field input-field-sm" />
+							<label for="due-date" class="text-[11px] font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-tertiary);">Due Date</label>
+							<input id="due-date" type="date" bind:value={fDueDate} class="input-field input-field-sm" />
 						</div>
 						<div>
-							<label class="text-[11px] font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-tertiary);">Due Time</label>
-							<input type="time" bind:value={fDueTime} class="input-field input-field-sm" />
+							<label for="due-time" class="text-[11px] font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-tertiary);">Due Time</label>
+							<input id="due-time" type="time" bind:value={fDueTime} class="input-field input-field-sm" />
 						</div>
 					</div>
 					<div class="grid grid-cols-2 gap-4">
 						<div>
-							<label class="text-[11px] font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-tertiary);">Priority</label>
-							<select bind:value={fPriority} class="input-field input-field-sm">
+							<label for="priority" class="text-[11px] font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-tertiary);">Priority</label>
+							<select id="priority" bind:value={fPriority} class="input-field input-field-sm">
 								<option value="low">Low</option>
 								<option value="medium">Medium</option>
 								<option value="high">High</option>
@@ -131,8 +131,8 @@
 							</select>
 						</div>
 						<div>
-							<label class="text-[11px] font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-tertiary);">Recurrence</label>
-							<select bind:value={fRecurrence} class="input-field input-field-sm">
+							<label for="recurrence" class="text-[11px] font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-tertiary);">Recurrence</label>
+							<select id="recurrence" bind:value={fRecurrence} class="input-field input-field-sm">
 								<option value="none">None</option>
 								<option value="daily">Daily</option>
 								<option value="weekly">Weekly</option>

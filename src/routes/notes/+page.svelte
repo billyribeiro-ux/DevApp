@@ -97,6 +97,10 @@
 			e.preventDefault();
 			handleCreate();
 		}
+		if (e.key === 'Escape' && searchQuery) {
+			e.preventDefault();
+			searchQuery = '';
+		}
 	}
 
 	onMount(async () => {
@@ -196,9 +200,9 @@
 			</div>
 		{:else}
 			<div class="flex flex-col items-center justify-center h-full">
-				<Icon icon="ph:note-pencil" width={56} height={56} style="color: var(--text-tertiary); opacity: 0.3;" />
-				<p class="mt-4 text-sm font-medium" style="color: var(--text-tertiary);">Select a note or create a new one</p>
-				<button onclick={handleCreate} class="mt-4 btn-primary rounded-xl text-sm px-5 py-2.5">
+				<Icon icon="ph:note-pencil" width={48} height={48} style="color: var(--text-tertiary); opacity: 0.3;" />
+				<p class="mt-4 font-medium" style="font-size: var(--text-sm); color: var(--text-tertiary);">Select a note or create a new one</p>
+				<button onclick={handleCreate} class="mt-4 btn-primary rounded-lg px-4 py-2" style="font-size: var(--text-sm);">
 					<Icon icon="ph:plus" width={16} height={16} style="display: inline; vertical-align: -2px;" /> New Note
 				</button>
 			</div>
