@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
-	import { nav, toasts } from '$stores/app.svelte';
-	import { getNotes, createNote, updateNote, deleteNote } from '$services/database';
+	import { nav, toasts, vault } from '$stores/app.svelte';
+	import { getNotes, createNote, updateNote, deleteNote, getFolders } from '$services/database';
 	import { formatRelativeDate, countWords } from '$utils/formatters';
+	import ConfirmDialog from '$lib/components/ui/ConfirmDialog.svelte';
 	import type { Note } from '$types';
 	import { v4 as uuid } from 'uuid';
 
@@ -13,6 +14,9 @@
 	let editContent = $state('');
 	let unsaved = $state(false);
 	let searchQuery = $state('');
+	let notesFolderId = $state<string | null>(null);
+	let confirmDeleteOpen = $state(false);
+	let pendingDeleteId = $state<string | null>(null);
 
 	let activeNote = $derived(notes.find(n => n.id === activeNoteId) ?? null);
 	let filteredNotes = $derived(
@@ -42,8 +46,16 @@
 	}
 
 	async function handleCreate() {
+		// Use the Notes folder from the workspace, or the first available folder
+		let folderId = notesFolderId;
+		if (!folderId) {
+			const notesFolder = vault.folders.find(f => f.folder_type === 'notes' && f.is_deleted === 0);
+			folderId = notesFolder?.id ?? vault.folders[0]?.id;
+		}
+		if (!folderId) { toasts.error('No folder available', 'Create a folder first'); return; }
+
 		const id = uuid();
-		await createNote({ id, folder_id: 'default', title: 'Untitled Note', content_text: '', word_count: 0 });
+		await createNote({ id, folder_id: folderId, title: 'Untitled Note', content_text: '', word_count: 0 });
 		notes = await getNotes();
 		selectNote(id);
 		toasts.success('Note Created');
@@ -63,7 +75,15 @@
 		}
 	}
 
-	async function handleDelete(id: string) {
+	function requestDelete(id: string) {
+		pendingDeleteId = id;
+		confirmDeleteOpen = true;
+	}
+
+	async function handleDelete() {
+		if (!pendingDeleteId) return;
+		const id = pendingDeleteId;
+		pendingDeleteId = null;
 		await deleteNote(id);
 		if (activeNoteId === id) {
 			activeNoteId = null;
@@ -167,7 +187,7 @@
 				</div>
 				<div class="flex items-center gap-2">
 					<button onclick={handleSave} class="btn-primary rounded-xl px-4 py-2">Save</button>
-					<button onclick={() => handleDelete(activeNote!.id)} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);">
+					<button onclick={() => requestDelete(activeNote!.id)} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);" aria-label="Delete note">
 						<Icon icon="ph:trash" width={18} height={18} />
 					</button>
 				</div>
@@ -209,6 +229,15 @@
 		{/if}
 	</div>
 </div>
+
+<ConfirmDialog
+	bind:open={confirmDeleteOpen}
+	title="Delete Note"
+	description="This note will be moved to trash. You can restore it later."
+	confirmLabel="Delete"
+	variant="danger"
+	onconfirm={handleDelete}
+/>
 
 <style>
 	button:hover { background: var(--bg-card-hover); }

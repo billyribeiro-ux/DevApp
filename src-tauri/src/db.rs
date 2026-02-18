@@ -244,5 +244,21 @@ pub fn get_migrations() -> Vec<Migration> {
             "#,
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 3,
+            description: "add_composite_indexes_for_soft_delete_queries",
+            sql: r#"
+                CREATE INDEX IF NOT EXISTS idx_folder_deleted ON folder(is_deleted, workspace_id);
+                CREATE INDEX IF NOT EXISTS idx_file_deleted ON file(is_deleted, updated_at DESC);
+                CREATE INDEX IF NOT EXISTS idx_file_favorited ON file(is_favorited, is_deleted);
+                CREATE INDEX IF NOT EXISTS idx_note_deleted ON note(is_deleted, updated_at DESC);
+                CREATE INDEX IF NOT EXISTS idx_prompt_deleted ON prompt(is_deleted, usage_count DESC);
+                CREATE INDEX IF NOT EXISTS idx_reminder_deleted ON reminder(is_deleted, status);
+                CREATE INDEX IF NOT EXISTS idx_course_deleted ON course(is_deleted, updated_at DESC);
+                CREATE INDEX IF NOT EXISTS idx_snippet_deleted ON snippet(is_deleted, usage_count DESC);
+                CREATE INDEX IF NOT EXISTS idx_sync_queue_pending ON sync_queue(status, retry_count, created_at ASC);
+            "#,
+            kind: MigrationKind::Up,
+        },
     ]
 }

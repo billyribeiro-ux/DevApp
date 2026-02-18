@@ -14,6 +14,33 @@ export async function getDb(): Promise<Database> {
   return db;
 }
 
+// Column whitelists to prevent SQL injection via dynamic UPDATE queries
+const FOLDER_COLUMNS = new Set(['workspace_id', 'parent_id', 'name', 'icon', 'color', 'folder_type', 'sort_order', 'is_expanded', 'is_deleted']);
+const FILE_COLUMNS = new Set(['folder_id', 'name', 'extension', 'mime_type', 'size_bytes', 'local_path', 'cloud_path', 'content_hash', 'thumbnail_path', 'is_favorited', 'is_pinned', 'open_count', 'last_opened_at', 'is_deleted']);
+const NOTE_COLUMNS = new Set(['folder_id', 'title', 'content_json', 'content_text', 'content_html', 'is_favorited', 'is_pinned', 'word_count', 'is_deleted']);
+const PROMPT_COLUMNS = new Set(['folder_id', 'title', 'content', 'category', 'language', 'variables', 'usage_count', 'is_favorited', 'last_used_at', 'is_deleted']);
+const REMINDER_COLUMNS = new Set(['folder_id', 'title', 'description', 'due_date', 'due_time', 'recurrence', 'priority', 'status', 'linked_file_id', 'linked_note_id', 'notify_before_minutes', 'completed_at', 'is_deleted']);
+const COURSE_COLUMNS = new Set(['folder_id', 'name', 'instructor', 'platform', 'url', 'description', 'thumbnail_path', 'progress_percent', 'total_lessons', 'completed_lessons', 'status', 'started_at', 'completed_at', 'rating', 'notes', 'is_deleted']);
+const SNIPPET_COLUMNS = new Set(['folder_id', 'title', 'code', 'language', 'description', 'is_favorited', 'usage_count', 'is_deleted']);
+
+function buildSafeUpdate(table: string, id: string, updates: Record<string, unknown>, allowedColumns: Set<string>): { query: string; values: unknown[] } {
+  const fields: string[] = [];
+  const values: unknown[] = [];
+  let idx = 1;
+
+  for (const [key, value] of Object.entries(updates)) {
+    if (key !== 'id' && allowedColumns.has(key)) {
+      fields.push(`${key} = $${idx}`);
+      values.push(value);
+      idx++;
+    }
+  }
+  fields.push(`updated_at = datetime('now')`);
+  values.push(id);
+
+  return { query: `UPDATE ${table} SET ${fields.join(', ')} WHERE id = $${idx}`, values };
+}
+
 // ============================================
 // WORKSPACE OPERATIONS
 // ============================================
@@ -61,21 +88,8 @@ export async function createFolder(folder: Partial<Folder>): Promise<void> {
 
 export async function updateFolder(id: string, updates: Partial<Folder>): Promise<void> {
   const d = await getDb();
-  const fields: string[] = [];
-  const values: unknown[] = [];
-  let idx = 1;
-
-  for (const [key, value] of Object.entries(updates)) {
-    if (key !== 'id') {
-      fields.push(`${key} = $${idx}`);
-      values.push(value);
-      idx++;
-    }
-  }
-  fields.push(`updated_at = datetime('now')`);
-  values.push(id);
-
-  await d.execute(`UPDATE folder SET ${fields.join(', ')} WHERE id = $${idx}`, values);
+  const { query, values } = buildSafeUpdate('folder', id, updates as Record<string, unknown>, FOLDER_COLUMNS);
+  await d.execute(query, values);
 }
 
 export async function deleteFolder(id: string): Promise<void> {
@@ -126,21 +140,8 @@ export async function createFile(file: Partial<VaultFile>): Promise<void> {
 
 export async function updateFile(id: string, updates: Partial<VaultFile>): Promise<void> {
   const d = await getDb();
-  const fields: string[] = [];
-  const values: unknown[] = [];
-  let idx = 1;
-
-  for (const [key, value] of Object.entries(updates)) {
-    if (key !== 'id') {
-      fields.push(`${key} = $${idx}`);
-      values.push(value);
-      idx++;
-    }
-  }
-  fields.push(`updated_at = datetime('now')`);
-  values.push(id);
-
-  await d.execute(`UPDATE file SET ${fields.join(', ')} WHERE id = $${idx}`, values);
+  const { query, values } = buildSafeUpdate('file', id, updates as Record<string, unknown>, FILE_COLUMNS);
+  await d.execute(query, values);
 }
 
 export async function deleteFile(id: string): Promise<void> {
@@ -194,21 +195,8 @@ export async function createNote(note: Partial<Note>): Promise<void> {
 
 export async function updateNote(id: string, updates: Partial<Note>): Promise<void> {
   const d = await getDb();
-  const fields: string[] = [];
-  const values: unknown[] = [];
-  let idx = 1;
-
-  for (const [key, value] of Object.entries(updates)) {
-    if (key !== 'id') {
-      fields.push(`${key} = $${idx}`);
-      values.push(value);
-      idx++;
-    }
-  }
-  fields.push(`updated_at = datetime('now')`);
-  values.push(id);
-
-  await d.execute(`UPDATE note SET ${fields.join(', ')} WHERE id = $${idx}`, values);
+  const { query, values } = buildSafeUpdate('note', id, updates as Record<string, unknown>, NOTE_COLUMNS);
+  await d.execute(query, values);
 }
 
 export async function deleteNote(id: string): Promise<void> {
@@ -241,21 +229,8 @@ export async function createPrompt(prompt: Partial<Prompt>): Promise<void> {
 
 export async function updatePrompt(id: string, updates: Partial<Prompt>): Promise<void> {
   const d = await getDb();
-  const fields: string[] = [];
-  const values: unknown[] = [];
-  let idx = 1;
-
-  for (const [key, value] of Object.entries(updates)) {
-    if (key !== 'id') {
-      fields.push(`${key} = $${idx}`);
-      values.push(value);
-      idx++;
-    }
-  }
-  fields.push(`updated_at = datetime('now')`);
-  values.push(id);
-
-  await d.execute(`UPDATE prompt SET ${fields.join(', ')} WHERE id = $${idx}`, values);
+  const { query, values } = buildSafeUpdate('prompt', id, updates as Record<string, unknown>, PROMPT_COLUMNS);
+  await d.execute(query, values);
 }
 
 export async function deletePrompt(id: string): Promise<void> {
@@ -296,21 +271,8 @@ export async function createReminder(reminder: Partial<Reminder>): Promise<void>
 
 export async function updateReminder(id: string, updates: Partial<Reminder>): Promise<void> {
   const d = await getDb();
-  const fields: string[] = [];
-  const values: unknown[] = [];
-  let idx = 1;
-
-  for (const [key, value] of Object.entries(updates)) {
-    if (key !== 'id') {
-      fields.push(`${key} = $${idx}`);
-      values.push(value);
-      idx++;
-    }
-  }
-  fields.push(`updated_at = datetime('now')`);
-  values.push(id);
-
-  await d.execute(`UPDATE reminder SET ${fields.join(', ')} WHERE id = $${idx}`, values);
+  const { query, values } = buildSafeUpdate('reminder', id, updates as Record<string, unknown>, REMINDER_COLUMNS);
+  await d.execute(query, values);
 }
 
 export async function completeReminder(id: string): Promise<void> {
@@ -365,21 +327,8 @@ export async function createCourse(course: Partial<Course>): Promise<void> {
 
 export async function updateCourse(id: string, updates: Partial<Course>): Promise<void> {
   const d = await getDb();
-  const fields: string[] = [];
-  const values: unknown[] = [];
-  let idx = 1;
-
-  for (const [key, value] of Object.entries(updates)) {
-    if (key !== 'id') {
-      fields.push(`${key} = $${idx}`);
-      values.push(value);
-      idx++;
-    }
-  }
-  fields.push(`updated_at = datetime('now')`);
-  values.push(id);
-
-  await d.execute(`UPDATE course SET ${fields.join(', ')} WHERE id = $${idx}`, values);
+  const { query, values } = buildSafeUpdate('course', id, updates as Record<string, unknown>, COURSE_COLUMNS);
+  await d.execute(query, values);
 }
 
 export async function deleteCourse(id: string): Promise<void> {
@@ -446,21 +395,8 @@ export async function createSnippet(snippet: Partial<Snippet>): Promise<void> {
 
 export async function updateSnippet(id: string, updates: Partial<Snippet>): Promise<void> {
   const d = await getDb();
-  const fields: string[] = [];
-  const values: unknown[] = [];
-  let idx = 1;
-
-  for (const [key, value] of Object.entries(updates)) {
-    if (key !== 'id') {
-      fields.push(`${key} = $${idx}`);
-      values.push(value);
-      idx++;
-    }
-  }
-  fields.push(`updated_at = datetime('now')`);
-  values.push(id);
-
-  await d.execute(`UPDATE snippet SET ${fields.join(', ')} WHERE id = $${idx}`, values);
+  const { query, values } = buildSafeUpdate('snippet', id, updates as Record<string, unknown>, SNIPPET_COLUMNS);
+  await d.execute(query, values);
 }
 
 export async function deleteSnippet(id: string): Promise<void> {

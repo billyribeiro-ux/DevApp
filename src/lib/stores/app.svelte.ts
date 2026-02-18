@@ -1,7 +1,7 @@
 import type { ThemeMode, ViewMode, SyncStatus, ToastMessage, Workspace, Folder, VaultFile } from '$types';
 
 // ============================================
-// THEME STORE
+// THEME STORE — persists to localStorage
 // ============================================
 
 class ThemeStore {
@@ -10,6 +10,15 @@ class ThemeStore {
     ? (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
     : this.mode
   );
+
+  constructor() {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('devvault_theme') as ThemeMode | null;
+      if (stored && ['light', 'dark', 'system'].includes(stored)) {
+        this.mode = stored;
+      }
+    }
+  }
 
   toggle() {
     this.mode = this.resolved === 'dark' ? 'light' : 'dark';
@@ -24,6 +33,7 @@ class ThemeStore {
   apply() {
     if (typeof document !== 'undefined') {
       document.documentElement.classList.toggle('dark', this.resolved === 'dark');
+      localStorage.setItem('devvault_theme', this.mode);
     }
   }
 }
@@ -154,23 +164,31 @@ class SyncStore {
 export const sync = new SyncStore();
 
 // ============================================
-// TOAST STORE
+// TOAST STORE — tracks timeouts for cleanup
 // ============================================
 
 class ToastStore {
   toasts = $state<ToastMessage[]>([]);
+  private timeouts = new Map<string, ReturnType<typeof setTimeout>>();
 
   add(toast: Omit<ToastMessage, 'id'>) {
     const id = crypto.randomUUID();
     this.toasts = [...this.toasts, { ...toast, id }];
 
     const duration = toast.duration ?? 4000;
-    setTimeout(() => {
-      this.remove(id);
+    const timeout = setTimeout(() => {
+      this.timeouts.delete(id);
+      this.toasts = this.toasts.filter(t => t.id !== id);
     }, duration);
+    this.timeouts.set(id, timeout);
   }
 
   remove(id: string) {
+    const timeout = this.timeouts.get(id);
+    if (timeout) {
+      clearTimeout(timeout);
+      this.timeouts.delete(id);
+    }
     this.toasts = this.toasts.filter(t => t.id !== id);
   }
 
@@ -194,8 +212,10 @@ class ToastStore {
 export const toasts = new ToastStore();
 
 // ============================================
-// NAVIGATION STORE
+// NAVIGATION STORE — bounded history
 // ============================================
+
+const MAX_NAV_HISTORY = 100;
 
 class NavStore {
   activePath = $state('/');
@@ -205,8 +225,17 @@ class NavStore {
 
   navigate(path: string) {
     this.activePath = path;
-    this.history = [...this.history.slice(0, this.historyIndex + 1), path];
-    this.historyIndex = this.history.length - 1;
+    const truncated = this.history.slice(0, this.historyIndex + 1);
+    truncated.push(path);
+    // Keep history bounded to prevent unbounded memory growth
+    if (truncated.length > MAX_NAV_HISTORY) {
+      const overflow = truncated.length - MAX_NAV_HISTORY;
+      this.history = truncated.slice(overflow);
+      this.historyIndex = this.history.length - 1;
+    } else {
+      this.history = truncated;
+      this.historyIndex = truncated.length - 1;
+    }
   }
 
   goBack() {

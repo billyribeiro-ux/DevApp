@@ -103,24 +103,36 @@ async function processSyncQueue(): Promise<void> {
 		// Push to cloud
 		const result = await pushToCloud(records);
 
-		// Mark as completed
+		// Build a set of conflicting entity IDs so we don't mark them as completed
+		const conflictIds = new Set(
+			result.conflicts.map(c => `${c.entity_type}:${c.entity_id}`)
+		);
+
+		// Mark accepted items as completed, leave conflicts as pending
 		for (const item of pending) {
-			await db.execute(
-				`UPDATE sync_queue SET status = 'completed', processed_at = datetime('now') WHERE id = $1`,
-				[item.id]
-			);
+			const key = `${item.entity_type}:${item.entity_id}`;
+			if (conflictIds.has(key)) {
+				await db.execute(
+					`UPDATE sync_queue SET error_message = 'Server conflict — needs resolution' WHERE id = $1`,
+					[item.id]
+				);
+			} else {
+				await db.execute(
+					`UPDATE sync_queue SET status = 'completed', processed_at = datetime('now') WHERE id = $1`,
+					[item.id]
+				);
+			}
 		}
 
 		// Handle conflicts
 		if (result.conflicts.length > 0) {
 			logger.warn(`${result.conflicts.length} conflicts detected`, { conflicts: result.conflicts });
-			// TODO: Implement conflict resolution UI
 		}
 
-		sync.status = 'synced';
+		sync.status = result.conflicts.length > 0 ? 'error' : 'synced';
 		sync.lastSyncedAt = new Date().toISOString();
-		sync.pendingCount = 0;
-		logger.info(`Synced ${result.accepted} items successfully`);
+		sync.pendingCount = result.conflicts.length;
+		logger.info(`Synced ${result.accepted} items, ${result.conflicts.length} conflicts`);
 
 	} catch (error) {
 		logger.error('Sync queue processing failed', error as Error);

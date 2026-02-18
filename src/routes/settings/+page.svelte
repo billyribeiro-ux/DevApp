@@ -31,8 +31,8 @@
 			sync.userEmail = authEmail;
 			authEmail = '';
 			authPassword = '';
-		} catch (e: any) {
-			toasts.error('Auth Failed', e.message);
+		} catch (e: unknown) {
+			toasts.error('Auth Failed', e instanceof Error ? e.message : 'Authentication failed');
 		}
 		authLoading = false;
 	}

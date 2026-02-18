@@ -140,18 +140,29 @@ pub fn delete_vault_file(path: String, app: AppHandle) -> CommandResult<()> {
 pub fn ensure_directory(path: String, app: AppHandle) -> CommandResult<()> {
     info!("Ensuring directory exists: {}", path);
 
+    // Reject path traversal sequences before any path construction
+    if path.contains("..") {
+        return Err(CommandError::PathTraversal(format!(
+            "Path contains '..' which is not allowed: {}",
+            path
+        )));
+    }
+
     // Get vault path for validation
     let vault_path = get_vault_base_path(&app)?;
 
-    // Validate path (allow creation of new paths)
+    // Only allow relative paths within the vault — reject absolute paths
     let path_buf = PathBuf::from(&path);
-    let target_path = if path_buf.is_absolute() {
-        path_buf
-    } else {
-        vault_path.join(&path_buf)
-    };
+    if path_buf.is_absolute() {
+        return Err(CommandError::PathTraversal(format!(
+            "Absolute paths are not allowed: {}",
+            path
+        )));
+    }
 
-    // Ensure it's within vault
+    let target_path = vault_path.join(&path_buf);
+
+    // Ensure the resolved path is within vault (defense in depth)
     if !target_path.starts_with(&vault_path) {
         return Err(CommandError::PathTraversal(format!(
             "Path is outside vault: {}",

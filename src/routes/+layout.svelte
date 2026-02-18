@@ -132,7 +132,7 @@
 				<span class="font-bold tracking-tight" style="color: var(--text-primary); font-size: var(--text-lg);">DevVault</span>
 			</div>
 
-			<nav class="flex-1 overflow-y-auto px-3 py-3">
+			<nav class="flex-1 overflow-y-auto px-3 py-3" aria-label="Main navigation">
 				{#each navGroups as group, gi}
 					<div class="{gi > 0 ? 'mt-6' : 'mt-1'}">
 						<p class="px-4 py-2 uppercase tracking-wider font-semibold" style="color: var(--text-tertiary); font-size: var(--text-xs); letter-spacing: 0.08em;">{group.label}</p>
@@ -156,7 +156,7 @@
 
 			<div class="border-t px-4 py-3 shrink-0" style="border-color: var(--border-subtle);">
 				<div class="flex items-center justify-between">
-					<button onclick={() => theme.toggle()} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);" title="Toggle theme">
+					<button onclick={() => theme.toggle()} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);" title="Toggle theme" aria-label="Toggle theme">
 						<Icon icon={theme.resolved === 'dark' ? 'ph:sun-bold' : 'ph:moon-bold'} width={18} height={18} />
 					</button>
 					<div class="flex items-center gap-1.5 text-[11px]" style="color: var(--text-tertiary);">
@@ -194,7 +194,7 @@
 							<p class="text-xs mt-0.5" style="color: var(--text-secondary);">{toast.description}</p>
 						{/if}
 					</div>
-					<button onclick={() => toasts.remove(toast.id)} class="shrink-0 rounded-lg p-1 transition-colors" style="color: var(--text-tertiary);">
+					<button onclick={() => toasts.remove(toast.id)} class="shrink-0 rounded-lg p-1 transition-colors" style="color: var(--text-tertiary);" aria-label="Dismiss notification">
 						<Icon icon="ph:x-bold" width={14} height={14} />
 					</button>
 				</div>
