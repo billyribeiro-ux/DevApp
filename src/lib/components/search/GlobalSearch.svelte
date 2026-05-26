@@ -123,7 +123,6 @@
   });
 
   async function loadAllData() {
-    if (allItems.length > 0) return; // Already loaded
     isLoading = true;
 
     try {

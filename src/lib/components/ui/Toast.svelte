@@ -39,11 +39,16 @@
   };
 
   function animateIn(node: HTMLElement) {
-    gsap.fromTo(
+    const tween = gsap.fromTo(
       node,
       { opacity: 0, x: 80, scale: 0.95 },
       { opacity: 1, x: 0, scale: 1, duration: 0.35, ease: 'back.out(1.4)' }
     );
+    return {
+      destroy() {
+        tween.kill();
+      }
+    };
   }
 
   function handleDismiss(id: string, node: HTMLElement) {

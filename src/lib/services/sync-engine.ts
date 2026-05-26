@@ -125,8 +125,12 @@ async function processSyncQueue(): Promise<void> {
 			const key = `${item.entity_type}:${item.entity_id}`;
 			if (conflictIds.has(key)) {
 				await db.execute(
-					`UPDATE sync_queue SET error_message = 'Server conflict — needs resolution' WHERE id = $1`,
-					[item.id]
+					`UPDATE sync_queue
+					 SET retry_count = retry_count + 1,
+					     error_message = 'Server conflict — needs resolution',
+					     status = CASE WHEN retry_count + 1 >= $1 THEN 'failed' ELSE 'pending' END
+					 WHERE id = $2`,
+					[MAX_RETRIES, item.id]
 				);
 			} else {
 				await db.execute(

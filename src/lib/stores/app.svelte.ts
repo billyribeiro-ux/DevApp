@@ -6,10 +6,8 @@ import type { ThemeMode, ViewMode, SyncStatus, ToastMessage, Workspace, Folder, 
 
 class ThemeStore {
   mode = $state<ThemeMode>('dark');
-  resolved = $derived(this.mode === 'system'
-    ? (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-    : this.mode
-  );
+  private osDark = $state(typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  resolved = $derived(this.mode === 'system' ? (this.osDark ? 'dark' : 'light') : this.mode);
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -17,6 +15,10 @@ class ThemeStore {
       if (stored && ['light', 'dark', 'system'].includes(stored)) {
         this.mode = stored;
       }
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        this.osDark = e.matches;
+        if (this.mode === 'system') this.apply();
+      });
     }
   }
 
@@ -173,6 +175,11 @@ class ToastStore {
 
   add(toast: Omit<ToastMessage, 'id'>) {
     const id = crypto.randomUUID();
+
+    if (this.toasts.length >= 5) {
+      this.remove(this.toasts[0].id);
+    }
+
     this.toasts = [...this.toasts, { ...toast, id }];
 
     const duration = toast.duration ?? 4000;

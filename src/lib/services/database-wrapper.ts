@@ -18,6 +18,7 @@ export async function getDb(): Promise<Database> {
 		try {
 			logger.info('Initializing database connection');
 			db = await Database.load(DB_NAME);
+			await db.execute('PRAGMA foreign_keys = ON');
 			logger.info('Database connection established');
 		} catch (error) {
 			logger.error('Failed to initialize database', error as Error);

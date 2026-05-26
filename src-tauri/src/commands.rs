@@ -51,12 +51,13 @@ pub fn hash_file(path: String, app: AppHandle) -> CommandResult<FileHashResult> 
         return Err(CommandError::FileNotFound(path));
     }
 
+    // Validate file size via metadata BEFORE loading into memory
+    let metadata = fs::metadata(&validated_path)?;
+    validate_file_size(metadata.len())?;
+
     // Read and hash file
     let data = fs::read(&validated_path)?;
     let size = data.len() as u64;
-
-    // Validate file size
-    validate_file_size(size)?;
 
     let hash = blake3::hash(&data);
 
@@ -76,7 +77,10 @@ pub fn copy_file_to_vault(
     filename: String,
     app: AppHandle,
 ) -> CommandResult<String> {
-    info!("Copying file to vault: {} -> {}/{}", source, dest_folder, filename);
+    info!(
+        "Copying file to vault: {} -> {}/{}",
+        source, dest_folder, filename
+    );
 
     // Validate filename
     let validated_filename = validate_filename(&filename)?;
@@ -95,10 +99,14 @@ pub fn copy_file_to_vault(
         fs::create_dir_all(&dest_dir)?;
     }
 
-    // Validate source file
-    let source_path = PathBuf::from(&source);
-    if !source_path.exists() {
-        return Err(CommandError::FileNotFound(source));
+    // Validate source file — canonicalize to resolve symlinks and prevent traversal
+    let source_path = PathBuf::from(&source)
+        .canonicalize()
+        .map_err(|_| CommandError::FileNotFound(source.clone()))?;
+    if !source_path.is_file() {
+        return Err(CommandError::InvalidPath(
+            "Source must be a regular file".to_string(),
+        ));
     }
 
     // Check source file size
@@ -191,8 +199,11 @@ pub fn read_file_bytes(path: String, app: AppHandle) -> CommandResult<Vec<u8>> {
         return Err(CommandError::FileNotFound(path));
     }
 
+    // Validate size via metadata before loading into memory
+    let metadata = fs::metadata(&validated_path)?;
+    validate_file_size(metadata.len())?;
+
     let data = fs::read(&validated_path)?;
-    validate_file_size(data.len() as u64)?;
 
     info!("File read successfully: {} bytes", data.len());
 

@@ -1,18 +1,10 @@
-import Database from '@tauri-apps/plugin-sql';
-import { DB_NAME } from '$config/constants';
+import { getDb } from './database-wrapper';
 import type {
   Workspace, Folder, VaultFile, Note, Prompt, Reminder,
   Course, CourseSection, CourseLesson, Tag, Snippet, Activity, SearchResult, FolderType
 } from '$types';
 
-let db: Database | null = null;
-
-export async function getDb(): Promise<Database> {
-  if (!db) {
-    db = await Database.load(DB_NAME);
-  }
-  return db;
-}
+export { getDb };
 
 // Column whitelists to prevent SQL injection via dynamic UPDATE queries
 const FOLDER_COLUMNS = new Set(['workspace_id', 'parent_id', 'name', 'icon', 'color', 'folder_type', 'sort_order', 'is_expanded', 'is_deleted']);
@@ -460,6 +452,14 @@ export async function logActivity(activity: Partial<Activity>): Promise<void> {
   );
 }
 
+export async function purgeOldActivities(keepDays: number = 90): Promise<void> {
+  const d = await getDb();
+  await d.execute(
+    `DELETE FROM activity WHERE created_at < datetime('now', '-' || $1 || ' days')`,
+    [keepDays]
+  );
+}
+
 // ============================================
 // SEARCH
 // ============================================
@@ -470,6 +470,21 @@ export async function searchAll(query: string): Promise<SearchResult[]> {
     "SELECT * FROM search_index WHERE search_index MATCH $1 ORDER BY rank LIMIT 50",
     [query]
   );
+}
+
+export async function indexEntity(entityType: string, entityId: string, title: string, content: string, tags?: string): Promise<void> {
+  const d = await getDb();
+  await d.execute(
+    `INSERT INTO search_index (entity_type, entity_id, title, content, tags)
+     VALUES ($1, $2, $3, $4, $5)
+     ON CONFLICT(entity_id) DO UPDATE SET title = $3, content = $4, tags = $5`,
+    [entityType, entityId, title, content ?? '', tags ?? '']
+  );
+}
+
+export async function removeFromIndex(entityId: string): Promise<void> {
+  const d = await getDb();
+  await d.execute('DELETE FROM search_index WHERE entity_id = $1', [entityId]);
 }
 
 // ============================================

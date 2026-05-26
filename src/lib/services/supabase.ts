@@ -247,6 +247,11 @@ export function connectRealtime(): void {
   if (ws && ws.readyState === WebSocket.OPEN) return;
 
   const wsUrl = SYNC_SERVER_URL.replace(/^http/, 'ws');
+
+  if (!wsUrl.startsWith('wss:') && typeof window !== 'undefined' && window.location.protocol === 'https:') {
+    console.warn('[DevVault Sync] WebSocket using insecure ws:// — configure VITE_SYNC_SERVER_URL with https://');
+  }
+
   ws = new WebSocket(`${wsUrl}/ws?token=${encodeURIComponent(authToken)}`);
 
   ws.onopen = () => {
@@ -257,7 +262,7 @@ export function connectRealtime(): void {
   ws.onmessage = (event) => {
     try {
       const data: RealtimeEvent = JSON.parse(event.data);
-      realtimeCallbacks.forEach(cb => cb(data));
+      for (const cb of realtimeCallbacks) cb(data);
     } catch (e) {
       console.warn('[DevVault Sync] Failed to parse realtime event:', e);
     }
@@ -265,7 +270,7 @@ export function connectRealtime(): void {
 
   ws.onclose = () => {
     console.log('[DevVault Sync] Realtime disconnected');
-    scheduleReconnect();
+    if (authToken) scheduleReconnect();
   };
 
   ws.onerror = (err) => {
@@ -284,12 +289,19 @@ function scheduleReconnect(): void {
 }
 
 export function disconnectRealtime(): void {
-  if (reconnectTimer) clearTimeout(reconnectTimer);
+  if (reconnectTimer) {
+    clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+  }
   if (ws) {
+    ws.onclose = null;
+    ws.onerror = null;
+    ws.onmessage = null;
     ws.close();
     ws = null;
   }
   reconnectAttempts = 0;
+  realtimeCallbacks = [];
 }
 
 export function onRealtimeEvent(callback: RealtimeCallback): () => void {

@@ -134,18 +134,25 @@ export async function withRetry<T>(
  */
 class DebouncedErrorHandler {
 	private errorMap = new Map<string, number>();
-	private readonly debounceTime = 5000; // 5 seconds
+	private readonly debounceTime = 5000;
+	private readonly maxEntries = 100;
 
 	handle(error: unknown, context?: string): void {
-		const key = `${context || 'global'}-${error instanceof Error ? error.message : String(error)}`;
-		const lastTime = this.errorMap.get(key) || 0;
+		const msg = error instanceof Error ? error.message : String(error);
+		const key = `${context || 'global'}-${msg.slice(0, 200)}`;
 		const now = Date.now();
+		const lastTime = this.errorMap.get(key) || 0;
 
 		if (now - lastTime > this.debounceTime) {
 			this.errorMap.set(key, now);
+			if (this.errorMap.size > this.maxEntries) {
+				const cutoff = now - this.debounceTime;
+				for (const [k, v] of this.errorMap) {
+					if (v < cutoff) this.errorMap.delete(k);
+				}
+			}
 			handleError(error, context);
 		} else {
-			// Just log, don't show toast
 			logger.error(`Debounced error${context ? ` in ${context}` : ''}`, error as Error);
 		}
 	}

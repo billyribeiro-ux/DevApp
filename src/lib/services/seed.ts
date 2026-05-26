@@ -229,18 +229,28 @@ export async function seedDatabase() {
 
 export async function clearDatabase() {
   const db = await getDb();
-  
-  await db.execute('DELETE FROM activity');
-  await db.execute('DELETE FROM course_lesson');
-  await db.execute('DELETE FROM course_section');
-  await db.execute('DELETE FROM course');
-  await db.execute('DELETE FROM snippet');
-  await db.execute('DELETE FROM reminder');
-  await db.execute('DELETE FROM prompt');
-  await db.execute('DELETE FROM note');
-  await db.execute('DELETE FROM file');
-  await db.execute('DELETE FROM folder');
-  await db.execute('DELETE FROM workspace');
-  
-  console.log('✅ Database cleared!');
+
+  await db.execute('BEGIN TRANSACTION');
+  try {
+    await db.execute('DELETE FROM taggable');
+    await db.execute('DELETE FROM sync_queue');
+    await db.execute('DELETE FROM activity');
+    await db.execute('DELETE FROM search_index');
+    await db.execute('DELETE FROM course_lesson');
+    await db.execute('DELETE FROM course_section');
+    await db.execute('DELETE FROM course');
+    await db.execute('DELETE FROM snippet');
+    await db.execute('DELETE FROM reminder');
+    await db.execute('DELETE FROM prompt');
+    await db.execute('DELETE FROM note');
+    await db.execute('DELETE FROM file');
+    await db.execute('DELETE FROM tag');
+    await db.execute('DELETE FROM folder');
+    await db.execute('DELETE FROM workspace');
+    await db.execute('DELETE FROM settings');
+    await db.execute('COMMIT');
+  } catch (error) {
+    await db.execute('ROLLBACK');
+    throw error;
+  }
 }

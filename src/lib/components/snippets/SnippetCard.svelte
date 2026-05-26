@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
   import Icon from '@iconify/svelte';
   import type { Snippet } from '$types';
 
@@ -62,6 +63,10 @@
       copyLabel = 'Copy';
     }, 2000);
   }
+
+  onDestroy(() => {
+    if (copyTimeout) clearTimeout(copyTimeout);
+  });
 
   function handleEdit() {
     onedit(snippet.id);
