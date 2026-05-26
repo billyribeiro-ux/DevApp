@@ -19,7 +19,7 @@ const WORKSPACE_COLUMNS = new Set(['name', 'icon', 'color', 'sort_order', 'is_de
 const COURSE_SECTION_COLUMNS = new Set(['name', 'sort_order']);
 const COURSE_LESSON_COLUMNS = new Set(['name', 'duration_minutes', 'sort_order', 'is_completed', 'completed_at', 'notes']);
 
-function buildSafeUpdate(table: string, id: string, updates: Record<string, unknown>, allowedColumns: Set<string>): { query: string; values: unknown[] } {
+function buildSafeUpdate(table: string, id: string, updates: Record<string, unknown>, allowedColumns: Set<string>, hasUpdatedAt = true): { query: string; values: unknown[] } {
   const fields: string[] = [];
   const values: unknown[] = [];
   let idx = 1;
@@ -31,7 +31,7 @@ function buildSafeUpdate(table: string, id: string, updates: Record<string, unkn
       idx++;
     }
   }
-  fields.push(`updated_at = datetime('now')`);
+  if (hasUpdatedAt) fields.push(`updated_at = datetime('now')`);
   values.push(id);
 
   return { query: `UPDATE ${table} SET ${fields.join(', ')} WHERE id = $${idx}`, values };
@@ -369,7 +369,7 @@ export async function createCourseSection(section: Partial<CourseSection>): Prom
 
 export async function updateCourseSection(id: string, updates: Partial<CourseSection>): Promise<void> {
   const d = await getDb();
-  const { query, values } = buildSafeUpdate('course_section', id, updates as Record<string, unknown>, COURSE_SECTION_COLUMNS);
+  const { query, values } = buildSafeUpdate('course_section', id, updates as Record<string, unknown>, COURSE_SECTION_COLUMNS, false);
   await d.execute(query, values);
 }
 
@@ -394,7 +394,7 @@ export async function createCourseLesson(lesson: Partial<CourseLesson>): Promise
 
 export async function updateCourseLesson(id: string, updates: Partial<CourseLesson>): Promise<void> {
   const d = await getDb();
-  const { query, values } = buildSafeUpdate('course_lesson', id, updates as Record<string, unknown>, COURSE_LESSON_COLUMNS);
+  const { query, values } = buildSafeUpdate('course_lesson', id, updates as Record<string, unknown>, COURSE_LESSON_COLUMNS, false);
   await d.execute(query, values);
 }
 
@@ -466,7 +466,7 @@ export async function createTag(tag: Partial<Tag>): Promise<void> {
 
 export async function updateTag(id: string, updates: Partial<Tag>): Promise<void> {
   const d = await getDb();
-  const { query, values } = buildSafeUpdate('tag', id, updates as Record<string, unknown>, TAG_COLUMNS);
+  const { query, values } = buildSafeUpdate('tag', id, updates as Record<string, unknown>, TAG_COLUMNS, false);
   await d.execute(query, values);
 }
 
