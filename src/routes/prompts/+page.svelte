@@ -20,14 +20,14 @@
 	let edCategory = $state('general');
 	let edLanguage = $state('');
 
-	let filteredPrompts = $derived(() => {
+	let filteredPrompts = $derived.by(() => {
 		let filtered = prompts;
 		if (activeCategory !== 'all') filtered = filtered.filter(p => p.category === activeCategory);
 		if (searchQuery) filtered = filtered.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase()) || p.content.toLowerCase().includes(searchQuery.toLowerCase()));
 		return filtered;
 	});
 
-	let detectedVars = $derived(() => {
+	let detectedVars = $derived.by(() => {
 		const matches = edContent.match(/\{\{(\w+)\}\}/g) || [];
 		return [...new Set(matches.map(m => m.replace(/[{}]/g, '')))];
 	});
@@ -62,7 +62,7 @@
 
 	async function handleSave() {
 		if (!edTitle.trim() || !edContent.trim()) { toasts.warning('Title and content are required'); return; }
-		const vars = detectedVars();
+		const vars = detectedVars;
 		if (editingPrompt) {
 			await updatePrompt(editingPrompt.id, { title: edTitle, content: edContent, category: edCategory as Prompt['category'], language: edLanguage || null, variables: vars.length ? JSON.stringify(vars.map(v => ({ name: v, default_value: '' }))) : null });
 		} else {
@@ -138,10 +138,10 @@
 						</select>
 					</div>
 					<textarea bind:value={edContent} placeholder="Write your prompt... Use {'{{'}variable{'}}'} for template variables" rows={10} class="input-field resize-none font-mono" style="font-size: var(--text-sm);"></textarea>
-					{#if detectedVars().length > 0}
+					{#if detectedVars.length > 0}
 						<div class="flex items-center gap-2 flex-wrap">
 							<span class="font-medium" style="font-size: var(--text-xs); color: var(--text-tertiary);">Variables:</span>
-							{#each detectedVars() as v}
+							{#each detectedVars as v}
 								<span class="rounded-lg px-2.5 py-1 font-mono" style="font-size: var(--text-xs); background: var(--bg-active); color: var(--text-accent);">{`{{${v}}}`}</span>
 							{/each}
 						</div>
@@ -154,7 +154,7 @@
 			</div>
 		{:else}
 			<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-				{#each filteredPrompts() as prompt (prompt.id)}
+				{#each filteredPrompts as prompt (prompt.id)}
 					<div class="group rounded-2xl border p-5 transition-all duration-150 hover:shadow-md" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
 						<div class="flex items-start justify-between mb-2">
 							<h3 class="font-semibold" style="font-size: var(--text-base); color: var(--text-primary);">{prompt.title}</h3>
@@ -181,7 +181,7 @@
 					</div>
 				{/each}
 			</div>
-			{#if filteredPrompts().length === 0}
+			{#if filteredPrompts.length === 0}
 				<div class="flex flex-col items-center justify-center py-24">
 					<Icon icon="ph:chat-dots" width={56} height={56} style="color: var(--text-tertiary); opacity: 0.3;" />
 					<p class="mt-4 text-sm" style="color: var(--text-tertiary);">{searchQuery ? 'No matching prompts' : 'No prompts yet'}</p>

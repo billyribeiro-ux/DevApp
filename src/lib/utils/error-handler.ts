@@ -51,11 +51,8 @@ function normalizeError(error: unknown): AppError {
 		return new AppError(ErrorCode.UNKNOWN_ERROR, error.message);
 	}
 
-	if (typeof error === 'object' && error !== null) {
-		const err = error as { code?: string; message?: string };
-		if (err.code && err.message) {
-			return AppError.fromTauriError(error);
-		}
+	if (typeof error === 'object' && error !== null && 'code' in error && 'message' in error) {
+		return AppError.fromTauriError(error);
 	}
 
 	return new AppError(ErrorCode.UNKNOWN_ERROR, String(error));

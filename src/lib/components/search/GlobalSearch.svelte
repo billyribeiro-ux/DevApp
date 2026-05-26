@@ -51,7 +51,7 @@
   let recentSearches = $state<string[]>([]);
 
   // Fuse.js instance
-  let fuse = $derived(() => {
+  let fuse = $derived.by(() => {
     return new Fuse(allItems, {
       keys: ['title', 'preview'],
       threshold: 0.4,
@@ -60,18 +60,17 @@
     });
   });
 
-  let searchResults = $derived(() => {
+  let searchResults = $derived.by(() => {
     if (!query.trim()) return [];
-    const results = fuse().search(query.trim());
+    const results = fuse.search(query.trim());
     return results.map((r) => r.item);
   });
 
-  let groupedResults = $derived(() => {
-    const results = searchResults();
+  let groupedResults = $derived.by(() => {
     const groups: { type: SearchItem['type']; label: string; items: SearchItem[] }[] = [];
 
     for (const type of CATEGORY_ORDER) {
-      const items = results.filter((r) => r.type === type);
+      const items = searchResults.filter((r) => r.type === type);
       if (items.length > 0) {
         groups.push({ type, label: CATEGORY_LABELS[type], items });
       }
@@ -80,12 +79,12 @@
     return groups;
   });
 
-  let flatResults = $derived(() => {
-    return groupedResults().flatMap((g) => g.items);
+  let flatResults = $derived.by(() => {
+    return groupedResults.flatMap((g) => g.items);
   });
 
   let hasQuery = $derived(query.trim().length > 0);
-  let hasResults = $derived(flatResults().length > 0);
+  let hasResults = $derived(flatResults.length > 0);
 
   // Reset selection on query change
   $effect(() => {
@@ -227,7 +226,7 @@
   }
 
   function handleKeydown(e: KeyboardEvent) {
-    const results = flatResults();
+    const results = flatResults;
 
     switch (e.key) {
       case 'ArrowDown':
@@ -288,7 +287,7 @@
   }
 
   function getItemGlobalIndex(item: SearchItem): number {
-    return flatResults().indexOf(item);
+    return flatResults.indexOf(item);
   }
 </script>
 
@@ -385,7 +384,7 @@
         <!-- Search results -->
         {:else if hasResults}
           <div class="py-2">
-            {#each groupedResults() as group (group.type)}
+            {#each groupedResults as group (group.type)}
               <div class="px-4 pt-2 pb-1">
                 <span class="text-[10px] font-semibold text-[var(--text-tertiary)] uppercase tracking-wider flex items-center gap-1.5">
                   <Icon icon={TYPE_META[group.type].icon} class="text-xs" />
@@ -471,7 +470,7 @@
         </div>
         {#if hasQuery && hasResults}
           <span class="text-[10px] text-[var(--text-tertiary)]">
-            {flatResults().length} results
+            {flatResults.length} results
           </span>
         {/if}
       </div>

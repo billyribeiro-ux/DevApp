@@ -19,7 +19,7 @@
 	let cUrl = $state('');
 	let cDescription = $state('');
 
-	let filteredCourses = $derived(() => {
+	let filteredCourses = $derived.by(() => {
 		if (activeFilter === 'all') return courses;
 		return courses.filter(c => c.status === activeFilter);
 	});
@@ -120,7 +120,7 @@
 			</div>
 		{:else}
 			<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-				{#each filteredCourses() as course (course.id)}
+				{#each filteredCourses as course (course.id)}
 					<div class="rounded-2xl border p-6 transition-all duration-150 hover:shadow-md" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
 						<div class="flex items-start justify-between mb-3">
 							<div>
@@ -169,7 +169,7 @@
 					</div>
 				{/each}
 			</div>
-			{#if filteredCourses().length === 0}
+			{#if filteredCourses.length === 0}
 				<div class="flex flex-col items-center justify-center py-24">
 					<Icon icon="ph:graduation-cap" width={56} height={56} style="color: var(--text-tertiary); opacity: 0.3;" />
 					<p class="mt-4 text-sm" style="color: var(--text-tertiary);">No courses yet</p>

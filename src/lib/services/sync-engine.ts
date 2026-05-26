@@ -8,19 +8,7 @@ import { pushToCloud, pullFromCloud, isAuthenticated, type SyncRecord } from './
 import { getDb } from './database-wrapper';
 import { logger } from '$lib/utils/logger';
 import { sync } from '$stores/app.svelte';
-
-interface SyncQueueItem {
-	id: string;
-	entity_type: string;
-	entity_id: string;
-	action: 'upsert' | 'delete';
-	payload: string | null;
-	status: string;
-	retry_count: number;
-	error_message: string | null;
-	created_at: string;
-	processed_at: string | null;
-}
+import type { SyncQueueItem } from '$types';
 
 let syncInterval: ReturnType<typeof setInterval> | null = null;
 let isSyncing = false;

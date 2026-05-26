@@ -19,7 +19,7 @@
 	let fPriority = $state<Reminder['priority']>('medium');
 	let fRecurrence = $state<Reminder['recurrence']>('none');
 
-	let filteredReminders = $derived(() => {
+	let filteredReminders = $derived.by(() => {
 		if (activeFilter === 'all') return reminders;
 		return reminders.filter(r => r.status === activeFilter);
 	});
@@ -148,7 +148,7 @@
 			</div>
 		{:else}
 			<div class="space-y-3">
-				{#each filteredReminders() as reminder (reminder.id)}
+				{#each filteredReminders as reminder (reminder.id)}
 					<div class="flex items-center gap-4 rounded-2xl border p-5 transition-all duration-150" style="background: var(--bg-card); border-color: var(--border-default); border-left: 3px solid {getPriorityColor(reminder.priority)}; box-shadow: var(--shadow-card);">
 						<button onclick={() => handleComplete(reminder.id)} class="shrink-0 rounded-lg border-2 w-6 h-6 flex items-center justify-center transition-colors" style="border-color: {reminder.status === 'completed' ? 'var(--color-success)' : 'var(--border-default)'}; background: {reminder.status === 'completed' ? 'var(--color-success)' : 'transparent'};">
 							{#if reminder.status === 'completed'}
@@ -185,7 +185,7 @@
 					</div>
 				{/each}
 			</div>
-			{#if filteredReminders().length === 0}
+			{#if filteredReminders.length === 0}
 				<div class="flex flex-col items-center justify-center py-24">
 					<Icon icon="ph:bell" width={56} height={56} style="color: var(--text-tertiary); opacity: 0.3;" />
 					<p class="mt-4 text-sm" style="color: var(--text-tertiary);">{activeFilter === 'all' ? 'No reminders yet' : `No ${activeFilter} reminders`}</p>
