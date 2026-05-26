@@ -104,9 +104,9 @@ export async function transaction<T>(
 }
 
 const ALLOWED_TABLES = new Set([
-	'workspaces', 'folders', 'files', 'notes', 'prompts',
-	'reminders', 'courses', 'course_sections', 'course_lessons',
-	'snippets', 'tags', 'sync_queue', 'activity_log',
+	'workspace', 'folder', 'file', 'note', 'prompt',
+	'reminder', 'course', 'course_section', 'course_lesson',
+	'snippet', 'tag', 'sync_queue', 'activity',
 ]);
 
 const IDENTIFIER_RE = /^[a-zA-Z_][a-zA-Z0-9_]*$/;

@@ -107,7 +107,7 @@ class VaultStore {
   );
 
   rootFolders = $derived(
-    this.folders.filter(f => f.parent_id === null && f.is_deleted === 0)
+    this.folders.filter(f => f.parent_id === null && f.is_deleted === 0 && f.workspace_id === this.currentWorkspaceId)
   );
 
   selectedFiles = $derived(
@@ -220,8 +220,8 @@ const MAX_NAV_HISTORY = 100;
 class NavStore {
   activePath = $state('/');
   breadcrumbs = $state<{ label: string; href: string }[]>([]);
-  history = $state<string[]>([]);
-  historyIndex = $state(-1);
+  history = $state<string[]>(['/']);
+  historyIndex = $state(0);
 
   navigate(path: string) {
     this.activePath = path;

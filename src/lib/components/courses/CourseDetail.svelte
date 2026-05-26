@@ -8,11 +8,13 @@
     sections,
     onupdatecourse,
     ontogglelesson,
+    onsavenotes,
   }: {
     course: Course;
     sections: CourseSection[];
     onupdatecourse: (updates: Partial<Course>) => void;
     ontogglelesson: (lessonId: string, completed: boolean) => void;
+    onsavenotes?: (lessonId: string, notes: string) => void;
   } = $props();
 
   const STATUS_LABELS: Record<Course['status'], string> = {
@@ -79,6 +81,14 @@
     editingNotes = lesson.id;
     // svelte-ignore state_referenced_locally
     noteText = lesson.notes ?? '';
+  }
+
+  function saveNotes() {
+    if (editingNotes) {
+      onsavenotes?.(editingNotes, noteText);
+    }
+    editingNotes = null;
+    noteText = '';
   }
 
   function closeNotes() {
@@ -385,7 +395,7 @@
             type="button"
             class="px-3 py-1.5 rounded-[var(--radius-md)] text-xs font-medium text-white
               bg-[var(--color-primary-600)] hover:bg-[var(--color-primary-700)] transition-colors"
-            onclick={closeNotes}
+            onclick={saveNotes}
           >
             Save Notes
           </button>

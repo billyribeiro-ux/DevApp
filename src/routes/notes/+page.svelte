@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import Icon from '@iconify/svelte';
 	import { nav, toasts, vault } from '$stores/app.svelte';
 	import { getNotes, createNote, updateNote, deleteNote, getFolders } from '$services/database';
 	import { formatRelativeDate, countWords } from '$utils/formatters';
+	import { handleError } from '$lib/utils/error-handler';
 	import ConfirmDialog from '$lib/components/ui/ConfirmDialog.svelte';
 	import type { Note } from '$types';
 	import { v4 as uuid } from 'uuid';
@@ -26,45 +27,56 @@
 	);
 	let wordCount = $derived(countWords(editContent));
 
-	let saveTimeout: ReturnType<typeof setTimeout>;
+	let saveTimeout: ReturnType<typeof setTimeout> | undefined;
 
 	function autoSave() {
 		clearTimeout(saveTimeout);
 		unsaved = true;
+		const noteId = activeNoteId;
+		const title = editTitle;
+		const content = editContent;
+		const wc = wordCount;
 		saveTimeout = setTimeout(async () => {
-			if (activeNoteId) {
-				await updateNote(activeNoteId, {
-					title: editTitle || 'Untitled Note',
-					content_text: editContent,
-					content_json: JSON.stringify({ text: editContent }),
-					word_count: wordCount
-				});
-				unsaved = false;
-				notes = await getNotes();
+			if (noteId) {
+				try {
+					await updateNote(noteId, {
+						title: title || 'Untitled Note',
+						content_text: content,
+						content_json: JSON.stringify({ text: content }),
+						word_count: wc
+					});
+					if (activeNoteId === noteId) unsaved = false;
+					notes = await getNotes();
+				} catch (err) { handleError(err, 'Auto-save'); }
 			}
 		}, 1000);
 	}
 
-	async function handleCreate() {
-		// Use the Notes folder from the workspace, or the first available folder
-		let folderId = notesFolderId;
-		if (!folderId) {
-			const notesFolder = vault.folders.find(f => f.folder_type === 'notes' && f.is_deleted === 0);
-			folderId = notesFolder?.id ?? vault.folders[0]?.id;
-		}
-		if (!folderId) { toasts.error('No folder available', 'Create a folder first'); return; }
+	onDestroy(() => {
+		clearTimeout(saveTimeout);
+	});
 
-		const id = uuid();
-		await createNote({ id, folder_id: folderId, title: 'Untitled Note', content_text: '', word_count: 0 });
-		notes = await getNotes();
-		selectNote(id);
-		toasts.success('Note Created');
+	async function handleCreate() {
+		try {
+			let folderId = notesFolderId;
+			if (!folderId) {
+				const notesFolder = vault.folders.find(f => f.folder_type === 'notes' && f.is_deleted === 0);
+				folderId = notesFolder?.id ?? vault.folders[0]?.id;
+			}
+			if (!folderId) { toasts.error('No folder available', 'Create a folder first'); return; }
+
+			const id = uuid();
+			await createNote({ id, folder_id: folderId, title: 'Untitled Note', content_text: '', word_count: 0 });
+			notes = await getNotes();
+			selectNote(id);
+			toasts.success('Note Created');
+		} catch (err) { handleError(err, 'Create Note'); }
 	}
 
 	function selectNote(id: string) {
 		if (unsaved && activeNoteId) {
-			// Save current before switching
-			updateNote(activeNoteId, { title: editTitle, content_text: editContent, word_count: wordCount });
+			clearTimeout(saveTimeout);
+			updateNote(activeNoteId, { title: editTitle, content_text: editContent, word_count: wordCount }).catch(err => handleError(err, 'Save note'));
 		}
 		activeNoteId = id;
 		const note = notes.find(n => n.id === id);
@@ -84,28 +96,32 @@
 		if (!pendingDeleteId) return;
 		const id = pendingDeleteId;
 		pendingDeleteId = null;
-		await deleteNote(id);
-		if (activeNoteId === id) {
-			activeNoteId = null;
-			editTitle = '';
-			editContent = '';
-		}
-		notes = await getNotes();
-		toasts.success('Note Deleted');
+		try {
+			await deleteNote(id);
+			if (activeNoteId === id) {
+				activeNoteId = null;
+				editTitle = '';
+				editContent = '';
+			}
+			notes = await getNotes();
+			toasts.success('Note Deleted');
+		} catch (err) { handleError(err, 'Delete Note'); }
 	}
 
 	async function handleSave() {
 		if (!activeNoteId) return;
 		clearTimeout(saveTimeout);
-		await updateNote(activeNoteId, {
-			title: editTitle || 'Untitled Note',
-			content_text: editContent,
-			content_json: JSON.stringify({ text: editContent }),
-			word_count: wordCount
-		});
-		unsaved = false;
-		notes = await getNotes();
-		toasts.success('Note Saved');
+		try {
+			await updateNote(activeNoteId, {
+				title: editTitle || 'Untitled Note',
+				content_text: editContent,
+				content_json: JSON.stringify({ text: editContent }),
+				word_count: wordCount
+			});
+			unsaved = false;
+			notes = await getNotes();
+			toasts.success('Note Saved');
+		} catch (err) { handleError(err, 'Save Note'); }
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
@@ -127,7 +143,7 @@
 		nav.navigate('/notes');
 		try {
 			notes = await getNotes();
-		} catch (e) { console.error(e); }
+		} catch (err) { handleError(err, 'Load Notes'); }
 	});
 </script>
 

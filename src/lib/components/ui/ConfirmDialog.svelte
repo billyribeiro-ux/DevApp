@@ -34,7 +34,14 @@
 	function handleKeydown(e: KeyboardEvent) {
 		if (!open) return;
 		if (e.key === 'Escape') handleCancel();
-		if (e.key === 'Enter') handleConfirm();
+	}
+
+	function handleDialogKeydown(e: KeyboardEvent) {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			e.stopPropagation();
+			handleConfirm();
+		}
 	}
 
 	const iconMap = {
@@ -67,10 +74,12 @@
 		role="presentation"
 	>
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 		<div
 			class="w-full max-w-sm rounded-2xl border p-6 animate-scale-in"
 			style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-xl);"
 			onclick={(e) => e.stopPropagation()}
+			onkeydown={handleDialogKeydown}
 			role="dialog"
 			aria-modal="true"
 			aria-label={title}

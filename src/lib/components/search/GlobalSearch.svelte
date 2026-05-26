@@ -1,7 +1,7 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
   import Fuse from 'fuse.js';
-  import { ui } from '$stores/app.svelte';
+  import { ui, nav } from '$stores/app.svelte';
   import { scaleIn } from '$utils/animations';
   import {
     getNotes,
@@ -259,13 +259,24 @@
     });
   }
 
+  const TYPE_ROUTES: Record<SearchItem['type'], string> = {
+    file: '/vault',
+    note: '/notes',
+    prompt: '/prompts',
+    course: '/courses',
+    snippet: '/snippets',
+    reminder: '/reminders',
+  };
+
   function selectResult(item: SearchItem) {
-    // Track recent search
     if (query.trim()) {
       addRecentSearch(query.trim());
     }
     close();
-    // Navigation would happen here via an event/callback
+    const route = TYPE_ROUTES[item.type];
+    if (route) {
+      nav.navigate(route);
+    }
   }
 
   function addRecentSearch(term: string) {

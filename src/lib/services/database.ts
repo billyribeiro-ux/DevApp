@@ -431,8 +431,13 @@ export async function getEntityTags(entityType: string, entityId: string): Promi
 
 export async function tagEntity(tagId: string, entityType: string, entityId: string): Promise<void> {
   const d = await getDb();
+  const existing: { tag_id: string }[] = await d.select(
+    'SELECT tag_id FROM taggable WHERE tag_id = $1 AND entity_type = $2 AND entity_id = $3',
+    [tagId, entityType, entityId]
+  );
+  if (existing.length > 0) return;
   await d.execute(
-    'INSERT OR IGNORE INTO taggable (tag_id, entity_type, entity_id) VALUES ($1, $2, $3)',
+    'INSERT INTO taggable (tag_id, entity_type, entity_id) VALUES ($1, $2, $3)',
     [tagId, entityType, entityId]
   );
   await d.execute('UPDATE tag SET usage_count = usage_count + 1 WHERE id = $1', [tagId]);

@@ -177,7 +177,7 @@
 
 	<!-- Toasts -->
 	{#if toasts.toasts.length > 0}
-		<div class="fixed top-4 right-4 z-50 flex flex-col gap-3 pointer-events-none" style="max-width: 420px;">
+		<div class="fixed top-4 right-4 z-50 flex flex-col gap-3 pointer-events-none" style="max-width: 420px;" role="status" aria-live="polite">
 			{#each toasts.toasts as toast (toast.id)}
 				<div
 					class="vibrancy pointer-events-auto flex items-start gap-3 rounded-2xl border px-5 py-4 shadow-lg animate-slide-down"

@@ -56,12 +56,13 @@ async function processSyncQueue(): Promise<void> {
 
 	isSyncing = true;
 	sync.status = 'syncing';
+	let pending: SyncQueueItem[] = [];
 
 	try {
 		const db = await getDb();
-		
+
 		// Get pending items
-		const pending = await db.select<SyncQueueItem[]>(
+		pending = await db.select<SyncQueueItem[]>(
 			`SELECT * FROM sync_queue 
 			 WHERE status = 'pending' AND retry_count < $1 
 			 ORDER BY created_at ASC 
@@ -79,14 +80,37 @@ async function processSyncQueue(): Promise<void> {
 		sync.pendingCount = pending.length;
 		logger.info(`Processing ${pending.length} sync queue items`);
 
-		// Convert to sync records
-		const records: SyncRecord[] = pending.map(item => ({
-			entity_type: item.entity_type,
-			entity_id: item.entity_id,
-			action: item.action,
-			data: item.payload ? JSON.parse(item.payload) : {},
-			client_updated_at: item.created_at
-		}));
+		// Convert to sync records, skipping malformed payloads
+		const records: SyncRecord[] = [];
+		const skippedIds: string[] = [];
+		for (const item of pending) {
+			try {
+				records.push({
+					entity_type: item.entity_type,
+					entity_id: item.entity_id,
+					action: item.action,
+					data: item.payload ? JSON.parse(item.payload) : {},
+					client_updated_at: item.created_at
+				});
+			} catch {
+				logger.warn('Skipping sync item with malformed payload', { id: item.id });
+				skippedIds.push(item.id);
+			}
+		}
+
+		// Mark malformed items as failed
+		for (const id of skippedIds) {
+			await db.execute(
+				`UPDATE sync_queue SET status = 'failed', error_message = 'Malformed JSON payload' WHERE id = $1`,
+				[id]
+			);
+		}
+
+		if (records.length === 0) {
+			sync.status = skippedIds.length > 0 ? 'error' : 'synced';
+			isSyncing = false;
+			return;
+		}
 
 		// Push to cloud
 		const result = await pushToCloud(records);
@@ -126,16 +150,23 @@ async function processSyncQueue(): Promise<void> {
 		logger.error('Sync queue processing failed', error as Error);
 		sync.status = 'error';
 		
-		// Mark failed items
-		const db = await getDb();
-		await db.execute(
-			`UPDATE sync_queue 
-			 SET retry_count = retry_count + 1, 
-			     error_message = $1,
-			     status = CASE WHEN retry_count + 1 >= $2 THEN 'failed' ELSE 'pending' END
-			 WHERE status = 'pending'`,
-			[(error as Error).message, MAX_RETRIES]
-		);
+		// Mark only the attempted batch items as failed (not all pending)
+		try {
+			const db = await getDb();
+			const pendingIds = pending.map(p => p.id);
+			for (const id of pendingIds) {
+				await db.execute(
+					`UPDATE sync_queue
+					 SET retry_count = retry_count + 1,
+					     error_message = $1,
+					     status = CASE WHEN retry_count + 1 >= $2 THEN 'failed' ELSE 'pending' END
+					 WHERE id = $3`,
+					[(error as Error).message, MAX_RETRIES, id]
+				);
+			}
+		} catch (dbError) {
+			logger.error('Failed to update sync queue after error', dbError as Error);
+		}
 	} finally {
 		isSyncing = false;
 	}

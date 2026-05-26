@@ -5,6 +5,8 @@
 	import { getPrompts, createPrompt, updatePrompt, deletePrompt, incrementPromptUsage } from '$services/database';
 	import { PROMPT_CATEGORIES, LANGUAGES } from '$config/constants';
 	import { formatRelativeDate } from '$utils/formatters';
+	import { handleError } from '$lib/utils/error-handler';
+	import ConfirmDialog from '$lib/components/ui/ConfirmDialog.svelte';
 	import type { Prompt } from '$types';
 	import { v4 as uuid } from 'uuid';
 
@@ -60,28 +62,44 @@
 		showEditor = true;
 	}
 
+	let confirmDeleteOpen = $state(false);
+	let pendingDeleteId = $state<string | null>(null);
+
 	async function handleSave() {
 		if (!edTitle.trim() || !edContent.trim()) { toasts.warning('Title and content are required'); return; }
-		const vars = detectedVars;
-		if (editingPrompt) {
-			await updatePrompt(editingPrompt.id, { title: edTitle, content: edContent, category: edCategory as Prompt['category'], language: edLanguage || null, variables: vars.length ? JSON.stringify(vars.map(v => ({ name: v, default_value: '' }))) : null });
-		} else {
-			await createPrompt({ id: uuid(), title: edTitle, content: edContent, category: edCategory as Prompt['category'], language: edLanguage || null, variables: vars.length ? JSON.stringify(vars.map(v => ({ name: v, default_value: '' }))) : null });
-		}
-		prompts = await getPrompts();
-		showEditor = false;
-		toasts.success(editingPrompt ? 'Prompt Updated' : 'Prompt Created');
+		try {
+			const vars = detectedVars;
+			if (editingPrompt) {
+				await updatePrompt(editingPrompt.id, { title: edTitle, content: edContent, category: edCategory as Prompt['category'], language: edLanguage || null, variables: vars.length ? JSON.stringify(vars.map(v => ({ name: v, default_value: '' }))) : null });
+			} else {
+				await createPrompt({ id: uuid(), title: edTitle, content: edContent, category: edCategory as Prompt['category'], language: edLanguage || null, variables: vars.length ? JSON.stringify(vars.map(v => ({ name: v, default_value: '' }))) : null });
+			}
+			prompts = await getPrompts();
+			showEditor = false;
+			toasts.success(editingPrompt ? 'Prompt Updated' : 'Prompt Created');
+		} catch (err) { handleError(err, 'Save Prompt'); }
 	}
 
-	async function handleDelete(id: string) {
-		await deletePrompt(id);
-		prompts = await getPrompts();
-		toasts.success('Prompt Deleted');
+	function requestDelete(id: string) {
+		pendingDeleteId = id;
+		confirmDeleteOpen = true;
+	}
+
+	async function handleDelete() {
+		if (!pendingDeleteId) return;
+		const id = pendingDeleteId;
+		pendingDeleteId = null;
+		try {
+			await deletePrompt(id);
+			prompts = await getPrompts();
+			toasts.success('Prompt Deleted');
+		} catch (err) { handleError(err, 'Delete Prompt'); }
 	}
 
 	onMount(async () => {
 		nav.navigate('/prompts');
-		prompts = await getPrompts();
+		try { prompts = await getPrompts(); }
+		catch (err) { handleError(err, 'Load Prompts'); }
 	});
 </script>
 
@@ -173,6 +191,7 @@
 							<span style="font-size: var(--text-xs); color: var(--text-tertiary);">Used {prompt.usage_count}x</span>
 							<div class="flex items-center gap-1.5">
 								<button onclick={() => startEdit(prompt)} class="rounded-xl px-3 py-1.5 transition-colors" style="font-size: var(--text-xs); color: var(--text-secondary);">Edit</button>
+								<button onclick={() => requestDelete(prompt.id)} class="rounded-xl p-1.5 transition-colors" style="color: var(--text-tertiary);"><Icon icon="ph:trash" width={14} height={14} /></button>
 								<button onclick={() => handleCopy(prompt)} class="rounded-xl px-4 py-1.5 font-medium text-white transition-colors" style="font-size: var(--text-xs); background: var(--color-primary-600);">
 									<Icon icon="ph:copy" width={13} height={13} style="display: inline; vertical-align: -1px;" /> Copy
 								</button>
@@ -191,3 +210,12 @@
 		{/if}
 	</div>
 </div>
+
+<ConfirmDialog
+	bind:open={confirmDeleteOpen}
+	title="Delete Prompt"
+	description="This prompt will be moved to trash."
+	confirmLabel="Delete"
+	variant="danger"
+	onconfirm={handleDelete}
+/>

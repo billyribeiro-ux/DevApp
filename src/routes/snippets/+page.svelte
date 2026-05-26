@@ -4,6 +4,7 @@
 	import { nav, toasts } from '$stores/app.svelte';
 	import { getSnippets, createSnippet, updateSnippet, deleteSnippet } from '$services/database';
 	import { LANGUAGES } from '$config/constants';
+	import { handleError } from '$lib/utils/error-handler';
 	import ConfirmDialog from '$lib/components/ui/ConfirmDialog.svelte';
 	import type { Snippet } from '$types';
 	import { v4 as uuid } from 'uuid';
@@ -54,14 +55,16 @@
 
 	async function handleSave() {
 		if (!sTitle.trim() || !sCode.trim()) { toasts.warning('Title and code are required'); return; }
-		if (editingSnippet) {
-			await updateSnippet(editingSnippet.id, { title: sTitle, code: sCode, language: sLanguage, description: sDescription || null });
-		} else {
-			await createSnippet({ id: uuid(), title: sTitle, code: sCode, language: sLanguage, description: sDescription || null });
-		}
-		snippets = await getSnippets();
-		showEditor = false;
-		toasts.success(editingSnippet ? 'Snippet Updated' : 'Snippet Created');
+		try {
+			if (editingSnippet) {
+				await updateSnippet(editingSnippet.id, { title: sTitle, code: sCode, language: sLanguage, description: sDescription || null });
+			} else {
+				await createSnippet({ id: uuid(), title: sTitle, code: sCode, language: sLanguage, description: sDescription || null });
+			}
+			snippets = await getSnippets();
+			showEditor = false;
+			toasts.success(editingSnippet ? 'Snippet Updated' : 'Snippet Created');
+		} catch (err) { handleError(err, 'Save Snippet'); }
 	}
 
 	let confirmDeleteOpen = $state(false);
@@ -76,14 +79,17 @@
 		if (!pendingDeleteId) return;
 		const id = pendingDeleteId;
 		pendingDeleteId = null;
-		await deleteSnippet(id);
-		snippets = await getSnippets();
-		toasts.success('Snippet Deleted');
+		try {
+			await deleteSnippet(id);
+			snippets = await getSnippets();
+			toasts.success('Snippet Deleted');
+		} catch (err) { handleError(err, 'Delete Snippet'); }
 	}
 
 	onMount(async () => {
 		nav.navigate('/snippets');
-		snippets = await getSnippets();
+		try { snippets = await getSnippets(); }
+		catch (err) { handleError(err, 'Load Snippets'); }
 	});
 </script>
 

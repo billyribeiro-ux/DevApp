@@ -4,6 +4,8 @@
 	import { nav, toasts } from '$stores/app.svelte';
 	import { getReminders, createReminder, updateReminder, completeReminder, deleteReminder } from '$services/database';
 	import { formatRelativeDate, formatDate, getPriorityColor } from '$utils/formatters';
+	import { handleError } from '$lib/utils/error-handler';
+	import ConfirmDialog from '$lib/components/ui/ConfirmDialog.svelte';
 	import type { Reminder } from '$types';
 	import { v4 as uuid } from 'uuid';
 
@@ -19,8 +21,13 @@
 	let fPriority = $state<Reminder['priority']>('medium');
 	let fRecurrence = $state<Reminder['recurrence']>('none');
 
+	function isOverdue(r: Reminder): boolean {
+		return r.status === 'pending' && !!r.due_date && new Date(r.due_date) < new Date();
+	}
+
 	let filteredReminders = $derived.by(() => {
 		if (activeFilter === 'all') return reminders;
+		if (activeFilter === 'overdue') return reminders.filter(isOverdue);
 		return reminders.filter(r => r.status === activeFilter);
 	});
 
@@ -52,33 +59,51 @@
 		showForm = true;
 	}
 
+	let confirmDeleteOpen = $state(false);
+	let pendingDeleteId = $state<string | null>(null);
+
 	async function handleSave() {
 		if (!fTitle.trim()) { toasts.warning('Title is required'); return; }
-		if (editingReminder) {
-			await updateReminder(editingReminder.id, { title: fTitle, description: fDescription || null, due_date: fDueDate || null, due_time: fDueTime || null, priority: fPriority, recurrence: fRecurrence });
-		} else {
-			await createReminder({ id: uuid(), title: fTitle, description: fDescription || null, due_date: fDueDate || null, due_time: fDueTime || null, priority: fPriority, recurrence: fRecurrence });
-		}
-		reminders = await getReminders();
-		showForm = false;
-		toasts.success(editingReminder ? 'Reminder Updated' : 'Reminder Created');
+		try {
+			if (editingReminder) {
+				await updateReminder(editingReminder.id, { title: fTitle, description: fDescription || null, due_date: fDueDate || null, due_time: fDueTime || null, priority: fPriority, recurrence: fRecurrence });
+			} else {
+				await createReminder({ id: uuid(), title: fTitle, description: fDescription || null, due_date: fDueDate || null, due_time: fDueTime || null, priority: fPriority, recurrence: fRecurrence });
+			}
+			reminders = await getReminders();
+			showForm = false;
+			toasts.success(editingReminder ? 'Reminder Updated' : 'Reminder Created');
+		} catch (err) { handleError(err, 'Save Reminder'); }
 	}
 
 	async function handleComplete(id: string) {
-		await completeReminder(id);
-		reminders = await getReminders();
-		toasts.success('Reminder Completed');
+		try {
+			await completeReminder(id);
+			reminders = await getReminders();
+			toasts.success('Reminder Completed');
+		} catch (err) { handleError(err, 'Complete Reminder'); }
 	}
 
-	async function handleDelete(id: string) {
-		await deleteReminder(id);
-		reminders = await getReminders();
-		toasts.success('Reminder Deleted');
+	function requestDelete(id: string) {
+		pendingDeleteId = id;
+		confirmDeleteOpen = true;
+	}
+
+	async function handleDelete() {
+		if (!pendingDeleteId) return;
+		const id = pendingDeleteId;
+		pendingDeleteId = null;
+		try {
+			await deleteReminder(id);
+			reminders = await getReminders();
+			toasts.success('Reminder Deleted');
+		} catch (err) { handleError(err, 'Delete Reminder'); }
 	}
 
 	onMount(async () => {
 		nav.navigate('/reminders');
-		reminders = await getReminders();
+		try { reminders = await getReminders(); }
+		catch (err) { handleError(err, 'Load Reminders'); }
 	});
 </script>
 
@@ -178,7 +203,7 @@
 							<button onclick={() => startEdit(reminder)} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);">
 								<Icon icon="ph:pencil" width={16} height={16} />
 							</button>
-							<button onclick={() => handleDelete(reminder.id)} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);">
+							<button onclick={() => requestDelete(reminder.id)} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);">
 								<Icon icon="ph:trash" width={16} height={16} />
 							</button>
 						</div>
@@ -194,3 +219,12 @@
 		{/if}
 	</div>
 </div>
+
+<ConfirmDialog
+	bind:open={confirmDeleteOpen}
+	title="Delete Reminder"
+	description="This reminder will be moved to trash."
+	confirmLabel="Delete"
+	variant="danger"
+	onconfirm={handleDelete}
+/>
