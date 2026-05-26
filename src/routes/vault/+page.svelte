@@ -40,6 +40,7 @@
 			currentFiles = [];
 			subfolders = vault.rootFolders;
 		}
+		vault.files = currentFiles;
 	}
 
 	async function navigateToFolder(folderId: string, name: string) {

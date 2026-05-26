@@ -89,7 +89,10 @@ impl Clone for CommandError {
             CommandError::PermissionDenied(s) => CommandError::PermissionDenied(s.clone()),
             CommandError::InvalidPath(s) => CommandError::InvalidPath(s.clone()),
             CommandError::PathTraversal(s) => CommandError::PathTraversal(s.clone()),
-            CommandError::FileTooLarge { size, max } => CommandError::FileTooLarge { size: *size, max: *max },
+            CommandError::FileTooLarge { size, max } => CommandError::FileTooLarge {
+                size: *size,
+                max: *max,
+            },
             CommandError::InvalidFileType(s) => CommandError::InvalidFileType(s.clone()),
             CommandError::Io(e) => CommandError::Io(std::io::Error::new(e.kind(), e.to_string())),
             CommandError::Database(s) => CommandError::Database(s.clone()),
@@ -101,4 +104,3 @@ impl Clone for CommandError {
 }
 
 pub type CommandResult<T> = Result<T, CommandError>;
-

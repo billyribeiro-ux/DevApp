@@ -3,6 +3,7 @@
 	import Icon from '@iconify/svelte';
 	import { nav } from '$stores/app.svelte';
 	import { getActivities } from '$services/database';
+	import { handleError } from '$lib/utils/error-handler';
 	import { formatRelativeDate } from '$utils/formatters';
 	import type { Activity } from '$types';
 
@@ -30,7 +31,8 @@
 
 	onMount(async () => {
 		nav.navigate('/activity');
-		activities = await getActivities(100);
+		try { activities = await getActivities(100); }
+		catch (err) { handleError(err, 'Load Activities'); }
 	});
 </script>
 

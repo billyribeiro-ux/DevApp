@@ -22,8 +22,7 @@ pub fn run() {
         .with_line_number(true)
         .finish();
 
-    tracing::subscriber::set_global_default(subscriber)
-        .expect("Failed to set tracing subscriber");
+    tracing::subscriber::set_global_default(subscriber).expect("Failed to set tracing subscriber");
 
     info!("Starting DevVault application");
 
@@ -52,7 +51,10 @@ pub fn run() {
             }
 
             // Create vault directory on startup
-            let app_data = app.path().app_data_dir().expect("Failed to get app data dir");
+            let app_data = app
+                .path()
+                .app_data_dir()
+                .expect("Failed to get app data dir");
             let vault_path = app_data.join("vault");
             if !vault_path.exists() {
                 info!("Creating vault directory: {:?}", vault_path);
