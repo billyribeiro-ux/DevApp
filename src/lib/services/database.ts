@@ -14,6 +14,10 @@ const PROMPT_COLUMNS = new Set(['folder_id', 'title', 'content', 'category', 'la
 const REMINDER_COLUMNS = new Set(['folder_id', 'title', 'description', 'due_date', 'due_time', 'recurrence', 'priority', 'status', 'linked_file_id', 'linked_note_id', 'notify_before_minutes', 'completed_at', 'is_deleted']);
 const COURSE_COLUMNS = new Set(['folder_id', 'name', 'instructor', 'platform', 'url', 'description', 'thumbnail_path', 'progress_percent', 'total_lessons', 'completed_lessons', 'status', 'started_at', 'completed_at', 'rating', 'notes', 'is_deleted']);
 const SNIPPET_COLUMNS = new Set(['folder_id', 'title', 'code', 'language', 'description', 'is_favorited', 'usage_count', 'is_deleted']);
+const TAG_COLUMNS = new Set(['name', 'color']);
+const WORKSPACE_COLUMNS = new Set(['name', 'icon', 'color', 'sort_order', 'is_default', 'is_deleted']);
+const COURSE_SECTION_COLUMNS = new Set(['name', 'sort_order']);
+const COURSE_LESSON_COLUMNS = new Set(['name', 'duration_minutes', 'sort_order', 'is_completed', 'completed_at', 'notes']);
 
 function buildSafeUpdate(table: string, id: string, updates: Record<string, unknown>, allowedColumns: Set<string>): { query: string; values: unknown[] } {
   const fields: string[] = [];
@@ -48,6 +52,17 @@ export async function createWorkspace(workspace: Partial<Workspace>): Promise<vo
     'INSERT INTO workspace (id, name, icon, color, sort_order, is_default) VALUES ($1, $2, $3, $4, $5, $6)',
     [workspace.id, workspace.name, workspace.icon ?? 'folder', workspace.color ?? '#6366f1', workspace.sort_order ?? 0, workspace.is_default ?? 0]
   );
+}
+
+export async function updateWorkspace(id: string, updates: Partial<Workspace>): Promise<void> {
+  const d = await getDb();
+  const { query, values } = buildSafeUpdate('workspace', id, updates as Record<string, unknown>, WORKSPACE_COLUMNS);
+  await d.execute(query, values);
+}
+
+export async function deleteWorkspace(id: string): Promise<void> {
+  const d = await getDb();
+  await d.execute("UPDATE workspace SET is_deleted = 1, updated_at = datetime('now') WHERE id = $1", [id]);
 }
 
 // ============================================
@@ -128,6 +143,7 @@ export async function createFile(file: Partial<VaultFile>): Promise<void> {
      file.size_bytes ?? 0, file.local_path ?? null, file.cloud_path ?? null,
      file.content_hash ?? null, file.is_favorited ?? 0, file.is_pinned ?? 0]
   );
+  if (file.id) indexEntity('file', file.id, file.name ?? '', file.extension ?? '').catch(() => {});
 }
 
 export async function updateFile(id: string, updates: Partial<VaultFile>): Promise<void> {
@@ -139,11 +155,13 @@ export async function updateFile(id: string, updates: Partial<VaultFile>): Promi
 export async function deleteFile(id: string): Promise<void> {
   const d = await getDb();
   await d.execute("UPDATE file SET is_deleted = 1, updated_at = datetime('now') WHERE id = $1", [id]);
+  removeFromIndex(id).catch(() => {});
 }
 
 export async function permanentDeleteFile(id: string): Promise<void> {
   const d = await getDb();
   await d.execute('DELETE FROM file WHERE id = $1', [id]);
+  removeFromIndex(id).catch(() => {});
 }
 
 export async function getTrashFiles(): Promise<VaultFile[]> {
@@ -183,6 +201,7 @@ export async function createNote(note: Partial<Note>): Promise<void> {
     'INSERT INTO note (id, folder_id, title, content_json, content_text, content_html, word_count) VALUES ($1, $2, $3, $4, $5, $6, $7)',
     [note.id, note.folder_id, note.title ?? 'Untitled Note', note.content_json ?? null, note.content_text ?? null, note.content_html ?? null, note.word_count ?? 0]
   );
+  if (note.id) indexEntity('note', note.id, note.title ?? 'Untitled Note', note.content_text ?? '').catch(() => {});
 }
 
 export async function updateNote(id: string, updates: Partial<Note>): Promise<void> {
@@ -194,6 +213,7 @@ export async function updateNote(id: string, updates: Partial<Note>): Promise<vo
 export async function deleteNote(id: string): Promise<void> {
   const d = await getDb();
   await d.execute("UPDATE note SET is_deleted = 1, updated_at = datetime('now') WHERE id = $1", [id]);
+  removeFromIndex(id).catch(() => {});
 }
 
 // ============================================
@@ -217,6 +237,7 @@ export async function createPrompt(prompt: Partial<Prompt>): Promise<void> {
     'INSERT INTO prompt (id, folder_id, title, content, category, language, variables) VALUES ($1, $2, $3, $4, $5, $6, $7)',
     [prompt.id, prompt.folder_id ?? null, prompt.title, prompt.content, prompt.category ?? 'general', prompt.language ?? null, prompt.variables ?? null]
   );
+  if (prompt.id) indexEntity('prompt', prompt.id, prompt.title ?? '', prompt.content ?? '', prompt.category).catch(() => {});
 }
 
 export async function updatePrompt(id: string, updates: Partial<Prompt>): Promise<void> {
@@ -228,6 +249,7 @@ export async function updatePrompt(id: string, updates: Partial<Prompt>): Promis
 export async function deletePrompt(id: string): Promise<void> {
   const d = await getDb();
   await d.execute("UPDATE prompt SET is_deleted = 1, updated_at = datetime('now') WHERE id = $1", [id]);
+  removeFromIndex(id).catch(() => {});
 }
 
 export async function incrementPromptUsage(id: string): Promise<void> {
@@ -259,6 +281,7 @@ export async function createReminder(reminder: Partial<Reminder>): Promise<void>
     'INSERT INTO reminder (id, folder_id, title, description, due_date, due_time, recurrence, priority, status, notify_before_minutes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',
     [reminder.id, reminder.folder_id ?? null, reminder.title, reminder.description ?? null, reminder.due_date ?? null, reminder.due_time ?? null, reminder.recurrence ?? 'none', reminder.priority ?? 'medium', reminder.status ?? 'pending', reminder.notify_before_minutes ?? 15]
   );
+  if (reminder.id) indexEntity('reminder', reminder.id, reminder.title ?? '', reminder.description ?? '', reminder.priority).catch(() => {});
 }
 
 export async function updateReminder(id: string, updates: Partial<Reminder>): Promise<void> {
@@ -286,6 +309,7 @@ export async function uncompleteReminder(id: string): Promise<void> {
 export async function deleteReminder(id: string): Promise<void> {
   const d = await getDb();
   await d.execute("UPDATE reminder SET is_deleted = 1, updated_at = datetime('now') WHERE id = $1", [id]);
+  removeFromIndex(id).catch(() => {});
 }
 
 // ============================================
@@ -315,6 +339,7 @@ export async function createCourse(course: Partial<Course>): Promise<void> {
     'INSERT INTO course (id, folder_id, name, instructor, platform, url, description, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
     [course.id, course.folder_id, course.name, course.instructor ?? null, course.platform ?? null, course.url ?? null, course.description ?? null, course.status ?? 'not_started']
   );
+  if (course.id) indexEntity('course', course.id, course.name ?? '', [course.instructor, course.platform, course.description].filter(Boolean).join(' ')).catch(() => {});
 }
 
 export async function updateCourse(id: string, updates: Partial<Course>): Promise<void> {
@@ -326,6 +351,7 @@ export async function updateCourse(id: string, updates: Partial<Course>): Promis
 export async function deleteCourse(id: string): Promise<void> {
   const d = await getDb();
   await d.execute("UPDATE course SET is_deleted = 1, updated_at = datetime('now') WHERE id = $1", [id]);
+  removeFromIndex(id).catch(() => {});
 }
 
 export async function getCourseSections(courseId: string): Promise<CourseSection[]> {
@@ -341,6 +367,18 @@ export async function createCourseSection(section: Partial<CourseSection>): Prom
   );
 }
 
+export async function updateCourseSection(id: string, updates: Partial<CourseSection>): Promise<void> {
+  const d = await getDb();
+  const { query, values } = buildSafeUpdate('course_section', id, updates as Record<string, unknown>, COURSE_SECTION_COLUMNS);
+  await d.execute(query, values);
+}
+
+export async function deleteCourseSection(id: string): Promise<void> {
+  const d = await getDb();
+  await d.execute('DELETE FROM course_lesson WHERE section_id = $1', [id]);
+  await d.execute('DELETE FROM course_section WHERE id = $1', [id]);
+}
+
 export async function getCourseLessons(sectionId: string): Promise<CourseLesson[]> {
   const d = await getDb();
   return d.select('SELECT * FROM course_lesson WHERE section_id = $1 ORDER BY sort_order', [sectionId]);
@@ -352,6 +390,17 @@ export async function createCourseLesson(lesson: Partial<CourseLesson>): Promise
     'INSERT INTO course_lesson (id, section_id, course_id, name, duration_minutes, sort_order) VALUES ($1, $2, $3, $4, $5, $6)',
     [lesson.id, lesson.section_id, lesson.course_id, lesson.name, lesson.duration_minutes ?? null, lesson.sort_order ?? 0]
   );
+}
+
+export async function updateCourseLesson(id: string, updates: Partial<CourseLesson>): Promise<void> {
+  const d = await getDb();
+  const { query, values } = buildSafeUpdate('course_lesson', id, updates as Record<string, unknown>, COURSE_LESSON_COLUMNS);
+  await d.execute(query, values);
+}
+
+export async function deleteCourseLesson(id: string): Promise<void> {
+  const d = await getDb();
+  await d.execute('DELETE FROM course_lesson WHERE id = $1', [id]);
 }
 
 export async function toggleLessonComplete(id: string, completed: boolean): Promise<void> {
@@ -383,6 +432,7 @@ export async function createSnippet(snippet: Partial<Snippet>): Promise<void> {
     'INSERT INTO snippet (id, folder_id, title, code, language, description) VALUES ($1, $2, $3, $4, $5, $6)',
     [snippet.id, snippet.folder_id ?? null, snippet.title, snippet.code, snippet.language ?? 'plaintext', snippet.description ?? null]
   );
+  if (snippet.id) indexEntity('snippet', snippet.id, snippet.title ?? '', snippet.code ?? '', snippet.language).catch(() => {});
 }
 
 export async function updateSnippet(id: string, updates: Partial<Snippet>): Promise<void> {
@@ -394,6 +444,7 @@ export async function updateSnippet(id: string, updates: Partial<Snippet>): Prom
 export async function deleteSnippet(id: string): Promise<void> {
   const d = await getDb();
   await d.execute("UPDATE snippet SET is_deleted = 1, updated_at = datetime('now') WHERE id = $1", [id]);
+  removeFromIndex(id).catch(() => {});
 }
 
 // ============================================
@@ -411,6 +462,27 @@ export async function createTag(tag: Partial<Tag>): Promise<void> {
     'INSERT INTO tag (id, name, color) VALUES ($1, $2, $3)',
     [tag.id, tag.name, tag.color ?? '#6366f1']
   );
+}
+
+export async function updateTag(id: string, updates: Partial<Tag>): Promise<void> {
+  const d = await getDb();
+  const { query, values } = buildSafeUpdate('tag', id, updates as Record<string, unknown>, TAG_COLUMNS);
+  await d.execute(query, values);
+}
+
+export async function deleteTag(id: string): Promise<void> {
+  const d = await getDb();
+  await d.execute('DELETE FROM taggable WHERE tag_id = $1', [id]);
+  await d.execute('DELETE FROM tag WHERE id = $1', [id]);
+}
+
+export async function untagEntity(tagId: string, entityType: string, entityId: string): Promise<void> {
+  const d = await getDb();
+  await d.execute(
+    'DELETE FROM taggable WHERE tag_id = $1 AND entity_type = $2 AND entity_id = $3',
+    [tagId, entityType, entityId]
+  );
+  await d.execute('UPDATE tag SET usage_count = MAX(usage_count - 1, 0) WHERE id = $1', [tagId]);
 }
 
 export async function getEntityTags(entityType: string, entityId: string): Promise<Tag[]> {
@@ -474,10 +546,9 @@ export async function searchAll(query: string): Promise<SearchResult[]> {
 
 export async function indexEntity(entityType: string, entityId: string, title: string, content: string, tags?: string): Promise<void> {
   const d = await getDb();
+  await d.execute('DELETE FROM search_index WHERE entity_id = $1', [entityId]);
   await d.execute(
-    `INSERT INTO search_index (entity_type, entity_id, title, content, tags)
-     VALUES ($1, $2, $3, $4, $5)
-     ON CONFLICT(entity_id) DO UPDATE SET title = $3, content = $4, tags = $5`,
+    'INSERT INTO search_index (entity_type, entity_id, title, content, tags) VALUES ($1, $2, $3, $4, $5)',
     [entityType, entityId, title, content ?? '', tags ?? '']
   );
 }
@@ -485,6 +556,59 @@ export async function indexEntity(entityType: string, entityId: string, title: s
 export async function removeFromIndex(entityId: string): Promise<void> {
   const d = await getDb();
   await d.execute('DELETE FROM search_index WHERE entity_id = $1', [entityId]);
+}
+
+export async function rebuildSearchIndex(): Promise<void> {
+  const d = await getDb();
+  await d.execute('DELETE FROM search_index');
+
+  const notes: Note[] = await d.select('SELECT * FROM note WHERE is_deleted = 0');
+  for (const n of notes) {
+    await d.execute(
+      'INSERT INTO search_index (entity_type, entity_id, title, content, tags) VALUES ($1, $2, $3, $4, $5)',
+      ['note', n.id, n.title, n.content_text ?? '', '']
+    );
+  }
+
+  const prompts: Prompt[] = await d.select('SELECT * FROM prompt WHERE is_deleted = 0');
+  for (const p of prompts) {
+    await d.execute(
+      'INSERT INTO search_index (entity_type, entity_id, title, content, tags) VALUES ($1, $2, $3, $4, $5)',
+      ['prompt', p.id, p.title, p.content ?? '', p.category ?? '']
+    );
+  }
+
+  const courses: Course[] = await d.select('SELECT * FROM course WHERE is_deleted = 0');
+  for (const c of courses) {
+    await d.execute(
+      'INSERT INTO search_index (entity_type, entity_id, title, content, tags) VALUES ($1, $2, $3, $4, $5)',
+      ['course', c.id, c.name, [c.instructor, c.platform, c.description].filter(Boolean).join(' '), '']
+    );
+  }
+
+  const snippets: Snippet[] = await d.select('SELECT * FROM snippet WHERE is_deleted = 0');
+  for (const s of snippets) {
+    await d.execute(
+      'INSERT INTO search_index (entity_type, entity_id, title, content, tags) VALUES ($1, $2, $3, $4, $5)',
+      ['snippet', s.id, s.title, s.code ?? '', s.language ?? '']
+    );
+  }
+
+  const reminders: Reminder[] = await d.select('SELECT * FROM reminder WHERE is_deleted = 0');
+  for (const r of reminders) {
+    await d.execute(
+      'INSERT INTO search_index (entity_type, entity_id, title, content, tags) VALUES ($1, $2, $3, $4, $5)',
+      ['reminder', r.id, r.title, r.description ?? '', r.priority ?? '']
+    );
+  }
+
+  const files: VaultFile[] = await d.select('SELECT * FROM file WHERE is_deleted = 0');
+  for (const f of files) {
+    await d.execute(
+      'INSERT INTO search_index (entity_type, entity_id, title, content, tags) VALUES ($1, $2, $3, $4, $5)',
+      ['file', f.id, f.name, f.extension ?? '', '']
+    );
+  }
 }
 
 // ============================================

@@ -35,6 +35,10 @@ async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
     ...options,
     headers: { ...headers(), ...options.headers as Record<string, string> },
   });
+  if (res.status === 401) {
+    logout();
+    throw new Error('Session expired — please log in again');
+  }
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body.error || `HTTP ${res.status}`);

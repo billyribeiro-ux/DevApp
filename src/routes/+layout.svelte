@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
 	import { ui, theme, vault, toasts, nav, sync } from '$stores/app.svelte';
-	import { getWorkspaces, getFolders, seedDefaultData, purgeOldActivities } from '$services/database';
+	import { getWorkspaces, getFolders, seedDefaultData, purgeOldActivities, rebuildSearchIndex } from '$services/database';
 	import ErrorBoundary from '$lib/components/ui/ErrorBoundary.svelte';
 	import { handleError } from '$lib/utils/error-handler';
 	import { logger } from '$lib/utils/logger';
@@ -82,6 +82,7 @@
 				vault.folders = await getFolders(workspaces[0].id);
 			}
 			purgeOldActivities(90).catch(() => {});
+			rebuildSearchIndex().catch(() => {});
 			logger.info('Application initialized successfully');
 		} catch (err) {
 			handleError(err, 'Application Initialization');
