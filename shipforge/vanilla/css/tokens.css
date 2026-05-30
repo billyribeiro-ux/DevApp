@@ -1,0 +1,317 @@
+/* ================================================================
+ * SHIPFORGE — Design Tokens
+ * 
+ * Single source of truth for all visual design decisions.
+ * Every component references these tokens — never raw values.
+ * 
+ * Token naming convention: --sf-{category}-{property}-{variant}
+ * ================================================================ */
+
+:root {
+  /* ----------------------------------------------------------------
+   * COLOR — Brand Primary (Deep Indigo/Navy)
+   * ---------------------------------------------------------------- */
+  --sf-color-primary-50:  #f0f4ff;
+  --sf-color-primary-100: #dbe4ff;
+  --sf-color-primary-200: #bac8ff;
+  --sf-color-primary-300: #91a7ff;
+  --sf-color-primary-400: #748ffc;
+  --sf-color-primary-500: #5c7cfa;
+  --sf-color-primary-600: #4c6ef5;
+  --sf-color-primary-700: #3b5bdb;
+  --sf-color-primary-800: #364fc7;
+  --sf-color-primary-900: #1e3a5f;
+  --sf-color-primary-950: #0f1d30;
+
+  /* ----------------------------------------------------------------
+   * COLOR — Brand Accent (Electric Coral)
+   * ---------------------------------------------------------------- */
+  --sf-color-accent-50:  #fff5f5;
+  --sf-color-accent-100: #ffe3e3;
+  --sf-color-accent-200: #ffc9c9;
+  --sf-color-accent-300: #ffa8a8;
+  --sf-color-accent-400: #ff8787;
+  --sf-color-accent-500: #ff6b6b;
+  --sf-color-accent-600: #fa5252;
+  --sf-color-accent-700: #f03e3e;
+  --sf-color-accent-800: #e03131;
+  --sf-color-accent-900: #c92a2a;
+
+  /* ----------------------------------------------------------------
+   * COLOR — Neutral Scale
+   * ---------------------------------------------------------------- */
+  --sf-color-neutral-0:   #ffffff;
+  --sf-color-neutral-50:  #f8f9fa;
+  --sf-color-neutral-100: #f1f3f5;
+  --sf-color-neutral-200: #e9ecef;
+  --sf-color-neutral-300: #dee2e6;
+  --sf-color-neutral-400: #ced4da;
+  --sf-color-neutral-500: #adb5bd;
+  --sf-color-neutral-600: #868e96;
+  --sf-color-neutral-700: #495057;
+  --sf-color-neutral-800: #343a40;
+  --sf-color-neutral-900: #212529;
+  --sf-color-neutral-950: #0d1117;
+
+  /* ----------------------------------------------------------------
+   * COLOR — Semantic
+   * ---------------------------------------------------------------- */
+  --sf-color-success:     #51cf66;
+  --sf-color-success-bg:  rgba(81, 207, 102, 0.1);
+  --sf-color-warning:     #fcc419;
+  --sf-color-warning-bg:  rgba(252, 196, 25, 0.1);
+  --sf-color-error:       #ff6b6b;
+  --sf-color-error-bg:    rgba(255, 107, 107, 0.1);
+  --sf-color-info:        #339af0;
+  --sf-color-info-bg:     rgba(51, 154, 240, 0.1);
+
+  /* ----------------------------------------------------------------
+   * COLOR — Theme Tokens (Light Mode)
+   * Semantic aliases that swap in dark mode.
+   * ---------------------------------------------------------------- */
+  --sf-bg-body:           var(--sf-color-neutral-0);
+  --sf-bg-surface:        var(--sf-color-neutral-50);
+  --sf-bg-card:           var(--sf-color-neutral-0);
+  --sf-bg-card-hover:     var(--sf-color-neutral-100);
+  --sf-bg-nav:            rgba(255, 255, 255, 0.92);
+  --sf-bg-overlay:        rgba(0, 0, 0, 0.5);
+  --sf-bg-code:           var(--sf-color-neutral-100);
+  --sf-bg-accent-subtle:  var(--sf-color-primary-50);
+
+  --sf-border-default:    var(--sf-color-neutral-200);
+  --sf-border-subtle:     var(--sf-color-neutral-100);
+  --sf-border-strong:     var(--sf-color-neutral-300);
+  --sf-border-active:     var(--sf-color-primary-600);
+
+  --sf-text-primary:      var(--sf-color-neutral-900);
+  --sf-text-secondary:    var(--sf-color-neutral-700);
+  --sf-text-tertiary:     var(--sf-color-neutral-600);
+  --sf-text-inverse:      var(--sf-color-neutral-0);
+  --sf-text-accent:       var(--sf-color-primary-600);
+  --sf-text-link:         var(--sf-color-primary-600);
+  --sf-text-link-hover:   var(--sf-color-primary-700);
+
+  /* ----------------------------------------------------------------
+   * TYPOGRAPHY — Font Families
+   * ---------------------------------------------------------------- */
+  --sf-font-sans:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                     Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  --sf-font-mono:    'JetBrains Mono', 'SF Mono', 'Fira Code', 'Cascadia Code',
+                     Consolas, monospace;
+  --sf-font-display: var(--sf-font-sans);
+
+  /* ----------------------------------------------------------------
+   * TYPOGRAPHY — Size Scale (Major Third — 1.25 ratio)
+   * ---------------------------------------------------------------- */
+  --sf-text-xs:   0.75rem;    /* 12px */
+  --sf-text-sm:   0.875rem;   /* 14px */
+  --sf-text-base: 1rem;       /* 16px */
+  --sf-text-lg:   1.125rem;   /* 18px */
+  --sf-text-xl:   1.25rem;    /* 20px */
+  --sf-text-2xl:  1.5rem;     /* 24px */
+  --sf-text-3xl:  1.875rem;   /* 30px */
+  --sf-text-4xl:  2.25rem;    /* 36px */
+  --sf-text-5xl:  3rem;       /* 48px */
+  --sf-text-6xl:  3.75rem;    /* 60px */
+
+  /* ----------------------------------------------------------------
+   * TYPOGRAPHY — Font Weights
+   * ---------------------------------------------------------------- */
+  --sf-weight-normal:    400;
+  --sf-weight-medium:    500;
+  --sf-weight-semibold:  600;
+  --sf-weight-bold:      700;
+  --sf-weight-extrabold: 800;
+
+  /* ----------------------------------------------------------------
+   * TYPOGRAPHY — Line Heights
+   * ---------------------------------------------------------------- */
+  --sf-leading-none:     1;
+  --sf-leading-tight:    1.2;
+  --sf-leading-snug:     1.375;
+  --sf-leading-normal:   1.5;
+  --sf-leading-relaxed:  1.625;
+  --sf-leading-loose:    2;
+
+  /* ----------------------------------------------------------------
+   * TYPOGRAPHY — Letter Spacing
+   * ---------------------------------------------------------------- */
+  --sf-tracking-tighter: -0.05em;
+  --sf-tracking-tight:   -0.025em;
+  --sf-tracking-normal:  0;
+  --sf-tracking-wide:    0.025em;
+  --sf-tracking-wider:   0.05em;
+  --sf-tracking-widest:  0.1em;
+
+  /* ----------------------------------------------------------------
+   * SPACING — 4px Base Unit
+   * ---------------------------------------------------------------- */
+  --sf-space-0:   0;
+  --sf-space-px:  1px;
+  --sf-space-0-5: 0.125rem;  /*  2px */
+  --sf-space-1:   0.25rem;   /*  4px */
+  --sf-space-1-5: 0.375rem;  /*  6px */
+  --sf-space-2:   0.5rem;    /*  8px */
+  --sf-space-2-5: 0.625rem;  /* 10px */
+  --sf-space-3:   0.75rem;   /* 12px */
+  --sf-space-4:   1rem;      /* 16px */
+  --sf-space-5:   1.25rem;   /* 20px */
+  --sf-space-6:   1.5rem;    /* 24px */
+  --sf-space-8:   2rem;      /* 32px */
+  --sf-space-10:  2.5rem;    /* 40px */
+  --sf-space-12:  3rem;      /* 48px */
+  --sf-space-16:  4rem;      /* 64px */
+  --sf-space-20:  5rem;      /* 80px */
+  --sf-space-24:  6rem;      /* 96px */
+  --sf-space-32:  8rem;      /* 128px */
+
+  /* ----------------------------------------------------------------
+   * BORDER RADIUS
+   * ---------------------------------------------------------------- */
+  --sf-radius-sm:   0.375rem;  /*  6px */
+  --sf-radius-md:   0.5rem;    /*  8px */
+  --sf-radius-lg:   0.75rem;   /* 12px */
+  --sf-radius-xl:   1rem;      /* 16px */
+  --sf-radius-2xl:  1.5rem;    /* 24px */
+  --sf-radius-full: 9999px;
+
+  /* ----------------------------------------------------------------
+   * SHADOWS — Elevation Scale
+   * ---------------------------------------------------------------- */
+  --sf-shadow-xs:    0 1px 2px rgba(0, 0, 0, 0.05);
+  --sf-shadow-sm:    0 1px 3px rgba(0, 0, 0, 0.1),
+                     0 1px 2px rgba(0, 0, 0, 0.06);
+  --sf-shadow-md:    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                     0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --sf-shadow-lg:    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+                     0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --sf-shadow-xl:    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+                     0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --sf-shadow-2xl:   0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --sf-shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+
+  /* ----------------------------------------------------------------
+   * TRANSITIONS
+   * ---------------------------------------------------------------- */
+  --sf-ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --sf-ease-in:      cubic-bezier(0.4, 0, 1, 1);
+  --sf-ease-out:     cubic-bezier(0, 0, 0.2, 1);
+  --sf-ease-in-out:  cubic-bezier(0.4, 0, 0.2, 1);
+  --sf-ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --sf-duration-75:  75ms;
+  --sf-duration-100: 100ms;
+  --sf-duration-150: 150ms;
+  --sf-duration-200: 200ms;
+  --sf-duration-300: 300ms;
+  --sf-duration-500: 500ms;
+
+  --sf-transition-fast: 150ms var(--sf-ease-default);
+  --sf-transition-base: 250ms var(--sf-ease-default);
+  --sf-transition-slow: 350ms var(--sf-ease-default);
+
+  /* ----------------------------------------------------------------
+   * Z-INDEX — Layer Scale
+   * ---------------------------------------------------------------- */
+  --sf-z-behind:   -1;
+  --sf-z-base:     0;
+  --sf-z-raised:   10;
+  --sf-z-dropdown: 20;
+  --sf-z-sticky:   30;
+  --sf-z-nav:      40;
+  --sf-z-overlay:  50;
+  --sf-z-modal:    60;
+  --sf-z-toast:    70;
+  --sf-z-max:      9999;
+
+  /* ----------------------------------------------------------------
+   * LAYOUT — Container & Component Dimensions
+   * ---------------------------------------------------------------- */
+  --sf-container-sm:  640px;
+  --sf-container-md:  768px;
+  --sf-container-lg:  1024px;
+  --sf-container-xl:  1280px;
+  --sf-container-2xl: 1400px;
+
+  --sf-nav-height:          72px;
+  --sf-nav-height-scrolled: 60px;
+}
+
+/* ==================================================================
+ * DARK MODE — Theme Token Overrides
+ *
+ * Dual strategy:
+ * 1. @media query for automatic OS preference detection
+ * 2. .dark class for JavaScript-driven manual toggle
+ *
+ * The :not(.light) guard prevents the media query from overriding
+ * an explicit user choice of light mode.
+ * ================================================================== */
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --sf-bg-body:          var(--sf-color-neutral-950);
+    --sf-bg-surface:       #161b22;
+    --sf-bg-card:          #1c2128;
+    --sf-bg-card-hover:    #272e37;
+    --sf-bg-nav:           rgba(13, 17, 23, 0.92);
+    --sf-bg-code:          #1c2128;
+    --sf-bg-accent-subtle: rgba(76, 110, 245, 0.1);
+
+    --sf-border-default:   #30363d;
+    --sf-border-subtle:    #21262d;
+    --sf-border-strong:    #484f58;
+    --sf-border-active:    var(--sf-color-primary-400);
+
+    --sf-text-primary:     #e6edf3;
+    --sf-text-secondary:   #8b949e;
+    --sf-text-tertiary:    #6e7681;
+    --sf-text-accent:      var(--sf-color-primary-400);
+    --sf-text-link:        var(--sf-color-primary-400);
+    --sf-text-link-hover:  var(--sf-color-primary-300);
+
+    --sf-shadow-xs:    0 1px 2px rgba(0, 0, 0, 0.2);
+    --sf-shadow-sm:    0 1px 3px rgba(0, 0, 0, 0.3),
+                       0 1px 2px rgba(0, 0, 0, 0.2);
+    --sf-shadow-md:    0 4px 6px -1px rgba(0, 0, 0, 0.4),
+                       0 2px 4px -2px rgba(0, 0, 0, 0.3);
+    --sf-shadow-lg:    0 10px 15px -3px rgba(0, 0, 0, 0.5),
+                       0 4px 6px -4px rgba(0, 0, 0, 0.4);
+    --sf-shadow-xl:    0 20px 25px -5px rgba(0, 0, 0, 0.6),
+                       0 8px 10px -6px rgba(0, 0, 0, 0.5);
+    --sf-shadow-2xl:   0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  }
+}
+
+.dark {
+  --sf-bg-body:          var(--sf-color-neutral-950);
+  --sf-bg-surface:       #161b22;
+  --sf-bg-card:          #1c2128;
+  --sf-bg-card-hover:    #272e37;
+  --sf-bg-nav:           rgba(13, 17, 23, 0.92);
+  --sf-bg-code:          #1c2128;
+  --sf-bg-accent-subtle: rgba(76, 110, 245, 0.1);
+
+  --sf-border-default:   #30363d;
+  --sf-border-subtle:    #21262d;
+  --sf-border-strong:    #484f58;
+  --sf-border-active:    var(--sf-color-primary-400);
+
+  --sf-text-primary:     #e6edf3;
+  --sf-text-secondary:   #8b949e;
+  --sf-text-tertiary:    #6e7681;
+  --sf-text-accent:      var(--sf-color-primary-400);
+  --sf-text-link:        var(--sf-color-primary-400);
+  --sf-text-link-hover:  var(--sf-color-primary-300);
+
+  --sf-shadow-xs:    0 1px 2px rgba(0, 0, 0, 0.2);
+  --sf-shadow-sm:    0 1px 3px rgba(0, 0, 0, 0.3),
+                     0 1px 2px rgba(0, 0, 0, 0.2);
+  --sf-shadow-md:    0 4px 6px -1px rgba(0, 0, 0, 0.4),
+                     0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --sf-shadow-lg:    0 10px 15px -3px rgba(0, 0, 0, 0.5),
+                     0 4px 6px -4px rgba(0, 0, 0, 0.4);
+  --sf-shadow-xl:    0 20px 25px -5px rgba(0, 0, 0, 0.6),
+                     0 8px 10px -6px rgba(0, 0, 0, 0.5);
+  --sf-shadow-2xl:   0 25px 50px -12px rgba(0, 0, 0, 0.7);
+}

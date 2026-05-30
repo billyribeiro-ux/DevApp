@@ -1,0 +1,190 @@
+/* ================================================================
+ * SHIPFORGE — Utility Classes
+ *
+ * Highest cascade priority (@layer utilities). Single-purpose
+ * classes for layout, accessibility, and print.
+ * ================================================================ */
+
+@layer utilities {
+
+  /* ----------------------------------------------------------------
+   * Accessibility — Screen Reader Only
+   * ---------------------------------------------------------------- */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* ----------------------------------------------------------------
+   * Accessibility — Skip Link
+   * ---------------------------------------------------------------- */
+  .sf-skip-link {
+    position: absolute;
+    top: -100%;
+    left: var(--sf-space-4);
+    z-index: var(--sf-z-max);
+    padding: var(--sf-space-2) var(--sf-space-4);
+    background: var(--sf-color-primary-600);
+    color: var(--sf-text-inverse);
+    border-radius: var(--sf-radius-md);
+    font-weight: var(--sf-weight-semibold);
+    font-size: var(--sf-text-sm);
+    text-decoration: none;
+    transition: top var(--sf-transition-fast);
+  }
+
+  .sf-skip-link:focus {
+    top: var(--sf-space-4);
+    color: var(--sf-text-inverse);
+  }
+
+  /* ----------------------------------------------------------------
+   * Layout — Container
+   * ---------------------------------------------------------------- */
+  .sf-container {
+    width: 100%;
+    max-width: var(--sf-container-xl);
+    margin-inline: auto;
+    padding-inline: var(--sf-space-4);
+  }
+
+  @media (min-width: 768px) {
+    .sf-container {
+      padding-inline: var(--sf-space-6);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .sf-container {
+      padding-inline: var(--sf-space-8);
+    }
+  }
+
+  .sf-container--narrow {
+    max-width: var(--sf-container-md);
+  }
+
+  .sf-container--wide {
+    max-width: var(--sf-container-2xl);
+  }
+
+  /* ----------------------------------------------------------------
+   * Layout — Section Spacing
+   * ---------------------------------------------------------------- */
+  .sf-section {
+    padding-block: var(--sf-space-16);
+  }
+
+  @media (min-width: 768px) {
+    .sf-section {
+      padding-block: var(--sf-space-20);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .sf-section {
+      padding-block: var(--sf-space-24);
+    }
+  }
+
+  /* ----------------------------------------------------------------
+   * Scroll Animation — Reveal on Scroll
+   *
+   * Elements with [data-animate] start hidden and become visible
+   * when IntersectionObserver adds .sf-animate--visible.
+   * ---------------------------------------------------------------- */
+  [data-animate] {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s var(--sf-ease-out),
+                transform 0.6s var(--sf-ease-out);
+  }
+
+  [data-animate].sf-animate--visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  [data-animate="fade"] {
+    transform: none;
+  }
+
+  [data-animate="scale"] {
+    transform: scale(0.95);
+  }
+
+  [data-animate="scale"].sf-animate--visible {
+    transform: scale(1);
+  }
+
+  /* Stagger children */
+  [data-animate-delay="1"] { transition-delay: 0.1s; }
+  [data-animate-delay="2"] { transition-delay: 0.2s; }
+  [data-animate-delay="3"] { transition-delay: 0.3s; }
+  [data-animate-delay="4"] { transition-delay: 0.4s; }
+
+  /* Respect reduced motion — elements appear immediately */
+  @media (prefers-reduced-motion: reduce) {
+    [data-animate] {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+
+  /* ----------------------------------------------------------------
+   * Text Utilities
+   * ---------------------------------------------------------------- */
+  .sf-text-gradient {
+    background: linear-gradient(
+      135deg,
+      var(--sf-color-primary-500),
+      var(--sf-color-accent-500)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* ----------------------------------------------------------------
+   * Print Styles
+   * ---------------------------------------------------------------- */
+  @media print {
+    .sf-nav,
+    .sf-nav__mobile,
+    .sf-footer__social,
+    .sf-cta,
+    .sf-skip-link,
+    .sf-nav__theme-toggle,
+    [data-animate] {
+      display: none !important;
+    }
+
+    body {
+      background: white !important;
+      color: black !important;
+      font-size: 12pt;
+    }
+
+    a[href^="http"]::after {
+      content: " (" attr(href) ")";
+      font-size: 0.8em;
+      color: #666;
+    }
+
+    .sf-section {
+      padding-block: 1rem;
+    }
+
+    * {
+      box-shadow: none !important;
+    }
+  }
+}
