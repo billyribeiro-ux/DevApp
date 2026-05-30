@@ -51,12 +51,13 @@ pub fn hash_file(path: String, app: AppHandle) -> CommandResult<FileHashResult> 
         return Err(CommandError::FileNotFound(path));
     }
 
+    // Validate file size via metadata BEFORE loading into memory
+    let metadata = fs::metadata(&validated_path)?;
+    validate_file_size(metadata.len())?;
+
     // Read and hash file
     let data = fs::read(&validated_path)?;
     let size = data.len() as u64;
-
-    // Validate file size
-    validate_file_size(size)?;
 
     let hash = blake3::hash(&data);
 
@@ -76,7 +77,10 @@ pub fn copy_file_to_vault(
     filename: String,
     app: AppHandle,
 ) -> CommandResult<String> {
-    info!("Copying file to vault: {} -> {}/{}", source, dest_folder, filename);
+    info!(
+        "Copying file to vault: {} -> {}/{}",
+        source, dest_folder, filename
+    );
 
     // Validate filename
     let validated_filename = validate_filename(&filename)?;
@@ -95,10 +99,14 @@ pub fn copy_file_to_vault(
         fs::create_dir_all(&dest_dir)?;
     }
 
-    // Validate source file
-    let source_path = PathBuf::from(&source);
-    if !source_path.exists() {
-        return Err(CommandError::FileNotFound(source));
+    // Validate source file — canonicalize to resolve symlinks and prevent traversal
+    let source_path = PathBuf::from(&source)
+        .canonicalize()
+        .map_err(|_| CommandError::FileNotFound(source.clone()))?;
+    if !source_path.is_file() {
+        return Err(CommandError::InvalidPath(
+            "Source must be a regular file".to_string(),
+        ));
     }
 
     // Check source file size
@@ -140,18 +148,29 @@ pub fn delete_vault_file(path: String, app: AppHandle) -> CommandResult<()> {
 pub fn ensure_directory(path: String, app: AppHandle) -> CommandResult<()> {
     info!("Ensuring directory exists: {}", path);
 
+    // Reject path traversal sequences before any path construction
+    if path.contains("..") {
+        return Err(CommandError::PathTraversal(format!(
+            "Path contains '..' which is not allowed: {}",
+            path
+        )));
+    }
+
     // Get vault path for validation
     let vault_path = get_vault_base_path(&app)?;
 
-    // Validate path (allow creation of new paths)
+    // Only allow relative paths within the vault — reject absolute paths
     let path_buf = PathBuf::from(&path);
-    let target_path = if path_buf.is_absolute() {
-        path_buf
-    } else {
-        vault_path.join(&path_buf)
-    };
+    if path_buf.is_absolute() {
+        return Err(CommandError::PathTraversal(format!(
+            "Absolute paths are not allowed: {}",
+            path
+        )));
+    }
 
-    // Ensure it's within vault
+    let target_path = vault_path.join(&path_buf);
+
+    // Ensure the resolved path is within vault (defense in depth)
     if !target_path.starts_with(&vault_path) {
         return Err(CommandError::PathTraversal(format!(
             "Path is outside vault: {}",
@@ -180,8 +199,11 @@ pub fn read_file_bytes(path: String, app: AppHandle) -> CommandResult<Vec<u8>> {
         return Err(CommandError::FileNotFound(path));
     }
 
+    // Validate size via metadata before loading into memory
+    let metadata = fs::metadata(&validated_path)?;
+    validate_file_size(metadata.len())?;
+
     let data = fs::read(&validated_path)?;
-    validate_file_size(data.len() as u64)?;
 
     info!("File read successfully: {} bytes", data.len());
 

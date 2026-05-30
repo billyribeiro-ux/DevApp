@@ -5,6 +5,7 @@
 	import { getFolders, getSubfolders, getFiles, createFile, createFolder, deleteFile, updateFile } from '$services/database';
 	import { formatFileSize, formatRelativeDate, getExtension } from '$utils/formatters';
 	import { getFileTypeInfo, FOLDER_TYPE_META } from '$config/constants';
+	import ConfirmDialog from '$lib/components/ui/ConfirmDialog.svelte';
 	import type { Folder, VaultFile } from '$types';
 	import { v4 as uuid } from 'uuid';
 
@@ -17,7 +18,7 @@
 	let showNewFolderInput = $state(false);
 	let newFolderName = $state('');
 
-	let sortedFiles = $derived(() => {
+	let sortedFiles = $derived.by(() => {
 		const files = [...currentFiles];
 		files.sort((a, b) => {
 			let cmp = 0;
@@ -39,6 +40,7 @@
 			currentFiles = [];
 			subfolders = vault.rootFolders;
 		}
+		vault.files = currentFiles;
 	}
 
 	async function navigateToFolder(folderId: string, name: string) {
@@ -99,7 +101,18 @@
 		}
 	}
 
-	async function handleDeleteFile(id: string) {
+	let confirmDeleteOpen = $state(false);
+	let pendingDeleteId = $state<string | null>(null);
+
+	function requestDeleteFile(id: string) {
+		pendingDeleteId = id;
+		confirmDeleteOpen = true;
+	}
+
+	async function handleDeleteFile() {
+		if (!pendingDeleteId) return;
+		const id = pendingDeleteId;
+		pendingDeleteId = null;
 		await deleteFile(id);
 		toasts.success('File Moved to Trash');
 		if (vault.currentFolderId) await loadFolder(vault.currentFolderId);
@@ -223,7 +236,7 @@
 
 					{#if ui.viewMode === 'grid'}
 						<div class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));">
-							{#each sortedFiles() as file (file.id)}
+							{#each sortedFiles as file (file.id)}
 								{@const typeInfo = getFileTypeInfo(file.extension)}
 								<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
 								<div
@@ -248,7 +261,7 @@
 										<button onclick={(e) => { e.stopPropagation(); toggleFavorite(file); }} class="rounded-md p-1" style="background: var(--bg-surface-raised);">
 											<Icon icon={file.is_favorited ? 'ph:star-fill' : 'ph:star'} width={12} height={12} style="color: var(--color-warning);" />
 										</button>
-										<button onclick={(e) => { e.stopPropagation(); handleDeleteFile(file.id); }} class="rounded-md p-1" style="background: var(--bg-surface-raised);">
+										<button onclick={(e) => { e.stopPropagation(); requestDeleteFile(file.id); }} class="rounded-md p-1" style="background: var(--bg-surface-raised);">
 											<Icon icon="ph:trash" width={12} height={12} style="color: var(--color-error);" />
 										</button>
 									</div>
@@ -261,7 +274,7 @@
 							<div class="grid grid-cols-[1fr,80px,80px,100px,60px] px-4 py-2 font-semibold uppercase tracking-wider border-b" style="font-size: var(--text-xs); color: var(--text-tertiary); border-color: var(--border-default); background: var(--bg-surface);">
 								<span>Name</span><span>Size</span><span>Type</span><span>Modified</span><span></span>
 							</div>
-							{#each sortedFiles() as file (file.id)}
+							{#each sortedFiles as file (file.id)}
 								{@const typeInfo = getFileTypeInfo(file.extension)}
 								<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
 								<div
@@ -282,7 +295,7 @@
 									<span class="text-xs uppercase" style="color: var(--text-tertiary);">{file.extension ?? '—'}</span>
 									<span class="text-xs" style="color: var(--text-tertiary);">{formatRelativeDate(file.updated_at)}</span>
 									<div class="flex items-center gap-1">
-										<button onclick={(e) => { e.stopPropagation(); handleDeleteFile(file.id); }} class="rounded-md p-1 opacity-0 hover:opacity-100 transition-opacity">
+										<button onclick={(e) => { e.stopPropagation(); requestDeleteFile(file.id); }} class="rounded-md p-1 opacity-0 hover:opacity-100 transition-opacity">
 											<Icon icon="ph:trash" width={14} height={14} style="color: var(--color-error);" />
 										</button>
 									</div>
@@ -310,6 +323,15 @@
 		<span>{vault.selectedFileIds.size > 0 ? `${vault.selectedFileIds.size} selected` : ''}</span>
 	</div>
 </div>
+
+<ConfirmDialog
+	bind:open={confirmDeleteOpen}
+	title="Delete File"
+	description="This file will be moved to trash. You can restore it later from the Trash page."
+	confirmLabel="Move to Trash"
+	variant="danger"
+	onconfirm={handleDeleteFile}
+/>
 
 <style>
 	button:hover {

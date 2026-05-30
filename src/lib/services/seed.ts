@@ -177,33 +177,37 @@ export async function seedDatabase() {
     await createReminder(reminder);
   }
 
+  // Create courses folder
+  const coursesFolderId = uuid();
+  await createFolder({
+    id: coursesFolderId,
+    workspace_id: workspaceId,
+    name: 'Courses',
+    folder_type: 'course',
+    sort_order: 2
+  });
+
   // Create sample courses
   const courses = [
     {
       id: uuid(),
+      folder_id: coursesFolderId,
       name: 'Complete React Developer Course',
       instructor: 'Andrew Mead',
       platform: 'Udemy',
       url: 'https://udemy.com',
       description: 'Master React by building real-world applications',
       status: 'in_progress' as const,
-      progress_percent: 35,
-      total_lessons: 200,
-      completed_lessons: 70,
-      start_date: new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString()
     },
     {
       id: uuid(),
+      folder_id: coursesFolderId,
       name: 'Node.js - The Complete Guide',
       instructor: 'Maximilian Schwarzmüller',
       platform: 'Udemy',
       url: 'https://udemy.com',
       description: 'Master Node.js, build REST APIs with Node.js, GraphQL APIs, add Authentication',
       status: 'in_progress' as const,
-      progress_percent: 60,
-      total_lessons: 150,
-      completed_lessons: 90,
-      start_date: new Date(now.getFullYear(), now.getMonth() - 2, 15).toISOString()
     }
   ];
 
@@ -225,18 +229,28 @@ export async function seedDatabase() {
 
 export async function clearDatabase() {
   const db = await getDb();
-  
-  await db.execute('DELETE FROM activity');
-  await db.execute('DELETE FROM course_lesson');
-  await db.execute('DELETE FROM course_section');
-  await db.execute('DELETE FROM course');
-  await db.execute('DELETE FROM snippet');
-  await db.execute('DELETE FROM reminder');
-  await db.execute('DELETE FROM prompt');
-  await db.execute('DELETE FROM note');
-  await db.execute('DELETE FROM file');
-  await db.execute('DELETE FROM folder');
-  await db.execute('DELETE FROM workspace');
-  
-  console.log('✅ Database cleared!');
+
+  await db.execute('BEGIN TRANSACTION');
+  try {
+    await db.execute('DELETE FROM taggable');
+    await db.execute('DELETE FROM sync_queue');
+    await db.execute('DELETE FROM activity');
+    await db.execute('DELETE FROM search_index');
+    await db.execute('DELETE FROM course_lesson');
+    await db.execute('DELETE FROM course_section');
+    await db.execute('DELETE FROM course');
+    await db.execute('DELETE FROM snippet');
+    await db.execute('DELETE FROM reminder');
+    await db.execute('DELETE FROM prompt');
+    await db.execute('DELETE FROM note');
+    await db.execute('DELETE FROM file');
+    await db.execute('DELETE FROM tag');
+    await db.execute('DELETE FROM folder');
+    await db.execute('DELETE FROM workspace');
+    await db.execute('DELETE FROM settings');
+    await db.execute('COMMIT');
+  } catch (error) {
+    await db.execute('ROLLBACK');
+    throw error;
+  }
 }

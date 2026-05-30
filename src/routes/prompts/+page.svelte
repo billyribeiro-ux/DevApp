@@ -5,6 +5,8 @@
 	import { getPrompts, createPrompt, updatePrompt, deletePrompt, incrementPromptUsage } from '$services/database';
 	import { PROMPT_CATEGORIES, LANGUAGES } from '$config/constants';
 	import { formatRelativeDate } from '$utils/formatters';
+	import { handleError } from '$lib/utils/error-handler';
+	import ConfirmDialog from '$lib/components/ui/ConfirmDialog.svelte';
 	import type { Prompt } from '$types';
 	import { v4 as uuid } from 'uuid';
 
@@ -20,14 +22,14 @@
 	let edCategory = $state('general');
 	let edLanguage = $state('');
 
-	let filteredPrompts = $derived(() => {
+	let filteredPrompts = $derived.by(() => {
 		let filtered = prompts;
 		if (activeCategory !== 'all') filtered = filtered.filter(p => p.category === activeCategory);
 		if (searchQuery) filtered = filtered.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase()) || p.content.toLowerCase().includes(searchQuery.toLowerCase()));
 		return filtered;
 	});
 
-	let detectedVars = $derived(() => {
+	let detectedVars = $derived.by(() => {
 		const matches = edContent.match(/\{\{(\w+)\}\}/g) || [];
 		return [...new Set(matches.map(m => m.replace(/[{}]/g, '')))];
 	});
@@ -60,28 +62,44 @@
 		showEditor = true;
 	}
 
+	let confirmDeleteOpen = $state(false);
+	let pendingDeleteId = $state<string | null>(null);
+
 	async function handleSave() {
 		if (!edTitle.trim() || !edContent.trim()) { toasts.warning('Title and content are required'); return; }
-		const vars = detectedVars();
-		if (editingPrompt) {
-			await updatePrompt(editingPrompt.id, { title: edTitle, content: edContent, category: edCategory as Prompt['category'], language: edLanguage || null, variables: vars.length ? JSON.stringify(vars.map(v => ({ name: v, default_value: '' }))) : null });
-		} else {
-			await createPrompt({ id: uuid(), title: edTitle, content: edContent, category: edCategory as Prompt['category'], language: edLanguage || null, variables: vars.length ? JSON.stringify(vars.map(v => ({ name: v, default_value: '' }))) : null });
-		}
-		prompts = await getPrompts();
-		showEditor = false;
-		toasts.success(editingPrompt ? 'Prompt Updated' : 'Prompt Created');
+		try {
+			const vars = detectedVars;
+			if (editingPrompt) {
+				await updatePrompt(editingPrompt.id, { title: edTitle, content: edContent, category: edCategory as Prompt['category'], language: edLanguage || null, variables: vars.length ? JSON.stringify(vars.map(v => ({ name: v, default_value: '' }))) : null });
+			} else {
+				await createPrompt({ id: uuid(), title: edTitle, content: edContent, category: edCategory as Prompt['category'], language: edLanguage || null, variables: vars.length ? JSON.stringify(vars.map(v => ({ name: v, default_value: '' }))) : null });
+			}
+			prompts = await getPrompts();
+			showEditor = false;
+			toasts.success(editingPrompt ? 'Prompt Updated' : 'Prompt Created');
+		} catch (err) { handleError(err, 'Save Prompt'); }
 	}
 
-	async function handleDelete(id: string) {
-		await deletePrompt(id);
-		prompts = await getPrompts();
-		toasts.success('Prompt Deleted');
+	function requestDelete(id: string) {
+		pendingDeleteId = id;
+		confirmDeleteOpen = true;
+	}
+
+	async function handleDelete() {
+		if (!pendingDeleteId) return;
+		const id = pendingDeleteId;
+		pendingDeleteId = null;
+		try {
+			await deletePrompt(id);
+			prompts = await getPrompts();
+			toasts.success('Prompt Deleted');
+		} catch (err) { handleError(err, 'Delete Prompt'); }
 	}
 
 	onMount(async () => {
 		nav.navigate('/prompts');
-		prompts = await getPrompts();
+		try { prompts = await getPrompts(); }
+		catch (err) { handleError(err, 'Load Prompts'); }
 	});
 </script>
 
@@ -138,10 +156,10 @@
 						</select>
 					</div>
 					<textarea bind:value={edContent} placeholder="Write your prompt... Use {'{{'}variable{'}}'} for template variables" rows={10} class="input-field resize-none font-mono" style="font-size: var(--text-sm);"></textarea>
-					{#if detectedVars().length > 0}
+					{#if detectedVars.length > 0}
 						<div class="flex items-center gap-2 flex-wrap">
 							<span class="font-medium" style="font-size: var(--text-xs); color: var(--text-tertiary);">Variables:</span>
-							{#each detectedVars() as v}
+							{#each detectedVars as v}
 								<span class="rounded-lg px-2.5 py-1 font-mono" style="font-size: var(--text-xs); background: var(--bg-active); color: var(--text-accent);">{`{{${v}}}`}</span>
 							{/each}
 						</div>
@@ -154,7 +172,7 @@
 			</div>
 		{:else}
 			<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-				{#each filteredPrompts() as prompt (prompt.id)}
+				{#each filteredPrompts as prompt (prompt.id)}
 					<div class="group rounded-2xl border p-5 transition-all duration-150 hover:shadow-md" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
 						<div class="flex items-start justify-between mb-2">
 							<h3 class="font-semibold" style="font-size: var(--text-base); color: var(--text-primary);">{prompt.title}</h3>
@@ -173,6 +191,7 @@
 							<span style="font-size: var(--text-xs); color: var(--text-tertiary);">Used {prompt.usage_count}x</span>
 							<div class="flex items-center gap-1.5">
 								<button onclick={() => startEdit(prompt)} class="rounded-xl px-3 py-1.5 transition-colors" style="font-size: var(--text-xs); color: var(--text-secondary);">Edit</button>
+								<button onclick={() => requestDelete(prompt.id)} class="rounded-xl p-1.5 transition-colors" style="color: var(--text-tertiary);"><Icon icon="ph:trash" width={14} height={14} /></button>
 								<button onclick={() => handleCopy(prompt)} class="rounded-xl px-4 py-1.5 font-medium text-white transition-colors" style="font-size: var(--text-xs); background: var(--color-primary-600);">
 									<Icon icon="ph:copy" width={13} height={13} style="display: inline; vertical-align: -1px;" /> Copy
 								</button>
@@ -181,7 +200,7 @@
 					</div>
 				{/each}
 			</div>
-			{#if filteredPrompts().length === 0}
+			{#if filteredPrompts.length === 0}
 				<div class="flex flex-col items-center justify-center py-24">
 					<Icon icon="ph:chat-dots" width={56} height={56} style="color: var(--text-tertiary); opacity: 0.3;" />
 					<p class="mt-4 text-sm" style="color: var(--text-tertiary);">{searchQuery ? 'No matching prompts' : 'No prompts yet'}</p>
@@ -191,3 +210,12 @@
 		{/if}
 	</div>
 </div>
+
+<ConfirmDialog
+	bind:open={confirmDeleteOpen}
+	title="Delete Prompt"
+	description="This prompt will be moved to trash."
+	confirmLabel="Delete"
+	variant="danger"
+	onconfirm={handleDelete}
+/>

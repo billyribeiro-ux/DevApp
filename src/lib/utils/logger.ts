@@ -115,25 +115,4 @@ class Logger {
 // Export singleton instance
 export const logger = new Logger();
 
-/**
- * Decorator for logging function calls (for future use)
- */
-export function logCall(target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
-	const originalMethod = descriptor.value;
-
-	descriptor.value = async function (...args: unknown[]) {
-		const endTimer = logger.startTimer(`${propertyKey}`);
-		try {
-			const result = await originalMethod.apply(this, args);
-			endTimer();
-			return result;
-		} catch (error) {
-			logger.error(`Error in ${propertyKey}`, error as Error);
-			endTimer();
-			throw error;
-		}
-	};
-
-	return descriptor;
-}
 

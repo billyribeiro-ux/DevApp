@@ -6,14 +6,15 @@ pub const MAX_FILE_SIZE: u64 = 100 * 1024 * 1024;
 
 /// Allowed file extensions for vault files
 pub const ALLOWED_EXTENSIONS: &[&str] = &[
-    "txt", "md", "json", "yaml", "yml", "toml", "rs", "js", "ts", "jsx", "tsx",
-    "py", "go", "java", "c", "cpp", "h", "hpp", "cs", "rb", "php", "swift",
-    "kt", "scala", "sh", "bash", "zsh", "fish", "sql", "html", "css", "scss",
-    "sass", "less", "xml", "svg", "pdf", "png", "jpg", "jpeg", "gif", "webp",
-    "mp4", "webm", "mp3", "wav", "zip", "tar", "gz", "7z", "rar",
+    "txt", "md", "json", "yaml", "yml", "toml", "rs", "js", "ts", "jsx", "tsx", "py", "go", "java",
+    "c", "cpp", "h", "hpp", "cs", "rb", "php", "swift", "kt", "scala", "sh", "bash", "zsh", "fish",
+    "sql", "html", "css", "scss", "sass", "less", "xml", "svg", "pdf", "png", "jpg", "jpeg", "gif",
+    "webp", "mp4", "webm", "mp3", "wav", "zip", "tar", "gz", "7z", "rar",
 ];
 
-/// Validates a file path to prevent path traversal attacks
+/// Validates a file path to prevent path traversal attacks.
+/// Handles both existing and not-yet-created paths by canonicalizing
+/// the nearest existing ancestor.
 pub fn validate_path(path: &str, base_path: &Path) -> CommandResult<PathBuf> {
     let path_buf = PathBuf::from(path);
 
@@ -25,19 +26,37 @@ pub fn validate_path(path: &str, base_path: &Path) -> CommandResult<PathBuf> {
         )));
     }
 
-    // Normalize the path
-    let canonical = if path_buf.is_absolute() {
-        path_buf.canonicalize().map_err(|e| {
-            CommandError::InvalidPath(format!("Failed to canonicalize path: {}", e))
-        })?
+    let target = if path_buf.is_absolute() {
+        path_buf.clone()
     } else {
-        base_path.join(&path_buf).canonicalize().map_err(|e| {
-            CommandError::InvalidPath(format!("Failed to canonicalize path: {}", e))
-        })?
+        base_path.join(&path_buf)
+    };
+
+    // Canonicalize base_path for consistent comparison
+    let canonical_base = base_path
+        .canonicalize()
+        .unwrap_or_else(|_| base_path.to_path_buf());
+
+    // Try to canonicalize the full path. If it doesn't exist yet,
+    // canonicalize the nearest existing ancestor and append the remainder.
+    let canonical = match target.canonicalize() {
+        Ok(p) => p,
+        Err(_) => {
+            let parent = target.parent().ok_or_else(|| {
+                CommandError::InvalidPath("Cannot determine parent directory".to_string())
+            })?;
+            let canonical_parent = parent.canonicalize().map_err(|e| {
+                CommandError::InvalidPath(format!("Failed to resolve parent path: {}", e))
+            })?;
+            let file_name = target.file_name().ok_or_else(|| {
+                CommandError::InvalidPath("Cannot determine file name".to_string())
+            })?;
+            canonical_parent.join(file_name)
+        }
     };
 
     // Ensure the path is within the base directory
-    if !canonical.starts_with(base_path) {
+    if !canonical.starts_with(&canonical_base) {
         return Err(CommandError::PathTraversal(format!(
             "Path is outside allowed directory: {}",
             canonical.display()
@@ -51,7 +70,9 @@ pub fn validate_path(path: &str, base_path: &Path) -> CommandResult<PathBuf> {
 pub fn validate_filename(filename: &str) -> CommandResult<String> {
     // Check for empty filename
     if filename.is_empty() {
-        return Err(CommandError::InvalidInput("Filename cannot be empty".to_string()));
+        return Err(CommandError::InvalidInput(
+            "Filename cannot be empty".to_string(),
+        ));
     }
 
     // Check for path separators
@@ -69,10 +90,11 @@ pub fn validate_filename(filename: &str) -> CommandResult<String> {
     }
 
     // Check for reserved names on Windows
-    let reserved_names = ["CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4",
-                          "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2",
-                          "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"];
-    
+    let reserved_names = [
+        "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8",
+        "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
+    ];
+
     let name_upper = filename.to_uppercase();
     for reserved in reserved_names {
         if name_upper == reserved || name_upper.starts_with(&format!("{}.", reserved)) {
@@ -89,7 +111,7 @@ pub fn validate_filename(filename: &str) -> CommandResult<String> {
 /// Validates file extension
 pub fn validate_file_extension(filename: &str) -> CommandResult<()> {
     let path = Path::new(filename);
-    
+
     if let Some(ext) = path.extension() {
         let ext_str = ext.to_string_lossy().to_lowercase();
         if ALLOWED_EXTENSIONS.contains(&ext_str.as_str()) {
@@ -151,4 +173,3 @@ mod tests {
         assert_eq!(sanitize_filename("normal.txt"), "normal.txt");
     }
 }
-

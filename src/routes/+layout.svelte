@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
 	import { ui, theme, vault, toasts, nav, sync } from '$stores/app.svelte';
-	import { getWorkspaces, getFolders, seedDefaultData } from '$services/database';
+	import { getWorkspaces, getFolders, seedDefaultData, purgeOldActivities, rebuildSearchIndex } from '$services/database';
 	import ErrorBoundary from '$lib/components/ui/ErrorBoundary.svelte';
 	import { handleError } from '$lib/utils/error-handler';
 	import { logger } from '$lib/utils/logger';
@@ -81,6 +81,8 @@
 				vault.currentWorkspaceId = workspaces[0].id;
 				vault.folders = await getFolders(workspaces[0].id);
 			}
+			purgeOldActivities(90).catch(() => {});
+			rebuildSearchIndex().catch(() => {});
 			logger.info('Application initialized successfully');
 		} catch (err) {
 			handleError(err, 'Application Initialization');
@@ -132,7 +134,7 @@
 				<span class="font-bold tracking-tight" style="color: var(--text-primary); font-size: var(--text-lg);">DevVault</span>
 			</div>
 
-			<nav class="flex-1 overflow-y-auto px-3 py-3">
+			<nav class="flex-1 overflow-y-auto px-3 py-3" aria-label="Main navigation">
 				{#each navGroups as group, gi}
 					<div class="{gi > 0 ? 'mt-6' : 'mt-1'}">
 						<p class="px-4 py-2 uppercase tracking-wider font-semibold" style="color: var(--text-tertiary); font-size: var(--text-xs); letter-spacing: 0.08em;">{group.label}</p>
@@ -156,7 +158,7 @@
 
 			<div class="border-t px-4 py-3 shrink-0" style="border-color: var(--border-subtle);">
 				<div class="flex items-center justify-between">
-					<button onclick={() => theme.toggle()} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);" title="Toggle theme">
+					<button onclick={() => theme.toggle()} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);" title="Toggle theme" aria-label="Toggle theme">
 						<Icon icon={theme.resolved === 'dark' ? 'ph:sun-bold' : 'ph:moon-bold'} width={18} height={18} />
 					</button>
 					<div class="flex items-center gap-1.5 text-[11px]" style="color: var(--text-tertiary);">
@@ -177,7 +179,7 @@
 
 	<!-- Toasts -->
 	{#if toasts.toasts.length > 0}
-		<div class="fixed top-4 right-4 z-50 flex flex-col gap-3 pointer-events-none" style="max-width: 420px;">
+		<div class="fixed top-4 right-4 z-50 flex flex-col gap-3 pointer-events-none" style="max-width: 420px;" role="status" aria-live="polite">
 			{#each toasts.toasts as toast (toast.id)}
 				<div
 					class="vibrancy pointer-events-auto flex items-start gap-3 rounded-2xl border px-5 py-4 shadow-lg animate-slide-down"
@@ -194,7 +196,7 @@
 							<p class="text-xs mt-0.5" style="color: var(--text-secondary);">{toast.description}</p>
 						{/if}
 					</div>
-					<button onclick={() => toasts.remove(toast.id)} class="shrink-0 rounded-lg p-1 transition-colors" style="color: var(--text-tertiary);">
+					<button onclick={() => toasts.remove(toast.id)} class="shrink-0 rounded-lg p-1 transition-colors" style="color: var(--text-tertiary);" aria-label="Dismiss notification">
 						<Icon icon="ph:x-bold" width={14} height={14} />
 					</button>
 				</div>

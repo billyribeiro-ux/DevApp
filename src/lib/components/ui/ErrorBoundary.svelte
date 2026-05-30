@@ -21,17 +21,19 @@
 	let errorInfo = $state<string>('');
 
 	onMount(() => {
-		// Global error handler
 		const handleGlobalError = (event: ErrorEvent) => {
-			logger.error('Global error caught', event.error);
-			handleError(event.error, 'Global');
+			const err = event.error instanceof Error ? event.error : new Error(String(event.error));
+			logger.error(`Error caught in ${context}`, err);
+			handleError(event.error, context);
+			handleComponentError(err);
 			event.preventDefault();
 		};
 
-		// Unhandled promise rejection handler
 		const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-			logger.error('Unhandled promise rejection', event.reason);
-			handleError(event.reason, 'Promise');
+			const err = event.reason instanceof Error ? event.reason : new Error(String(event.reason));
+			logger.error(`Unhandled rejection in ${context}`, err);
+			handleError(event.reason, context);
+			handleComponentError(err);
 			event.preventDefault();
 		};
 

@@ -31,8 +31,8 @@
 			sync.userEmail = authEmail;
 			authEmail = '';
 			authPassword = '';
-		} catch (e: any) {
-			toasts.error('Auth Failed', e.message);
+		} catch (e: unknown) {
+			toasts.error('Auth Failed', e instanceof Error ? e.message : 'Authentication failed');
 		}
 		authLoading = false;
 	}
@@ -114,12 +114,13 @@
 						<p class="mt-0.5" style="font-size: var(--text-sm); color: var(--text-tertiary);">Choose grid or list view for files</p>
 					</div>
 					<select
+						value={ui.viewMode}
 						onchange={(e) => ui.setViewMode((e.target as HTMLSelectElement).value as 'grid' | 'list')}
 						class="input-field input-field-sm"
 						style="width: auto;"
 					>
-						<option value="grid" selected={ui.viewMode === 'grid'}>Grid</option>
-						<option value="list" selected={ui.viewMode === 'list'}>List</option>
+						<option value="grid">Grid</option>
+						<option value="list">List</option>
 					</select>
 				</div>
 				<div class="flex items-center justify-between">

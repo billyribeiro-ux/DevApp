@@ -15,6 +15,7 @@
 	let textareaRef = $state<HTMLTextAreaElement | null>(null);
 
 	let wordCount = $derived(countWords(content));
+	let isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.userAgent);
 
 	// Sync props when note changes externally
 	$effect(() => {
@@ -285,7 +286,7 @@
 		</div>
 		<div class="text-xs text-neutral-400 dark:text-neutral-500">
 			<kbd class="rounded bg-neutral-100 px-1.5 py-0.5 font-mono text-[10px] dark:bg-neutral-800">
-				{navigator?.platform?.includes('Mac') ? 'Cmd' : 'Ctrl'}+S
+				{isMac ? 'Cmd' : 'Ctrl'}+S
 			</kbd>
 			to save
 		</div>

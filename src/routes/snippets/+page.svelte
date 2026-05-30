@@ -4,6 +4,8 @@
 	import { nav, toasts } from '$stores/app.svelte';
 	import { getSnippets, createSnippet, updateSnippet, deleteSnippet } from '$services/database';
 	import { LANGUAGES } from '$config/constants';
+	import { handleError } from '$lib/utils/error-handler';
+	import ConfirmDialog from '$lib/components/ui/ConfirmDialog.svelte';
 	import type { Snippet } from '$types';
 	import { v4 as uuid } from 'uuid';
 
@@ -18,7 +20,7 @@
 	let sLanguage = $state('javascript');
 	let sDescription = $state('');
 
-	let filteredSnippets = $derived(() => {
+	let filteredSnippets = $derived.by(() => {
 		let filtered = snippets;
 		if (activeLanguage !== 'all') filtered = filtered.filter(s => s.language === activeLanguage);
 		if (searchQuery) filtered = filtered.filter(s => s.title.toLowerCase().includes(searchQuery.toLowerCase()) || s.code.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -53,25 +55,41 @@
 
 	async function handleSave() {
 		if (!sTitle.trim() || !sCode.trim()) { toasts.warning('Title and code are required'); return; }
-		if (editingSnippet) {
-			await updateSnippet(editingSnippet.id, { title: sTitle, code: sCode, language: sLanguage, description: sDescription || null });
-		} else {
-			await createSnippet({ id: uuid(), title: sTitle, code: sCode, language: sLanguage, description: sDescription || null });
-		}
-		snippets = await getSnippets();
-		showEditor = false;
-		toasts.success(editingSnippet ? 'Snippet Updated' : 'Snippet Created');
+		try {
+			if (editingSnippet) {
+				await updateSnippet(editingSnippet.id, { title: sTitle, code: sCode, language: sLanguage, description: sDescription || null });
+			} else {
+				await createSnippet({ id: uuid(), title: sTitle, code: sCode, language: sLanguage, description: sDescription || null });
+			}
+			snippets = await getSnippets();
+			showEditor = false;
+			toasts.success(editingSnippet ? 'Snippet Updated' : 'Snippet Created');
+		} catch (err) { handleError(err, 'Save Snippet'); }
 	}
 
-	async function handleDelete(id: string) {
-		await deleteSnippet(id);
-		snippets = await getSnippets();
-		toasts.success('Snippet Deleted');
+	let confirmDeleteOpen = $state(false);
+	let pendingDeleteId = $state<string | null>(null);
+
+	function requestDelete(id: string) {
+		pendingDeleteId = id;
+		confirmDeleteOpen = true;
+	}
+
+	async function handleDelete() {
+		if (!pendingDeleteId) return;
+		const id = pendingDeleteId;
+		pendingDeleteId = null;
+		try {
+			await deleteSnippet(id);
+			snippets = await getSnippets();
+			toasts.success('Snippet Deleted');
+		} catch (err) { handleError(err, 'Delete Snippet'); }
 	}
 
 	onMount(async () => {
 		nav.navigate('/snippets');
-		snippets = await getSnippets();
+		try { snippets = await getSnippets(); }
+		catch (err) { handleError(err, 'Load Snippets'); }
 	});
 </script>
 
@@ -123,7 +141,7 @@
 			</div>
 		{:else}
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-				{#each filteredSnippets() as snippet (snippet.id)}
+				{#each filteredSnippets as snippet (snippet.id)}
 					<div class="group rounded-2xl border overflow-hidden transition-all duration-150 hover:shadow-md" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
 						<div class="flex items-center justify-between px-5 py-4 border-b" style="border-color: var(--border-subtle);">
 							<div class="flex items-center gap-2.5 min-w-0">
@@ -141,13 +159,13 @@
 							<span style="font-size: var(--text-xs); color: var(--text-tertiary);">Used {snippet.usage_count}x</span>
 							<div class="flex gap-1">
 								<button onclick={() => startEdit(snippet)} class="rounded-xl p-1.5" style="color: var(--text-tertiary);"><Icon icon="ph:pencil" width={14} height={14} /></button>
-								<button onclick={() => handleDelete(snippet.id)} class="rounded-xl p-1.5" style="color: var(--text-tertiary);"><Icon icon="ph:trash" width={14} height={14} /></button>
+								<button onclick={() => requestDelete(snippet.id)} class="rounded-xl p-1.5" style="color: var(--text-tertiary);"><Icon icon="ph:trash" width={14} height={14} /></button>
 							</div>
 						</div>
 					</div>
 				{/each}
 			</div>
-			{#if filteredSnippets().length === 0}
+			{#if filteredSnippets.length === 0}
 				<div class="flex flex-col items-center justify-center py-24">
 					<Icon icon="ph:code" width={56} height={56} style="color: var(--text-tertiary); opacity: 0.3;" />
 					<p class="mt-4 text-sm" style="color: var(--text-tertiary);">No snippets yet</p>
@@ -157,3 +175,12 @@
 		{/if}
 	</div>
 </div>
+
+<ConfirmDialog
+	bind:open={confirmDeleteOpen}
+	title="Delete Snippet"
+	description="This snippet will be moved to trash."
+	confirmLabel="Delete"
+	variant="danger"
+	onconfirm={handleDelete}
+/>

@@ -25,12 +25,12 @@
   let isEditing = $derived(snippet !== null);
   let canSave = $derived(title.trim().length > 0 && code.trim().length > 0);
 
-  let lineNumbers = $derived(() => {
+  let lineNumbers = $derived.by(() => {
     const count = code.split('\n').length;
     return Array.from({ length: Math.max(count, 1) }, (_, i) => i + 1);
   });
 
-  let previewLines = $derived(() => {
+  let previewLines = $derived.by(() => {
     return code.split('\n').slice(0, 20);
   });
 
@@ -197,7 +197,7 @@
                 bg-[var(--bg-surface)]"
               aria-hidden="true"
             >
-              {#each lineNumbers() as num}
+              {#each lineNumbers as num}
                 <div class="text-[11px] leading-[1.625rem] text-[var(--text-tertiary)] font-mono tabular-nums">
                   {num}
                 </div>
@@ -268,7 +268,7 @@
                   class="px-3 py-2.5 text-[11px] leading-relaxed text-[var(--text-secondary)]
                     bg-[var(--bg-surface-raised)] overflow-hidden font-mono whitespace-pre
                     max-h-64"
-                ><code>{previewLines().join('\n')}</code></pre>
+                ><code>{previewLines.join('\n')}</code></pre>
                 {#if code.split('\n').length > 20}
                   <div class="px-3 py-1.5 text-[9px] text-[var(--text-tertiary)] text-center border-t border-[var(--border-subtle)]">
                     Showing first 20 of {code.split('\n').length} lines

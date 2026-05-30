@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
   import Icon from '@iconify/svelte';
   import type { Snippet } from '$types';
 
@@ -43,7 +44,7 @@
 
   let langColor = $derived(LANGUAGE_COLORS[snippet.language] ?? '#71717a');
 
-  let codePreview = $derived(() => {
+  let codePreview = $derived.by(() => {
     const lines = snippet.code.split('\n');
     return lines.slice(0, 6).join('\n');
   });
@@ -62,6 +63,10 @@
       copyLabel = 'Copy';
     }, 2000);
   }
+
+  onDestroy(() => {
+    if (copyTimeout) clearTimeout(copyTimeout);
+  });
 
   function handleEdit() {
     onedit(snippet.id);
@@ -153,7 +158,7 @@
     <pre
       class="px-4 py-3 text-xs leading-relaxed text-[var(--text-secondary)] bg-[var(--bg-surface-raised)]
         overflow-hidden font-mono whitespace-pre"
-    ><code>{codePreview()}</code></pre>
+    ><code>{codePreview}</code></pre>
 
     {#if hasMoreLines}
       <div class="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[var(--bg-surface-raised)] to-transparent

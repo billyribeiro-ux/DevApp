@@ -1,9 +1,11 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import Icon from '@iconify/svelte';
-	import { nav, toasts } from '$stores/app.svelte';
-	import { getNotes, createNote, updateNote, deleteNote } from '$services/database';
+	import { nav, toasts, vault } from '$stores/app.svelte';
+	import { getNotes, createNote, updateNote, deleteNote, getFolders } from '$services/database';
 	import { formatRelativeDate, countWords } from '$utils/formatters';
+	import { handleError } from '$lib/utils/error-handler';
+	import ConfirmDialog from '$lib/components/ui/ConfirmDialog.svelte';
 	import type { Note } from '$types';
 	import { v4 as uuid } from 'uuid';
 
@@ -13,6 +15,9 @@
 	let editContent = $state('');
 	let unsaved = $state(false);
 	let searchQuery = $state('');
+	let notesFolderId = $state<string | null>(null);
+	let confirmDeleteOpen = $state(false);
+	let pendingDeleteId = $state<string | null>(null);
 
 	let activeNote = $derived(notes.find(n => n.id === activeNoteId) ?? null);
 	let filteredNotes = $derived(
@@ -22,37 +27,56 @@
 	);
 	let wordCount = $derived(countWords(editContent));
 
-	let saveTimeout: ReturnType<typeof setTimeout>;
+	let saveTimeout: ReturnType<typeof setTimeout> | undefined;
 
 	function autoSave() {
 		clearTimeout(saveTimeout);
 		unsaved = true;
+		const noteId = activeNoteId;
+		const title = editTitle;
+		const content = editContent;
+		const wc = wordCount;
 		saveTimeout = setTimeout(async () => {
-			if (activeNoteId) {
-				await updateNote(activeNoteId, {
-					title: editTitle || 'Untitled Note',
-					content_text: editContent,
-					content_json: JSON.stringify({ text: editContent }),
-					word_count: wordCount
-				});
-				unsaved = false;
-				notes = await getNotes();
+			if (noteId) {
+				try {
+					await updateNote(noteId, {
+						title: title || 'Untitled Note',
+						content_text: content,
+						content_json: JSON.stringify({ text: content }),
+						word_count: wc
+					});
+					if (activeNoteId === noteId) unsaved = false;
+					notes = await getNotes();
+				} catch (err) { handleError(err, 'Auto-save'); }
 			}
 		}, 1000);
 	}
 
+	onDestroy(() => {
+		clearTimeout(saveTimeout);
+	});
+
 	async function handleCreate() {
-		const id = uuid();
-		await createNote({ id, folder_id: 'default', title: 'Untitled Note', content_text: '', word_count: 0 });
-		notes = await getNotes();
-		selectNote(id);
-		toasts.success('Note Created');
+		try {
+			let folderId = notesFolderId;
+			if (!folderId) {
+				const notesFolder = vault.folders.find(f => f.folder_type === 'notes' && f.is_deleted === 0);
+				folderId = notesFolder?.id ?? vault.folders[0]?.id;
+			}
+			if (!folderId) { toasts.error('No folder available', 'Create a folder first'); return; }
+
+			const id = uuid();
+			await createNote({ id, folder_id: folderId, title: 'Untitled Note', content_text: '', word_count: 0 });
+			notes = await getNotes();
+			selectNote(id);
+			toasts.success('Note Created');
+		} catch (err) { handleError(err, 'Create Note'); }
 	}
 
 	function selectNote(id: string) {
 		if (unsaved && activeNoteId) {
-			// Save current before switching
-			updateNote(activeNoteId, { title: editTitle, content_text: editContent, word_count: wordCount });
+			clearTimeout(saveTimeout);
+			updateNote(activeNoteId, { title: editTitle, content_text: editContent, word_count: wordCount }).catch(err => handleError(err, 'Save note'));
 		}
 		activeNoteId = id;
 		const note = notes.find(n => n.id === id);
@@ -63,29 +87,41 @@
 		}
 	}
 
-	async function handleDelete(id: string) {
-		await deleteNote(id);
-		if (activeNoteId === id) {
-			activeNoteId = null;
-			editTitle = '';
-			editContent = '';
-		}
-		notes = await getNotes();
-		toasts.success('Note Deleted');
+	function requestDelete(id: string) {
+		pendingDeleteId = id;
+		confirmDeleteOpen = true;
+	}
+
+	async function handleDelete() {
+		if (!pendingDeleteId) return;
+		const id = pendingDeleteId;
+		pendingDeleteId = null;
+		try {
+			await deleteNote(id);
+			if (activeNoteId === id) {
+				activeNoteId = null;
+				editTitle = '';
+				editContent = '';
+			}
+			notes = await getNotes();
+			toasts.success('Note Deleted');
+		} catch (err) { handleError(err, 'Delete Note'); }
 	}
 
 	async function handleSave() {
 		if (!activeNoteId) return;
 		clearTimeout(saveTimeout);
-		await updateNote(activeNoteId, {
-			title: editTitle || 'Untitled Note',
-			content_text: editContent,
-			content_json: JSON.stringify({ text: editContent }),
-			word_count: wordCount
-		});
-		unsaved = false;
-		notes = await getNotes();
-		toasts.success('Note Saved');
+		try {
+			await updateNote(activeNoteId, {
+				title: editTitle || 'Untitled Note',
+				content_text: editContent,
+				content_json: JSON.stringify({ text: editContent }),
+				word_count: wordCount
+			});
+			unsaved = false;
+			notes = await getNotes();
+			toasts.success('Note Saved');
+		} catch (err) { handleError(err, 'Save Note'); }
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
@@ -107,7 +143,7 @@
 		nav.navigate('/notes');
 		try {
 			notes = await getNotes();
-		} catch (e) { console.error(e); }
+		} catch (err) { handleError(err, 'Load Notes'); }
 	});
 </script>
 
@@ -167,7 +203,7 @@
 				</div>
 				<div class="flex items-center gap-2">
 					<button onclick={handleSave} class="btn-primary rounded-xl px-4 py-2">Save</button>
-					<button onclick={() => handleDelete(activeNote!.id)} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);">
+					<button onclick={() => requestDelete(activeNote!.id)} class="rounded-xl p-2 transition-colors" style="color: var(--text-tertiary);" aria-label="Delete note">
 						<Icon icon="ph:trash" width={18} height={18} />
 					</button>
 				</div>
@@ -209,6 +245,15 @@
 		{/if}
 	</div>
 </div>
+
+<ConfirmDialog
+	bind:open={confirmDeleteOpen}
+	title="Delete Note"
+	description="This note will be moved to trash. You can restore it later."
+	confirmLabel="Delete"
+	variant="danger"
+	onconfirm={handleDelete}
+/>
 
 <style>
 	button:hover { background: var(--bg-card-hover); }

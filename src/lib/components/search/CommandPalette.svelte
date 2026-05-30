@@ -142,7 +142,7 @@
   let inputEl: HTMLInputElement | undefined = $state(undefined);
   let panelEl: HTMLDivElement | undefined = $state(undefined);
 
-  let filteredCommands = $derived(() => {
+  let filteredCommands = $derived.by(() => {
     if (!query.trim()) return COMMANDS;
     const q = query.toLowerCase().trim();
     return COMMANDS.filter(
@@ -153,12 +153,11 @@
     );
   });
 
-  let groupedCommands = $derived(() => {
-    const commands = filteredCommands();
+  let groupedCommands = $derived.by(() => {
     const groups: { category: string; items: CommandAction[] }[] = [];
 
     for (const cat of CATEGORY_ORDER) {
-      const items = commands.filter((c) => c.category === cat);
+      const items = filteredCommands.filter((c) => c.category === cat);
       if (items.length > 0) {
         groups.push({ category: cat, items });
       }
@@ -167,8 +166,8 @@
     return groups;
   });
 
-  let flatResults = $derived(() => {
-    return groupedCommands().flatMap((g) => g.items);
+  let flatResults = $derived.by(() => {
+    return groupedCommands.flatMap((g) => g.items);
   });
 
   // Reset selection index when query changes
@@ -207,7 +206,7 @@
   });
 
   function handleKeydown(e: KeyboardEvent) {
-    const results = flatResults();
+    const results = flatResults;
 
     switch (e.key) {
       case 'ArrowDown':
@@ -253,7 +252,7 @@
   }
 
   function getItemGlobalIndex(cmd: CommandAction): number {
-    return flatResults().indexOf(cmd);
+    return flatResults.indexOf(cmd);
   }
 </script>
 
@@ -296,7 +295,7 @@
 
       <!-- Results -->
       <div class="max-h-80 overflow-y-auto py-2">
-        {#each groupedCommands() as group (group.category)}
+        {#each groupedCommands as group (group.category)}
           <div class="px-3 pt-2 pb-1">
             <span class="text-[10px] font-semibold text-[var(--text-tertiary)] uppercase tracking-wider px-1">
               {group.category}
@@ -338,7 +337,7 @@
         {/each}
 
         <!-- No results -->
-        {#if filteredCommands().length === 0}
+        {#if filteredCommands.length === 0}
           <div class="px-4 py-8 text-center">
             <Icon icon="ph:magnifying-glass" class="text-2xl text-[var(--text-tertiary)] mx-auto mb-2" />
             <p class="text-sm text-[var(--text-secondary)]">No commands found</p>
@@ -365,7 +364,7 @@
           </span>
         </div>
         <span class="text-[10px] text-[var(--text-tertiary)]">
-          {filteredCommands().length} commands
+          {filteredCommands.length} commands
         </span>
       </div>
     </div>

@@ -221,7 +221,7 @@ export interface SyncQueueItem {
   id: string;
   entity_type: string;
   entity_id: string;
-  action: string;
+  action: 'upsert' | 'delete';
   payload: string | null;
   status: string;
   retry_count: number;

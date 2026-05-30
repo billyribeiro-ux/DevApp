@@ -18,6 +18,7 @@ export async function getDb(): Promise<Database> {
 		try {
 			logger.info('Initializing database connection');
 			db = await Database.load(DB_NAME);
+			await db.execute('PRAGMA foreign_keys = ON');
 			logger.info('Database connection established');
 		} catch (error) {
 			logger.error('Failed to initialize database', error as Error);
@@ -103,6 +104,28 @@ export async function transaction<T>(
 	}
 }
 
+const ALLOWED_TABLES = new Set([
+	'workspace', 'folder', 'file', 'note', 'prompt',
+	'reminder', 'course', 'course_section', 'course_lesson',
+	'snippet', 'tag', 'sync_queue', 'activity',
+]);
+
+const IDENTIFIER_RE = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+
+function validateIdentifier(name: string): string {
+	if (!IDENTIFIER_RE.test(name)) {
+		throw new AppError(ErrorCode.VALIDATION_FAILED, `Invalid identifier: ${name}`);
+	}
+	return name;
+}
+
+function validateTable(table: string): string {
+	if (!ALLOWED_TABLES.has(table)) {
+		throw new AppError(ErrorCode.VALIDATION_FAILED, `Disallowed table: ${table}`);
+	}
+	return table;
+}
+
 /**
  * Batch insert with transaction support
  */
@@ -111,9 +134,10 @@ export async function batchInsert<T extends Record<string, unknown>>(
 	records: T[]
 ): Promise<void> {
 	if (records.length === 0) return;
+	validateTable(table);
 
 	await transaction(async (db) => {
-		const keys = Object.keys(records[0]);
+		const keys = Object.keys(records[0]).map(validateIdentifier);
 		const placeholders = keys.map((_, i) => `$${i + 1}`).join(', ');
 		const query = `INSERT INTO ${table} (${keys.join(', ')}) VALUES (${placeholders})`;
 
@@ -135,12 +159,14 @@ export async function batchUpdate<T extends Record<string, unknown>>(
 	idKey: keyof T = 'id'
 ): Promise<void> {
 	if (records.length === 0) return;
+	validateTable(table);
+	const safeIdKey = validateIdentifier(String(idKey));
 
 	await transaction(async (db) => {
 		for (const record of records) {
-			const keys = Object.keys(record).filter((k) => k !== idKey);
+			const keys = Object.keys(record).filter((k) => k !== idKey).map(validateIdentifier);
 			const setClause = keys.map((k, i) => `${k} = $${i + 1}`).join(', ');
-			const query = `UPDATE ${table} SET ${setClause} WHERE ${String(idKey)} = $${keys.length + 1}`;
+			const query = `UPDATE ${table} SET ${setClause} WHERE ${safeIdKey} = $${keys.length + 1}`;
 			const values = [...keys.map((k) => record[k]), record[idKey]];
 			await db.execute(query, values);
 		}
@@ -157,6 +183,7 @@ export async function safeDelete(
 	id: string,
 	soft: boolean = true
 ): Promise<void> {
+	validateTable(table);
 	const d = await getDb();
 
 	if (soft) {

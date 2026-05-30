@@ -3,7 +3,7 @@
   import { vault, sync } from '$stores/app.svelte';
   import { formatFileSize } from '$utils/formatters';
 
-  let currentFolderPath = $derived(() => {
+  let currentFolderPath = $derived.by(() => {
     if (!vault.currentFolder) return 'DevVault';
     const folder = vault.currentFolder;
     return folder.name;
@@ -11,7 +11,7 @@
 
   let fileCount = $derived(vault.files.length);
 
-  let storageUsed = $derived(() => {
+  let storageUsed = $derived.by(() => {
     return vault.files.reduce((acc, f) => acc + (f.size_bytes ?? 0), 0);
   });
 
@@ -62,7 +62,7 @@
       height={14}
       style="color: var(--text-tertiary); flex-shrink: 0;"
     />
-    <span class="truncate">{currentFolderPath()}</span>
+    <span class="truncate">{currentFolderPath}</span>
   </div>
 
   <!-- Center: File count -->
@@ -108,7 +108,7 @@
         height={14}
         style="color: var(--text-tertiary); flex-shrink: 0;"
       />
-      <span>{formatFileSize(storageUsed())}</span>
+      <span>{formatFileSize(storageUsed)}</span>
     </div>
   </div>
 </footer>

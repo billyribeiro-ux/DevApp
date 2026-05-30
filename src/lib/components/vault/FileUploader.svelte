@@ -180,9 +180,8 @@
         updateEntry(entry.id, { progress: 30 });
 
         const vaultPath = await invoke<string>('get_vault_path');
-        const destFolder = `${vaultPath}/${folderId}`;
-        await invoke('ensure_directory', { path: destFolder });
-        const destPath = `${destFolder}/${entry.name}`;
+        await invoke('ensure_directory', { path: folderId });
+        const destPath = `${vaultPath}/${folderId}/${entry.name}`;
         await writeFile(destPath, new Uint8Array(arrayBuf));
         updateEntry(entry.id, { progress: 90 });
 

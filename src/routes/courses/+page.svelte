@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
-	import { nav, toasts } from '$stores/app.svelte';
+	import { nav, toasts, vault } from '$stores/app.svelte';
 	import { getCourses, createCourse, updateCourse, deleteCourse } from '$services/database';
 	import { COURSE_PLATFORMS } from '$config/constants';
 	import { getStatusColor } from '$utils/formatters';
+	import { handleError } from '$lib/utils/error-handler';
+	import ConfirmDialog from '$lib/components/ui/ConfirmDialog.svelte';
 	import type { Course } from '$types';
 	import { v4 as uuid } from 'uuid';
 
@@ -12,6 +14,8 @@
 	let activeFilter = $state('all');
 	let showForm = $state(false);
 	let editingCourse = $state<Course | null>(null);
+	let confirmDeleteOpen = $state(false);
+	let pendingDeleteId = $state<string | null>(null);
 
 	let cName = $state('');
 	let cInstructor = $state('');
@@ -19,7 +23,7 @@
 	let cUrl = $state('');
 	let cDescription = $state('');
 
-	let filteredCourses = $derived(() => {
+	let filteredCourses = $derived.by(() => {
 		if (activeFilter === 'all') return courses;
 		return courses.filter(c => c.status === activeFilter);
 	});
@@ -45,33 +49,51 @@
 
 	async function handleSave() {
 		if (!cName.trim()) { toasts.warning('Course name is required'); return; }
-		if (editingCourse) {
-			await updateCourse(editingCourse.id, { name: cName, instructor: cInstructor || null, platform: cPlatform || null, url: cUrl || null, description: cDescription || null });
-		} else {
-			await createCourse({ id: uuid(), folder_id: 'courses', name: cName, instructor: cInstructor || null, platform: cPlatform || null, url: cUrl || null, description: cDescription || null });
-		}
-		courses = await getCourses();
-		showForm = false;
-		toasts.success(editingCourse ? 'Course Updated' : 'Course Created');
+		try {
+			if (editingCourse) {
+				await updateCourse(editingCourse.id, { name: cName, instructor: cInstructor || null, platform: cPlatform || null, url: cUrl || null, description: cDescription || null });
+			} else {
+				const coursesFolder = vault.folders.find(f => f.folder_type === 'course' && f.is_deleted === 0);
+				const folderId = coursesFolder?.id ?? vault.folders[0]?.id;
+				if (!folderId) { toasts.error('No folder available'); return; }
+				await createCourse({ id: uuid(), folder_id: folderId, name: cName, instructor: cInstructor || null, platform: cPlatform || null, url: cUrl || null, description: cDescription || null });
+			}
+			courses = await getCourses();
+			showForm = false;
+			toasts.success(editingCourse ? 'Course Updated' : 'Course Created');
+		} catch (err) { handleError(err, 'Save Course'); }
 	}
 
 	async function toggleStatus(course: Course) {
-		const statuses: Course['status'][] = ['not_started', 'in_progress', 'completed', 'paused'];
-		const idx = statuses.indexOf(course.status);
-		const next = statuses[(idx + 1) % statuses.length];
-		await updateCourse(course.id, { status: next });
-		courses = await getCourses();
+		try {
+			const statuses: Course['status'][] = ['not_started', 'in_progress', 'completed', 'paused'];
+			const idx = statuses.indexOf(course.status);
+			const next = statuses[(idx + 1) % statuses.length];
+			await updateCourse(course.id, { status: next });
+			courses = await getCourses();
+		} catch (err) { handleError(err, 'Update Course Status'); }
 	}
 
-	async function handleDelete(id: string) {
-		await deleteCourse(id);
-		courses = await getCourses();
-		toasts.success('Course Deleted');
+	function requestDelete(id: string) {
+		pendingDeleteId = id;
+		confirmDeleteOpen = true;
+	}
+
+	async function handleDelete() {
+		if (!pendingDeleteId) return;
+		const id = pendingDeleteId;
+		pendingDeleteId = null;
+		try {
+			await deleteCourse(id);
+			courses = await getCourses();
+			toasts.success('Course Deleted');
+		} catch (err) { handleError(err, 'Delete Course'); }
 	}
 
 	onMount(async () => {
 		nav.navigate('/courses');
-		courses = await getCourses();
+		try { courses = await getCourses(); }
+		catch (err) { handleError(err, 'Load Courses'); }
 	});
 </script>
 
@@ -120,7 +142,7 @@
 			</div>
 		{:else}
 			<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-				{#each filteredCourses() as course (course.id)}
+				{#each filteredCourses as course (course.id)}
 					<div class="rounded-2xl border p-6 transition-all duration-150 hover:shadow-md" style="background: var(--bg-card); border-color: var(--border-default); box-shadow: var(--shadow-card);">
 						<div class="flex items-start justify-between mb-3">
 							<div>
@@ -154,7 +176,7 @@
 								<button onclick={() => startEdit(course)} class="rounded-xl p-2" style="color: var(--text-tertiary);">
 									<Icon icon="ph:pencil" width={16} height={16} />
 								</button>
-								<button onclick={() => handleDelete(course.id)} class="rounded-xl p-2" style="color: var(--text-tertiary);">
+								<button onclick={() => requestDelete(course.id)} class="rounded-xl p-2" style="color: var(--text-tertiary);">
 									<Icon icon="ph:trash" width={16} height={16} />
 								</button>
 							</div>
@@ -169,7 +191,7 @@
 					</div>
 				{/each}
 			</div>
-			{#if filteredCourses().length === 0}
+			{#if filteredCourses.length === 0}
 				<div class="flex flex-col items-center justify-center py-24">
 					<Icon icon="ph:graduation-cap" width={56} height={56} style="color: var(--text-tertiary); opacity: 0.3;" />
 					<p class="mt-4 text-sm" style="color: var(--text-tertiary);">No courses yet</p>
@@ -179,3 +201,12 @@
 		{/if}
 	</div>
 </div>
+
+<ConfirmDialog
+	bind:open={confirmDeleteOpen}
+	title="Delete Course"
+	description="This course will be moved to trash."
+	confirmLabel="Delete"
+	variant="danger"
+	onconfirm={handleDelete}
+/>
